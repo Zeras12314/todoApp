@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Spring Boot local config (recommended) ###
+application-local.properties
+application-dev.properties
+
 ### STS ###
 .apt_generated
 .classpath
