@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+@use "./app/styles/tokens.scss" as *;
+@use "./app/styles/utils.scss" as *;
+@use "./app/styles/material-overrides.scss";
+@import 'bootstrap/scss/bootstrap';
+
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-primary;
+  background: #f5f7fb;
+  color: #1a1a1a;
+    margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

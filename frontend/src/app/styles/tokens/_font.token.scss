@@ -1,0 +1,25 @@
+/* FONT FAMILY */
+$font-primary: 'Roboto', sans-serif;
+
+/* FONT SIZES */
+$text-34: 34px;
+$text-22: 22px;
+$text-20: 20px;
+$text-16: 16px;
+$text-14: 14px;
+$text-12: 12px;
+
+/* FONT WEIGHTS */
+$fw-bold: 700;
+$fw-semibold: 600;
+$fw-medium: 500;
+$fw-regular: 400;
+
+/* TYPOGRAPHY */
+$heading-lg: $fw-bold $text-34 $font-primary;
+$title: $fw-semibold $text-22 $font-primary;
+$subtitle: $fw-medium $text-20 $font-primary;
+$body: $fw-regular $text-16 $font-primary;
+$label-bold: $fw-bold $text-14 $font-primary;
+$label: $fw-regular $text-14 $font-primary;
+$caption: $fw-regular $text-12 $font-primary;

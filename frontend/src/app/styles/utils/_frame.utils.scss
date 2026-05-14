@@ -1,0 +1,13 @@
+@use '../tokens.scss' as *;
+
+.frame-low {
+  border-color: $frame-low !important;
+}
+
+.frame-high {
+  border-color: $frame-high !important;
+}
+
+.frame-critical {
+  border-color: $frame-critical !important;
+}

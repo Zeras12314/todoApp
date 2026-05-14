@@ -1,0 +1,37 @@
+@use '../tokens.scss' as *;
+/* ----------------------------------------------------------------------------- */
+/* Text Utilities */
+/* ----------------------------------------------------------------------------- */
+
+.primary-blue {
+  color: $primary-blue !important;
+}
+
+.primary-black {
+  color: $primary-black !important;
+}
+
+.secondary-text {
+  color: $secondary-grey !important;
+}
+
+.tertiary-text {
+  color: $tertiary-grey !important;
+}
+
+.white-text {
+  color: $white !important;
+}
+
+/* status text */
+.text-low {
+  color: $text-low !important;
+}
+
+.text-high {
+  color: $text-high !important;
+}
+
+.text-critical {
+  color: $text-critical !important;
+}

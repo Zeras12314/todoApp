@@ -1,0 +1,17 @@
+@use '../tokens.scss' as *;
+
+.primary-bg {
+  background-color: $primary-blue !important;
+}
+
+.low-bg {
+  background-color: $card-low !important;
+}
+
+.high-bg {
+  background-color: $card-high !important;
+}
+
+.critical-bg {
+  background-color: $card-crititcal !important;
+}
