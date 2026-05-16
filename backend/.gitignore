@@ -8,6 +8,9 @@ target/
 application-local.properties
 application-dev.properties
 
+# Spring config
+application.properties
+
 ### STS ###
 .apt_generated
 .classpath
