@@ -12,6 +12,12 @@ public class UserService {
     private UserRepository userRepo;
 
     public User saveUser(User user){
+        if (userRepo.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
         return userRepo.save(user);
     }
+
+
 }
