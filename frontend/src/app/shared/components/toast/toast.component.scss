@@ -1,0 +1,143 @@
+$radius: 10px;
+$shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+$duration: 3000ms;
+
+$colors: (
+  success: (
+    bg: #f0fdf4,
+    border: #86efac,
+    icon: #16a34a,
+    progress: #22c55e,
+    text: #14532d,
+  ),
+  error: (
+    bg: #fff1f2,
+    border: #fda4af,
+    icon: #dc2626,
+    progress: #ef4444,
+    text: #7f1d1d,
+  ),
+  warning: (
+    bg: #fffbeb,
+    border: #fcd34d,
+    icon: #d97706,
+    progress: #f59e0b,
+    text: #78350f,
+  ),
+  info: (
+    bg: #eff6ff,
+    border: #93c5fd,
+    icon: #2563eb,
+    progress: #3b82f6,
+    text: #1e3a8a,
+  ),
+);
+
+// ── Wrapper ────────────────────────────────────────────────
+.toast-wrapper {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem 1.25rem;
+  border-radius: $radius;
+  border: 1px solid transparent;
+  box-shadow: $shadow;
+  font-family: system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  overflow: hidden;
+  max-width: 380px;
+  width: calc(100vw - 3rem);
+  backdrop-filter: blur(8px);
+  animation: toast-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+// ── Type variants ──────────────────────────────────────────
+@each $type, $map in $colors {
+  .toast-wrapper--#{$type} {
+    background-color: map-get($map, bg);
+    border-color: map-get($map, border);
+    color: map-get($map, text);
+
+    .toast__icon svg {
+      color: map-get($map, icon);
+    }
+
+    .toast__progress {
+      background: map-get($map, progress);
+    }
+  }
+}
+
+// ── Icon ───────────────────────────────────────────────────
+.toast__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    display: block;
+  }
+}
+
+// ── Message ────────────────────────────────────────────────
+.toast__message {
+  flex: 1;
+  word-break: break-word;
+}
+
+// ── Close ──────────────────────────────────────────────────
+.toast__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 1px;
+  opacity: 0.45;
+  color: inherit;
+  line-height: 0;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 1; }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
+  }
+}
+
+// ── Progress bar ───────────────────────────────────────────
+.toast__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 0 0 $radius $radius;
+  transform-origin: left;
+  animation: progress-shrink $duration linear forwards;
+}
+
+// ── Keyframes ──────────────────────────────────────────────
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(110%) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes progress-shrink {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}

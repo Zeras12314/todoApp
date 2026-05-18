@@ -2,3 +2,8 @@
 @forward './/utils/cards.utils';
 @forward './utils/frame.utils';
 @forward './utils/text.utils';
+
+a{
+    cursor: pointer;
+    text-decoration: none;
+}
