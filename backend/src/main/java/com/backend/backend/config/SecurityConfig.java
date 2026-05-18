@@ -41,7 +41,7 @@ public class SecurityConfig {
         http.csrf(customizer -> customizer.disable())
         // authenticate every request
         .authorizeHttpRequests(request -> request
-                .requestMatchers("/register", "/login")
+                .requestMatchers("/api/register", "/api/login", "/api/hello")
                 .permitAll()
                 .anyRequest().authenticated())
         // stateless session

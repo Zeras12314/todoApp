@@ -12,8 +12,8 @@ public class RegisterRequest {
 
     @NotBlank(message = "Password is required")
     @Pattern(
-            regexp = "^[A-Za-z0-9 !#()_\\-]+$",
-            message = "Password contains invalid characters"
+            regexp = "^(?=.*[0-9!#()_\\-])[A-Za-z0-9 !#()_\\-]+$",
+            message = "Password must contain at least one number or symbol (!#()_-) and may only include letters, numbers, spaces, and !#()_-"
     )
     private String password;
 }
