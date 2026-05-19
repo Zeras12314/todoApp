@@ -13,6 +13,7 @@ import {
 
 import { catchError, map, mergeMap, of, tap } from "rxjs";
 import { ToastService } from "../../services/toast.service";
+import { Router } from "@angular/router";
 
 @Injectable()
 export class AuthEffects {
@@ -20,6 +21,7 @@ export class AuthEffects {
   authService = inject(AuthService);
   actions$ = inject(Actions);
   toastService = inject(ToastService);
+  router = inject(Router)
 
   // =========================
   // LOGIN
@@ -64,9 +66,7 @@ export class AuthEffects {
 
         tap(({ message }) => {
           this.toastService.success(message);
-
-          // optional: move to app after login
-          this.toastService.success('Login success');
+          this.router.navigate(['/todos']);
         })
       ),
     { dispatch: false }
@@ -122,12 +122,10 @@ export class AuthEffects {
   registerSuccessToast$ = createEffect(() =>
     this.actions$.pipe(
       ofType(registerSuccess),
-
       tap(({ message }) => {
         this.toastService.success(message);
       }),
-
-      map(() => setAuthMode({ mode: 'success' }))
+      map(() => setAuthMode({ mode: 'success' }))  // dispatch mode change
     )
   );
 

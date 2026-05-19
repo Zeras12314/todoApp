@@ -46,15 +46,14 @@ type AuthMode = 'login' | 'signup' | 'success';
 })
 export class RegisterComponent {
 
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   hide = true;
 
-  // ✅ convert store → signal (NO subscriptions needed)
+  // 
   mode = signal<AuthMode>('signup');
 
   constructor() {
-    // sync NgRx store → signal
     this.store.select(selectAuthMode).subscribe(m => this.mode.set(m));
 
     // react to mode changes
@@ -87,7 +86,7 @@ export class RegisterComponent {
     this.store.dispatch(setAuthMode({ mode: next }));
   }
 
-  // update validators (clean + reactive)
+  // update validators
   private updatePasswordValidators() {
     const control = this.userForm.get('password');
     if (!control) return;

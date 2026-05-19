@@ -22,3 +22,7 @@ export const selectAuthMode = createSelector(
   selectAuth,
   (state): AuthMode => state.mode
 );
+
+export const selectIsAuthenticated = createSelector(
+  selectToken, token => !!token
+);

@@ -3,8 +3,8 @@ import { noAuthGuard } from './guards/no-auth.guard';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'register', pathMatch: 'full' },
-    { path: 'register', canActivate: [noAuthGuard], loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: 'login', canActivate: [noAuthGuard], loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
     {
         path: '',
         canActivate: [authGuard],
@@ -17,5 +17,5 @@ export const routes: Routes = [
             { path: 'todos/:id/edit', loadComponent: () => import('./features/todos/todo-form/todo-form.component').then(m => m.TodoFormComponent) },
         ]
     },
-    { path: '**', redirectTo: 'register' }
+    { path: '**', redirectTo: 'login' }
 ];
