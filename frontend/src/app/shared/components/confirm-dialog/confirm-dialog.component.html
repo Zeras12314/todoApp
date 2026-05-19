@@ -1,3 +1,10 @@
-@if (false) {
-  <p>confirm-dialog works!</p>
-}
+<h2 mat-dialog-title>Sign out</h2>
+
+<mat-dialog-content>
+  Are you sure you want to sign out? All unsaved changes will be lost.
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="logout()">Sign out</button>
+</mat-dialog-actions>

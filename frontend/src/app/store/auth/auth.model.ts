@@ -5,4 +5,5 @@ export interface AuthState {
   loading: boolean;
   error: string | null;
   mode: AuthMode;
+  username: string
 }

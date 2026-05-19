@@ -51,7 +51,8 @@ public class UserController {
                             user.getUsername(), user.getPassword()
                     ));
             if (authentication.isAuthenticated()) {
-                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getUsername())));
+                return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getUsername()),
+                        "username", user.getUsername()));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login failed"));
         } catch (Exception e) {

@@ -11,6 +11,7 @@ export const loginSuccess = createAction(
   props<{
     token: string;
     message: string;
+    username: string
   }>()
 );
 

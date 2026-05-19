@@ -5,6 +5,7 @@ import {
   login,
   loginFailure,
   loginSuccess,
+  logout,
   register,
   registerFailure,
   registerSuccess,
@@ -40,7 +41,8 @@ export class AuthEffects {
           map((res: any) =>
             loginSuccess({
               token: res.token,
-              message: res.message || 'Login successful'
+              message: res.message || 'Login successful',
+              username: res.username
             })
           ),
 
@@ -140,4 +142,16 @@ export class AuthEffects {
       ),
     { dispatch: false }
   );
+
+  // LOGOUT
+  logout$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(logout),
+      tap(() => {
+        localStorage.removeItem('todo_token');
+        localStorage.removeItem('username');
+         this.router.navigate(['/login']);
+      })
+    ),
+    { dispatch: false })
 }
