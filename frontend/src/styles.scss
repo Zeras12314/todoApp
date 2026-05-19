@@ -1,7 +1,7 @@
 @use "./app/styles/tokens.scss" as *;
 @use "./app/styles/utils.scss" as *;
 @use "./app/styles/material-overrides.scss";
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap';
 
 
 /* RESET */
@@ -13,8 +13,8 @@
 
 body {
   font-family: $font-primary;
-  background: #f5f7fb;
-  color: #1a1a1a;
+  background: $white;
+  color: $primary-black;
     margin: 0;
   padding: 0;
   box-sizing: border-box;

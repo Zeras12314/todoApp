@@ -150,8 +150,9 @@ export class AuthEffects {
       tap(() => {
         localStorage.removeItem('todo_token');
         localStorage.removeItem('username');
-         this.router.navigate(['/login']);
-      })
+        window.location.href = '/login';
+      }),
     ),
-    { dispatch: false })
+    { dispatch: false }
+  );
 }

@@ -1,0 +1,12 @@
+@use '../../styles/tokens.scss' as *;
+
+.main-wrapper {
+//   background-color: $bg-platinum;
+  padding-block: 24px;
+    border-radius: 12px;
+  main {
+     background-color: $alice-blue;
+    padding: 24px;
+    border-radius: 12px;
+  }
+}

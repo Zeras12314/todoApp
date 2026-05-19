@@ -4,7 +4,18 @@
   Are you sure you want to sign out? All unsaved changes will be lost.
 </mat-dialog-content>
 
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="logout()">Sign out</button>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>
+    Cancel
+  </button>
+
+  <button
+    mat-flat-button
+    color="primary"
+    mat-dialog-close
+    cdkFocusInitial
+    (click)="logout()"
+  >
+    Sign out
+  </button>
 </mat-dialog-actions>
