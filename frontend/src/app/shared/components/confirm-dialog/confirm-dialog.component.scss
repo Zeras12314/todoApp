@@ -1,7 +1,8 @@
 @use '@angular/material' as mat;
+@use '../../../styles/tokens.scss' as *;
 
 button {
-  margin-right: 8px;
+  margin-right: $space-2;
 }
 
 :host {
@@ -9,10 +10,10 @@ button {
 }
 
 mat-dialog-content {
-  padding-inline: 24px !important;
+  padding-inline: $space-6 !important;
 }
 
 mat-dialog-actions {
-  padding-inline: 24px !important;
+  padding-inline: $space-6 !important;
 }
 
