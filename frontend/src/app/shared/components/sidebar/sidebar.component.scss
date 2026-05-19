@@ -2,14 +2,14 @@
 @use '../../../styles/utils.scss' as *;
 
 .sidebar {
-  width: 100%;        // ← let col-2 control the width
+  width: 100%;        
   height: 100vh;
   background-color: $white;
   border-right: 1px solid #e9ecef;
   display: flex;
   flex-direction: column;
   padding: $space-4;
-  position: sticky;   // ← stays in view on scroll but stays in flow
+  position: sticky;   
   top: 0;
 
   &-wrapper {
@@ -39,11 +39,11 @@
     gap: $space-5;
   }
 
-  // USER SECTION (FIXED VERTICAL CENTERING)
+  // USER SECTION
 &-content-user {
   display: flex;
-  flex-direction: column;  // ← stack vertically
-  align-items: center;     // ← center horizontally
+  flex-direction: column;  
+  align-items: center;     
   gap: $space-2;
   border-radius: $space-3;
   min-height: $space-15;
@@ -62,7 +62,7 @@
     font-weight: $fw-medium;
     color: $primary-black;
     line-height: 1;
-    text-align: center;  // ← center the text under the image
+    text-align: center;  
   }
 }
 
