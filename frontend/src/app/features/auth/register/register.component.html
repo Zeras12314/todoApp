@@ -1,6 +1,5 @@
 <div class="register container-fluid">
   <div class="row min-vh-100">
-
     <!-- LEFT SECTION -->
     <div class="col-lg-6 d-none d-lg-block register-branding p-0">
       <img src="/wallpaper.svg" alt="wallpaper" class="register-branding-bg" />
@@ -9,18 +8,15 @@
 
     <!-- RIGHT SECTION -->
     <div class="col-12 col-lg-6 register-form px-0">
-
       <div class="register-form-header d-lg-none">
         <img src="/brand-logo.svg" alt="logo" />
       </div>
 
       <div class="register-form-container">
-
         <!-- TITLE -->
         <h2>{{ title }}</h2>
 
         <form class="auth-form" [formGroup]="userForm">
-
           <!-- USERNAME -->
           <mat-form-field appearance="outline" class="full-width mb-2">
             <mat-label>Username</mat-label>
@@ -30,7 +26,6 @@
             @if (username?.hasError('required')) {
               <mat-error>Username is required</mat-error>
             }
-
           </mat-form-field>
 
           <!-- PASSWORD -->
@@ -59,24 +54,28 @@
             <!-- SIGNUP ERRORS ONLY -->
             @if (mode() === 'signup' && password?.hasError('minlength')) {
               <mat-error>Password must be at least 8 characters</mat-error>
-            }
-
-            @if (mode() === 'signup' && password?.hasError('pattern')) {
-              <mat-error>Only letters, numbers, spaces, !#()_-</mat-error>
+            } @else if (mode() === 'signup' && password?.hasError('pattern')) {
+              <mat-error>
+                Password must contain at least 1 uppercase letter and only use letters, numbers,
+                spaces, !#()_-
+              </mat-error>
             }
 
             <!-- SUCCESS -->
             @if (mode() === 'signup' && password?.valid && password?.value) {
-              <mat-hint class="password-strong text-primary">
-                Password strength: Strong
-              </mat-hint>
+              <mat-hint class="password-strong text-primary"> Password strength: Strong </mat-hint>
             }
-
           </mat-form-field>
 
           <!-- VALIDATION CHECKLIST -->
           @if (mode() === 'signup') {
             <div class="validation-list">
+              <div class="validation-list-item" [class.valid]="password?.value?.length > 0" >
+                <mat-icon>
+                  {{  !password.hasError('required') ? 'check' : 'circle' }}
+                </mat-icon>
+                <span>Cannot contain your name or email address</span>
+              </div>
 
               <div class="validation-list-item" [class.valid]="password?.value?.length >= 8">
                 <mat-icon>
@@ -85,47 +84,32 @@
                 <span>At least 8 characters</span>
               </div>
 
-              <div class="validation-list-item" [class.valid]="/[A-Z]/.test(password?.value || '')">
+              <div
+                class="validation-list-item"
+                [class.valid]="/[0-9!#()_\-]/.test(password?.value || '')"
+              >
                 <mat-icon>
-                  {{ /[A-Z]/.test(password?.value || '') ? 'check' : 'circle' }}
+                  {{ /[0-9!#()_\-]/.test(password?.value || '') ? 'check' : 'circle' }}
                 </mat-icon>
-                <span>Contains uppercase letter</span>
+                <span>Contains a number or symbol</span>
               </div>
-
-              <div class="validation-list-item" [class.valid]="/[!#()_\-]/.test(password?.value || '')">
-                <mat-icon>
-                  {{ /[!#()_\-]/.test(password?.value || '') ? 'check' : 'circle' }}
-                </mat-icon>
-                <span>Contains special character</span>
-              </div>
-
             </div>
           }
 
           <!-- CTA -->
-          <button
-            mat-raised-button
-            color="primary"
-            class="submit-btn"
-            (click)="submit()"
-          >
+          <button mat-raised-button color="primary" class="submit-btn" (click)="submit()">
             {{ mode() === 'login' ? 'Sign in' : 'Sign up' }}
           </button>
-
         </form>
 
         <!-- SWITCH MODE -->
         <div class="text-center">
           <h3 class="primary-black">
-
-            {{ mode() === 'login'
-              ? "Don't have an account?"
-              : 'Already have an account?' }}
+            {{ mode() === 'login' ? "Don't have an account?" : 'Already have an account?' }}
 
             <a (click)="toggleMode()" class="primary-blue">
               {{ mode() === 'login' ? 'Sign up' : 'Sign in' }}
             </a>
-
           </h3>
         </div>
 
@@ -138,8 +122,9 @@
 
         <!-- SOCIAL LOGIN -->
         <div class="cta cta-wrapper">
-
-          <button class="cta-google btn w-100 mb-2 d-flex align-items-center justify-content-center gap-2">
+          <button
+            class="cta-google btn w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
+          >
             <img src="Icons/Google.svg" width="18" height="18" alt="google logo" />
             <span>Continue with Google</span>
           </button>
@@ -148,9 +133,7 @@
             <img src="Icons/Facebook.svg" width="18" height="18" alt="facebook logo" />
             <span>Continue with Facebook</span>
           </button>
-
         </div>
-
       </div>
     </div>
   </div>

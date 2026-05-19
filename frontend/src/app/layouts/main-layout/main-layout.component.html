@@ -1,6 +1,12 @@
 <div class="layout">
-  <app-sidebar></app-sidebar>
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
+  <div class="row">
+    <div class="col-lg-2 col-md-3 d-none d-md-block">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div class="col-9 col-lg-10">
+      <main class="content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
 </div>

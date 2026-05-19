@@ -1,0 +1,106 @@
+@use '../../../styles/tokens.scss' as *;
+@use '../../../styles/utils.scss' as *;
+
+.sidebar {
+  width: 100%;        // ← let col-2 control the width
+  height: 100vh;
+  background-color: $white;
+  border-right: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  padding: $space-4;
+  position: sticky;   // ← stays in view on scroll but stays in flow
+  top: 0;
+
+  &-wrapper {
+    overflow-y: auto;
+  }
+
+  // HEADER
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding-bottom: $space-2;
+    margin-bottom: $space-4;
+    border-bottom: 1px solid #e9ecef;
+
+    img {
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  // CONTENT WRAPPER
+  &-content {
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+  }
+
+  // USER SECTION (FIXED VERTICAL CENTERING)
+&-content-user {
+  display: flex;
+  flex-direction: column;  // ← stack vertically
+  align-items: center;     // ← center horizontally
+  gap: $space-2;
+  border-radius: $space-3;
+  min-height: $space-15;
+  margin-bottom: $space-3;
+
+  img {
+    width: $space-20;
+    height: $space-20;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .user-details {
+    font-size: $text-20;
+    font-weight: $fw-medium;
+    color: $primary-black;
+    line-height: 1;
+    text-align: center;  // ← center the text under the image
+  }
+}
+
+  // CONTROLS / MENU
+  &-content-controls {
+    display: flex;
+    flex-direction: column;
+
+    p {
+        margin: 0;
+      display: flex;
+      align-items: center;
+      gap: $space-6;
+      padding: $space-2 $space-3;
+      border-radius: $space-2;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      img {
+        width: $space-4;
+        height: $space-4;
+        display: block;
+      }
+
+      a {
+        text-decoration: none;
+        color: $primary-black;
+        font-size: $text-14;
+        flex: 1;
+      }
+
+      &:hover {
+        background-color: $surface-hover;
+      }
+
+      &:active {
+        background-color: $surface-active;
+      }
+    }
+  }
+}

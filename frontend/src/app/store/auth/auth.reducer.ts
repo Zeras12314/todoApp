@@ -13,11 +13,19 @@ export const authReducer = createReducer(
         error: null
     })),
 
-    on(loginSuccess, (state, { token }) => ({
-        ...state,
-        loading: false,
-        token
-    })),
+    on(loginSuccess, (state, { token }) => {
+        localStorage.setItem('todo_token', token);   // ← persist on login
+        return {
+            ...state,
+            loading: false,
+            token
+        };
+    }),
+
+    on(logout, () => {
+        localStorage.removeItem('todo_token');        // ← clear on logout
+        return initialAuthState;
+    }),
 
     on(loginFailure, (state, { error }) => ({
         ...state,
@@ -49,8 +57,5 @@ export const authReducer = createReducer(
         mode
     })),
 
-
-    // LOGOUT
-    on(logout, () => initialAuthState)
 )
 
