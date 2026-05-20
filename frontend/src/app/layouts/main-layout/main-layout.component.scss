@@ -1,12 +1,23 @@
 @use '../../styles/tokens.scss' as *;
 
 .main-wrapper {
-//   background-color: $bg-platinum;
-  padding-block: 24px;
-    border-radius: 12px;
+  // smaller spacing for mobile
+  padding-block: $space-4;
+  @media (min-width: 768px) {
+    padding-block: $space-6;
+  }
+
   main {
-     background-color: $alice-blue;
-    padding: 24px;
-    border-radius: 12px;
+    border-radius: 8px;
+    margin-inline: $space-4;
+
+    // mobile padding
+    padding: $space-4;
+
+    @media (min-width: 768px) {
+      padding: $space-6;
+      border-radius: $space-3;
+      background-color: $alice-blue;
+    }
   }
 }

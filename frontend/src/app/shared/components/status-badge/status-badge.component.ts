@@ -5,8 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './status-badge.component.html',
-  styleUrl: './status-badge.component.scss'
+  styleUrl: './status-badge.component.scss',
 })
-export class StatusBadgeComponent {
-
-}
+export class StatusBadgeComponent {}

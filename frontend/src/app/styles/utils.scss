@@ -2,8 +2,43 @@
 @forward './/utils/cards.utils';
 @forward './utils/frame.utils';
 @forward './utils/text.utils';
+@use '../styles/tokens.scss' as *;
 
-a{
-    cursor: pointer;
-    text-decoration: none;
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: $primary-blue !important;
+  color: $white !important;
+  border-color: $primary-blue !important;
+
+  // Hover state
+  &:hover {
+    background-color: darken($primary-blue, 8%) !important;
+    border-color: darken($primary-blue, 10%) !important;
+    color: $white !important;
+  }
+
+  // Active (clicked) state
+  &:active,
+  &.active {
+    background-color: darken($primary-blue, 12%) !important;
+    border-color: darken($primary-blue, 15%) !important;
+    transform: scale(0.98); // subtle press effect
+  }
+
+  //   // Focus state (for accessibility)
+  //   &:focus {
+  //     box-shadow: 0 0 0 0.2rem rgba($primary-blue, 0.4);
+  //   }
+
+  // Disabled state
+  &:disabled {
+    background-color: lighten($primary-blue, 20%) !important;
+    border-color: lighten($primary-blue, 20%) !important;
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
 }

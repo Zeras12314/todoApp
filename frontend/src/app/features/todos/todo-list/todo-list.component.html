@@ -1,1 +1,18 @@
-<p>todo-list works!</p>
+<!-- <ng-container *ngIf="todo$ | async as todos">
+
+  <div *ngFor="let todo of todos">
+    <h3>{{ todo.title }}</h3>
+    <p>{{ todo.dueDate | date }}</p>
+    <p>{{ todo.completed ? 'Done' : 'Pending' }}</p>
+  </div>
+
+</ng-container> -->
+
+@if (todo$ | async; as todos) {
+  @for (todo of todos; track $index) {
+    <h3>{{ todo.title }}</h3>
+    <p>{{ todo.dueDate | date }}</p>
+    <p>{{ todo.priority }}</p>
+    <p>{{ todo.status }}</p>
+  }
+}

@@ -1,6 +1,6 @@
-import { inject, Injectable } from "@angular/core";
-import { AuthService } from "../../services/auth.service";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { inject, Injectable } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   login,
   loginFailure,
@@ -9,20 +9,19 @@ import {
   register,
   registerFailure,
   registerSuccess,
-  setAuthMode
-} from "./auth.action";
+  setAuthMode,
+} from './auth.action';
 
-import { catchError, map, mergeMap, of, tap } from "rxjs";
-import { ToastService } from "../../services/toast.service";
-import { Router } from "@angular/router";
+import { catchError, map, mergeMap, of, tap } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthEffects {
-
   authService = inject(AuthService);
   actions$ = inject(Actions);
   toastService = inject(ToastService);
-  router = inject(Router)
+  router = inject(Router);
 
   // =========================
   // LOGIN
@@ -31,9 +30,8 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(login),
 
-      mergeMap(action =>
+      mergeMap((action) =>
         this.authService.login(action.username, action.password).pipe(
-
           tap((res) => {
             console.log('LOGIN RESPONSE:', res);
           }),
@@ -42,22 +40,22 @@ export class AuthEffects {
             loginSuccess({
               token: res.token,
               message: res.message || 'Login successful',
-              username: res.username
-            })
+              username: res.username,
+            }),
           ),
 
-          catchError(err => {
+          catchError((err) => {
             console.log('LOGIN ERROR:', err);
 
             return of(
               loginFailure({
-                error: err.error?.error || err.error?.message || 'Login failed'
-              })
+                error: err.error?.error || err.error?.message || 'Login failed',
+              }),
             );
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   // LOGIN SUCCESS TOAST + MODE CHANGE
@@ -69,9 +67,9 @@ export class AuthEffects {
         tap(({ message }) => {
           this.toastService.success(message);
           this.router.navigate(['/todos']);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   loginFailureToast$ = createEffect(
@@ -81,9 +79,9 @@ export class AuthEffects {
 
         tap(({ error }) => {
           this.toastService.error(error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   // =========================
@@ -93,31 +91,30 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(register),
 
-      mergeMap(action =>
+      mergeMap((action) =>
         this.authService.register(action.username, action.password).pipe(
-
           tap((res) => {
             console.log('REGISTER RESPONSE:', res);
           }),
 
           map((res: any) =>
             registerSuccess({
-              message: res.message || 'Account successfully created'
-            })
+              message: res.message || 'Account successfully created',
+            }),
           ),
 
-          catchError(err => {
+          catchError((err) => {
             console.log('REGISTER ERROR:', err);
 
             return of(
               registerFailure({
-                error: err.error?.error || err.error?.message || 'Register failed'
-              })
+                error: err.error?.error || err.error?.message || 'Register failed',
+              }),
             );
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   // REGISTER SUCCESS
@@ -127,8 +124,8 @@ export class AuthEffects {
       tap(({ message }) => {
         this.toastService.success(message);
       }),
-      map(() => setAuthMode({ mode: 'success' }))  // dispatch mode change
-    )
+      map(() => setAuthMode({ mode: 'success' })), // dispatch mode change
+    ),
   );
 
   registerFailureToast$ = createEffect(
@@ -138,21 +135,22 @@ export class AuthEffects {
 
         tap(({ error }) => {
           this.toastService.error(error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   // LOGOUT
-  logout$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(logout),
-      tap(() => {
-        localStorage.removeItem('todo_token');
-        localStorage.removeItem('username');
-        window.location.href = '/login';
-      }),
-    ),
-    { dispatch: false }
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(logout),
+        tap(() => {
+          localStorage.removeItem('todo_token');
+          localStorage.removeItem('username');
+          window.location.href = '/login';
+        }),
+      ),
+    { dispatch: false },
   );
 }

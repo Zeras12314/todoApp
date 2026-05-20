@@ -8,8 +8,6 @@ import { TodoFilterComponent } from '../../features/todos/todo-filter/todo-filte
   standalone: true,
   imports: [SidebarComponent, RouterOutlet, TodoFilterComponent],
   templateUrl: './main-layout.component.html',
-  styleUrl: './main-layout.component.scss'
+  styleUrl: './main-layout.component.scss',
 })
-export class MainLayoutComponent {
-
-}
+export class MainLayoutComponent {}

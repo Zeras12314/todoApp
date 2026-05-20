@@ -5,8 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './todo-form.component.html',
-  styleUrl: './todo-form.component.scss'
+  styleUrl: './todo-form.component.scss',
 })
-export class TodoFormComponent {
-
-}
+export class TodoFormComponent {}

@@ -10,7 +10,7 @@ import { StoreService } from '../../../store/store.service';
   styleUrls: ['./loading-overlay.component.scss'],
 })
 export class LoadingOverlayComponent {
-  storeService = inject(StoreService)
+  storeService = inject(StoreService);
 
   loading$ = this.storeService.loading$;
 

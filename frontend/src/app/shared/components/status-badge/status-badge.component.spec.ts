@@ -8,10 +8,9 @@ describe('StatusBadgeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StatusBadgeComponent]
-    })
-    .compileComponents();
-    
+      imports: [StatusBadgeComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(StatusBadgeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

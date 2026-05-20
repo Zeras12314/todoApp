@@ -1,19 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 import { Toast } from '../models/toast.model';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService {
-
   toast = signal<Toast | null>(null);
 
   show(message: string, type: Toast['type'] = 'info') {
-
     this.toast.set({
       message,
-      type
+      type,
     });
 
     setTimeout(() => {

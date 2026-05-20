@@ -5,17 +5,9 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button mat-dialog-close>
-    Cancel
-  </button>
+  <button mat-stroked-button mat-dialog-close class="black-button">Cancel</button>
 
-  <button
-    mat-flat-button
-    color="primary"
-    mat-dialog-close
-    cdkFocusInitial
-    (click)="logout()"
-  >
+  <button mat-flat-button class="btn-primary" mat-dialog-close cdkFocusInitial (click)="logout()">
     Sign out
   </button>
 </mat-dialog-actions>
