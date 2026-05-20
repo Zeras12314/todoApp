@@ -6,12 +6,14 @@
   <div class="sidebar-content">
     <div class="sidebar-content-user">
       <img src="user-placeholder.png" alt="user" />
-      <div class="user-details"> {{ user$ | async}}</div>
+      <div class="user-details">{{ user$ | async }}</div>
     </div>
     <div class="sidebar-content-controls">
       <p><img src="Icons/Home.svg" alt="" /><a class="cursor-pointer">Home</a></p>
       <p>
-        <img src="Icons/Signout.svg" alt="sign-out" /><a class="cursor-pointer" (click)="openDialog('0ms', '0ms')"
+        <img src="Icons/Signout.svg" alt="sign-out" /><a
+          class="cursor-pointer"
+          (click)="openDialog('0ms', '0ms')"
           >Sign out</a
         >
       </p>

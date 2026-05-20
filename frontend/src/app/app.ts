@@ -6,12 +6,10 @@ import { LoadingOverlayComponent } from './shared/components/loading-overlay/loa
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ConfirmDialogComponent, ToastComponent, LoadingOverlayComponent],
+  imports: [RouterOutlet, ToastComponent, LoadingOverlayComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('frontend');
-  
-  
 }

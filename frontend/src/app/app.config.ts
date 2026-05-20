@@ -13,9 +13,9 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideStore({
-      auth: authReducer
+      auth: authReducer,
     }),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    provideEffects([AuthEffects])
-]
+    provideEffects([AuthEffects]),
+  ],
 };

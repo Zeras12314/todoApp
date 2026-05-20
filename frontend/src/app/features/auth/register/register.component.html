@@ -23,7 +23,7 @@
 
             <input matInput type="text" formControlName="username" />
 
-            @if (username?.hasError('required')) {
+            @if (username.hasError('required')) {
               <mat-error>Username is required</mat-error>
             }
           </mat-form-field>
@@ -47,49 +47,75 @@
             </button>
 
             <!-- REQUIRED -->
-            @if (password?.hasError('required')) {
+            @if (password.hasError('required')) {
               <mat-error>Password is required</mat-error>
             }
 
             <!-- SIGNUP ERRORS ONLY -->
-            @if (mode() === 'signup' && password?.hasError('minlength')) {
+            @if (mode() === 'signup' && password.hasError('minlength')) {
               <mat-error>Password must be at least 8 characters</mat-error>
-            } @else if (mode() === 'signup' && password?.hasError('pattern')) {
+            } @else if (mode() === 'signup' && password.hasError('pattern')) {
               <mat-error>
-                Password must contain at least 1 uppercase letter and only use letters, numbers,
-                spaces, !#()_-
+                Only letters, numbers, spaces, and the symbols !#()_- are allowed
               </mat-error>
             }
 
             <!-- SUCCESS -->
-            @if (mode() === 'signup' && password?.valid && password?.value) {
-              <mat-hint class="password-strong text-primary"> Password strength: Strong </mat-hint>
+            <!-- SUCCESS HINT -->
+            @if (mode() === 'signup' && isPasswordStrong(password.value, username.value)) {
+              <mat-hint class="password-strong text-primary">Password strength: Strong</mat-hint>
             }
           </mat-form-field>
 
           <!-- VALIDATION CHECKLIST -->
           @if (mode() === 'signup') {
             <div class="validation-list">
-              <div class="validation-list-item" [class.valid]="password?.value?.length > 0" >
+              <!-- cannot contain username -->
+              <div
+                class="validation-list-item"
+                [ngClass]="{
+                  valid: doesNotContainUsername(passwordValue(), usernameValue()),
+                  invalid:
+                    passwordValue() && !doesNotContainUsername(passwordValue(), usernameValue()),
+                  pending: !passwordValue(),
+                }"
+              >
                 <mat-icon>
-                  {{  !password.hasError('required') ? 'check' : 'circle' }}
+                  {{
+                    passwordValue()
+                      ? doesNotContainUsername(passwordValue(), usernameValue())
+                        ? 'check'
+                        : 'circle'
+                      : 'circle'
+                  }}
                 </mat-icon>
-                <span>Cannot contain your name or email address</span>
+                <span>Cannot contain your username</span>
               </div>
 
-              <div class="validation-list-item" [class.valid]="password?.value?.length >= 8">
+              <!-- min length -->
+              <div class="validation-list-item" [class.valid]="hasMinLength(passwordValue())">
                 <mat-icon>
-                  {{ password?.value?.length >= 8 ? 'check' : 'circle' }}
+                  {{
+                    passwordValue()
+                      ? hasMinLength(passwordValue())
+                        ? 'check'
+                        : 'circle'
+                      : 'circle'
+                  }}
                 </mat-icon>
                 <span>At least 8 characters</span>
               </div>
 
-              <div
-                class="validation-list-item"
-                [class.valid]="/[0-9!#()_\-]/.test(password?.value || '')"
-              >
+              <!-- number or symbol -->
+              <div class="validation-list-item" [class.valid]="hasNumberOrSymbol(passwordValue())">
                 <mat-icon>
-                  {{ /[0-9!#()_\-]/.test(password?.value || '') ? 'check' : 'circle' }}
+                  {{
+                    passwordValue()
+                      ? hasNumberOrSymbol(passwordValue())
+                        ? 'check'
+                        : 'circle'
+                      : 'circle'
+                  }}
                 </mat-icon>
                 <span>Contains a number or symbol</span>
               </div>

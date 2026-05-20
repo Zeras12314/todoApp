@@ -1,19 +1,56 @@
-@use '@angular/material' as mat;
 @use '../../../styles/tokens.scss' as *;
-
-button {
-  margin-right: $space-2;
-}
 
 :host {
   display: block;
 }
 
+h2[mat-dialog-title] {
+  padding: $space-6 $space-6 0;
+  margin: 0;
+}
+
 mat-dialog-content {
-  padding-inline: $space-6 !important;
+  padding: $space-3 $space-6 $space-6 !important;
+  margin: 0;
+  color: $secondary-grey;
+  line-height: 1.5;
 }
 
 mat-dialog-actions {
-  padding-inline: $space-6 !important;
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+
+  padding: 0 $space-6 $space-6 !important;
+  margin: 0;
 }
 
+button {
+  min-width: 96px;
+}
+
+.black-button {
+  color: $primary-black !important;
+  border-color: $primary-black !important;
+
+  // ✅ Hover
+  &:hover {
+    border-color: $tertiary-grey !important;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  // ✅ Focus (keyboard + accessibility)
+  &:focus,
+  &:focus-visible {
+    outline: none; // remove default
+    border-color: $tertiary-grey !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2); // subtle focus ring
+  }
+
+  // ✅ Active (when clicked)
+  &:active {
+    border-color: $tertiary-grey !important;
+    background-color: rgba(0, 0, 0, 0.1); // slightly stronger than hover
+    transform: scale(0.98); // optional pressed effect
+  }
+}

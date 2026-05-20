@@ -9,19 +9,15 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatButtonModule, AsyncPipe, JsonPipe],
+  imports: [MatButtonModule, AsyncPipe],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
   readonly dialog = inject(MatDialog);
   store = inject(Store);
   storeService = inject(StoreService);
-  user$ = this.storeService.user$
-
-  signOut() {
-    console.log("Logout");
-  }
+  user$ = this.storeService.user$;
 
   openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
     this.dialog.open(ConfirmDialogComponent, {
@@ -31,5 +27,4 @@ export class SidebarComponent {
       exitAnimationDuration,
     });
   }
-
 }

@@ -37,7 +37,8 @@ public class UserController {
         User user = new User();
 
         user.setUsername(request.getUsername());
-        user.setPassword(encoder.encode(request.getPassword()));
+//        user.setPassword(encoder.encode(request.getPassword()));
+        user.setPassword(request.getPassword());
 
         User saved = service.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);

@@ -1,0 +1,40 @@
+@use '../../../styles/tokens.scss' as *;
+
+.filter {
+  background-color: $white;
+  border: 1px solid $tertiary-grey;
+  border-radius: $space-2;
+  padding: $space-1 $space-3;
+
+  &-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &-content-left {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-1 $space-3;
+    border-radius: $space-1;
+    border: 1px solid $tertiary-grey;
+    cursor: pointer;
+  }
+
+  &-content-right {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    img {
+      display: block;
+    }
+  }
+
+  &-image img {
+    display: block;
+    width: $space-4;
+    height: $space-4;
+  }
+}

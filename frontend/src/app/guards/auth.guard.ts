@@ -5,10 +5,10 @@ import { selectIsAuthenticated } from '../store/auth/auth.selector';
 import { map, take } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
-    const store = inject(Store);
-    const router = inject(Router);
-    return store.select(selectIsAuthenticated).pipe(
-        take(1),
-        map(auth => auth ? true : router.createUrlTree(['/login']))
-    )
+  const store = inject(Store);
+  const router = inject(Router);
+  return store.select(selectIsAuthenticated).pipe(
+    take(1),
+    map((auth) => (auth ? true : router.createUrlTree(['/login']))),
+  );
 };
