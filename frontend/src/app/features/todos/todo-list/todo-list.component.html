@@ -1,18 +1,223 @@
-<!-- <ng-container *ngIf="todo$ | async as todos">
-
-  <div *ngFor="let todo of todos">
-    <h3>{{ todo.title }}</h3>
-    <p>{{ todo.dueDate | date }}</p>
-    <p>{{ todo.completed ? 'Done' : 'Pending' }}</p>
-  </div>
-
-</ng-container> -->
+<app-todo-filter></app-todo-filter>
 
 @if (todo$ | async; as todos) {
-  @for (todo of todos; track $index) {
-    <h3>{{ todo.title }}</h3>
-    <p>{{ todo.dueDate | date }}</p>
-    <p>{{ todo.priority }}</p>
-    <p>{{ todo.status }}</p>
-  }
+  <div class="d-none d-md-block w-100 mt-3 table-wrapper">
+    <!--  DESKTOP  -->
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      multiTemplateDataRows
+      class="mat-elevation-z8"
+      matSort
+    >
+      <!-- Select -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <img src="/Icons/Delete_active.svg" alt="delete" class="d-block m-auto" />
+        </th>
+        <td mat-cell *matCellDef="let todo">
+          <mat-checkbox (click)="$event.stopPropagation()"></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Expand toggle column -->
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let todo">
+          <button
+            mat-icon-button
+            aria-label="expand row"
+            (click)="toggle(todo); $event.stopPropagation()"
+          >
+            <mat-icon class="expand-icon" [class.expand-icon--open]="isExpanded(todo)">
+              chevron_right
+            </mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Title -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by title">
+          <span class="header-cell">
+            Title
+            <span matSortHeaderIcon
+              ><img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" /></span
+          ></span>
+        </th>
+        <td mat-cell *matCellDef="let todo">
+          {{ todo.title }}
+        </td>
+        <!-- <td mat-cell *matCellDef="let todo">
+          <span
+            class="todo-title"
+            [class.todo-title--overdue]="isOverdue(todo)"
+            [class.todo-title--warning]="isWarning(todo)"
+          >
+            {{ todo.title }}
+          </span>
+          @if (isOverdue(todo)) {
+            <div class="due-label due-label--overdue">
+              {{ todo.dueDate | date: 'MM/dd/yyyy' }} · Overdue
+            </div>
+          } @else if (isWarning(todo)) {
+            <div class="due-label due-label--warning">
+              {{ todo.dueDate | date: 'MM/dd/yyyy' }} · Today
+            </div>
+          }
+        </td> -->
+      </ng-container>
+
+      <!-- Due Date -->
+      <ng-container matColumnDef="dueDate">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          mat-sort-header
+          sortActionDescription="Sort by dueDate"
+        >
+          <span class="header-cell">
+            Due Date
+            <span matSortHeaderIcon>
+              <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" /></span
+          ></span>
+        </th>
+        <td mat-cell *matCellDef="let todo">
+          @if (!isOverdue(todo) && !isWarning(todo)) {
+            {{ todo.dueDate | date: 'MM/dd/yyyy' }}
+          }
+        </td>
+      </ng-container>
+
+      <!-- Priority -->
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="priority">
+          <span class="header-cell">
+            Priority
+            <span matSortHeaderIcon>
+              <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon"
+            /></span>
+          </span>
+        </th>
+        <td mat-cell *matCellDef="let todo">
+          <!-- Priority badge -->
+          <img [src]="getPriorityIcon(todo.priority)" alt="{{ todo.priority }}" />
+        </td>
+      </ng-container>
+
+      <!-- Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="status">
+          <span class="header-cell">
+            Status
+            <span matSortHeaderIcon>
+              <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon"
+            /></span>
+          </span>
+        </th>
+        <td mat-cell *matCellDef="let todo" class="status-content">
+          <!-- Priority badge -->
+          <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
+          <span class="status-cell d-inline ms-2">
+            {{ todo.status | titlecase }}
+          </span>
+          @if (todo.status === 'COMPLETED' && todo.completedDate) {
+            <div class="completed-date">{{ todo.completedDate | date: 'MM/dd/yyyy' }}</div>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Edit -->
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let todo">
+          <img src="/Icons/Edit.svg" alt="edit" class="edit-icon" />
+          <!-- <button mat-icon-button (click)="onEdit(todo); $event.stopPropagation()">
+            <img src="/Icons/Edit.svg" alt="edit" class="edit-icon"/>
+          </button> -->
+        </td>
+      </ng-container>
+
+      <!-- Expanded detail -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let todo" [attr.colspan]="columnsToDisplayWithExpand.length">
+          <div
+            class="example-element-detail-wrapper"
+            [class.example-element-detail-wrapper-expanded]="isExpanded(todo)"
+          >
+            <div class="example-element-detail">
+              <div class="example-element-description">
+                {{ getTodoNote(todo) }}
+                <span class="example-element-description-attribution"> — Notes</span>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
+      <tr
+        mat-row
+        *matRowDef="let todo; columns: columnsToDisplayWithExpand"
+        class="example-element-row"
+        [class.example-expanded-row]="isExpanded(todo)"
+        (click)="toggle(todo)"
+      ></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+  </div>
+
+  <!-- MOBILE -->
+  <!-- MOBILE CARDS — hidden on desktop -->
+  <div class="d-md-none todo-card-list mt-3">
+    @for (todo of todos; track todo.id) {
+      <div class="todo-card" [class.todo-card--expanded]="isExpanded(todo)">
+        <!-- MAIN ROW -->
+        <div class="todo-card__row" (click)="toggle(todo)">
+          <!-- Checkbox -->
+          <mat-checkbox (click)="$event.stopPropagation()" class="todo-card__checkbox">
+          </mat-checkbox>
+
+          <!-- Priority badge -->
+          <img [src]="getPriorityIcon(todo.priority)" alt="" />
+
+          <!-- Status -->
+          <span class="todo-card__status">
+            <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
+            {{ todo.status | titlecase }}
+          </span>
+
+          <!-- Expand arrow -->
+          <button
+            mat-icon-button
+            class="todo-card__expand"
+            (click)="toggle(todo); $event.stopPropagation()"
+          >
+            <mat-icon>
+              {{ isExpanded(todo) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+            </mat-icon>
+          </button>
+        </div>
+
+        <!-- TITLE + DATE ROW -->
+        <div class="todo-card__meta" (click)="toggle(todo)">
+          <span class="todo-card__title">{{ todo.title }}</span>
+          <span class="todo-card__date">
+            <mat-icon class="date-icon">schedule</mat-icon>
+            {{ todo.dueDate | date: 'MM/dd/yyyy' }}
+          </span>
+        </div>
+
+        <!-- EXPANDED DETAIL -->
+        @if (isExpanded(todo)) {
+          <div class="todo-card__detail">
+            <div><strong>Status:</strong> {{ todo.status }}</div>
+            <div><strong>Priority:</strong> {{ todo.priority }}</div>
+            <div><strong>Due:</strong> {{ todo.dueDate | date }}</div>
+            <div class="mt-2">{{ getTodoNote(todo) }}</div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 }

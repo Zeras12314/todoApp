@@ -1,0 +1,133 @@
+@use '../../../styles/tokens.scss' as *;
+
+.todo-form {
+//   max-width: 900px;
+margin-top: $space-4;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: $white;
+
+  // ── HEADER ──
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+
+    h2 {
+      flex: 1;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  // ── BODY ──
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // ── ROW ──
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── FIELDS ──
+  &__field {
+    width: 100%;
+
+    &--full { width: 100%; }
+  }
+
+  // ── ATTACHMENTS ──
+  &__attachments {
+    position: relative;
+    border: 1px dashed #adb5bd;
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  &__attachments-label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: white;
+    padding: 0 4px;
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  &__dropzone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6c757d;
+    cursor: pointer;
+    min-height: 60px;
+
+    mat-icon { color: #adb5bd; }
+  }
+
+  &__browse {
+    color: $primary-blue;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  // ── SUBTASKS ──
+  &__subtasks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  &__subtasks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  &__subtasks-col-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 48px;
+    gap: 12px;
+    padding: 0 4px;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  &__subtask-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 48px;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
+.delete-btn mat-icon { color: #E24B4A; }
+.delete-icon         { color: #adb5bd; }

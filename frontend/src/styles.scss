@@ -18,13 +18,6 @@ $my-theme: mat.define-theme(
   @include mat.all-component-themes($my-theme);
 }
 
-@include mat.chips-overrides(
-  (
-    container-shape-radius: 2px,
-    label-text-color: red,
-  )
-);
-
 * {
   margin: 0;
   padding: 0;

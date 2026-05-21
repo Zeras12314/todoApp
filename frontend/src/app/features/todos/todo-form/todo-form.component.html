@@ -1,1 +1,167 @@
-<p>todo-form works!</p>
+<div class="todo-form">
+
+  <!-- HEADER -->
+  <div class="todo-form__header">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2>{{ isEdit ? 'Edit Todo' : 'New Todo' }}</h2>
+    <div class="todo-form__header-actions">
+      @if (isEdit) {
+        <button mat-icon-button class="delete-btn" (click)="onDelete()">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      }
+      <button mat-raised-button color="primary" (click)="onSubmit()">
+        {{ isEdit ? 'Save' : 'Create' }}
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="todoForm" class="todo-form__body">
+
+    <!-- ROW 1: PRIORITY + STATUS -->
+    <div class="todo-form__row">
+      <mat-form-field appearance="outline" class="todo-form__field">
+        <mat-label>Priority</mat-label>
+        <input matInput formControlName="priority" readonly />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="todo-form__field">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="NOT_STARTED">Not Started</mat-option>
+          <mat-option value="IN_PROGRESS">In Progress</mat-option>
+          <mat-option value="COMPLETED">Completed</mat-option>
+          <mat-option value="CANCELLED">Cancelled</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- TITLE -->
+    <mat-form-field appearance="outline" class="todo-form__field todo-form__field--full">
+      <mat-label>Title</mat-label>
+      <textarea
+        matInput
+        formControlName="title"
+        rows="4"
+        maxlength="25"
+      ></textarea>
+      <mat-hint align="end">{{ todoForm.get('title')?.value?.length ?? 0 }}/25</mat-hint>
+      @if (todoForm.get('title')?.hasError('required')) {
+        <mat-error>Title is required</mat-error>
+      }
+      @if (todoForm.get('title')?.hasError('maxlength')) {
+        <mat-error>Title cannot exceed 25 characters</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- ROW 2: DATE CREATED + DUE DATE -->
+    <div class="todo-form__row">
+      <mat-form-field appearance="outline" class="todo-form__field">
+        <mat-label>Date Created</mat-label>
+        <input
+          matInput
+          formControlName="createdAt"
+          readonly
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="todo-form__field">
+        <mat-label>Due Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="dueDatePicker"
+          formControlName="dueDate"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #dueDatePicker></mat-datepicker>
+        @if (todoForm.get('dueDate')?.hasError('required')) {
+          <mat-error>Due date is required</mat-error>
+        }
+        @if (todoForm.get('dueDate')?.hasError('dueDateInvalid')) {
+          <mat-error>Due date must be after created date</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- COMPLETED DATE — only shown when status is COMPLETED -->
+    @if (todoForm.get('status')?.value === 'COMPLETED') {
+      <mat-form-field appearance="outline" class="todo-form__field todo-form__field--full">
+        <mat-label>Completed Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="completedPicker"
+          formControlName="completedDate"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="completedPicker"></mat-datepicker-toggle>
+        <mat-datepicker #completedPicker></mat-datepicker>
+      </mat-form-field>
+    }
+
+    <!-- DETAILS -->
+    <mat-form-field appearance="outline" class="todo-form__field todo-form__field--full">
+      <mat-label>Details</mat-label>
+      <textarea
+        matInput
+        formControlName="details"
+        rows="6"
+        maxlength="300"
+      ></textarea>
+      <mat-hint align="end">{{ todoForm.get('details')?.value?.length ?? 0 }}/300</mat-hint>
+    </mat-form-field>
+
+    <!-- ATTACHMENTS -->
+    <div class="todo-form__attachments">
+      <span class="todo-form__attachments-label">Attachments</span>
+      <div class="todo-form__dropzone"
+           (dragover)="$event.preventDefault()"
+           (drop)="onDrop($event)">
+        <mat-icon>upload</mat-icon>
+        <span>Drop files to attach, or
+          <span class="todo-form__browse" (click)="fileInput.click()">browse</span>.
+        </span>
+        <input #fileInput type="file" multiple hidden (change)="onFileSelect($event)" />
+      </div>
+    </div>
+
+    <!-- SUBTASKS -->
+    <div class="todo-form__subtasks">
+      <div class="todo-form__subtasks-header">
+        <h3>Subtask</h3>
+        <button mat-stroked-button color="primary" type="button" (click)="addSubtask()">
+          <mat-icon>add</mat-icon> New Subtask
+        </button>
+      </div>
+
+      <!-- SUBTASK LIST -->
+      <div class="todo-form__subtasks-table">
+        <div class="todo-form__subtasks-col-header">
+          <span>Title</span>
+          <span>Status</span>
+          <span></span>
+        </div>
+
+        @for (subtask of subtasks; track $index) {
+          <div class="todo-form__subtask-row">
+            <mat-form-field appearance="outline" class="todo-form__field">
+              <input matInput [(ngModel)]="subtask.title" [ngModelOptions]="{standalone: true}" placeholder="Subtask title" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="todo-form__field">
+              <mat-select [(ngModel)]="subtask.status" [ngModelOptions]="{standalone: true}">
+                <mat-option value="NOT_DONE">Not Done</mat-option>
+                <mat-option value="DONE">Done</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-icon-button type="button" (click)="removeSubtask($index)">
+              <mat-icon class="delete-icon">delete_outline</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+  </form>
+</div>
