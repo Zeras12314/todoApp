@@ -85,7 +85,12 @@ columnsToDisplay = [
     'Finish report': 'Attach screenshots, verify totals, and send before EOD.',
   };
  private readonly destroy$ = new Subject<void>();
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort)
+set matSort(sort: MatSort) {
+  if (sort) {
+    this.dataSource.sort = sort;
+  }
+}
 
   ngOnInit(): void {
     this.store.dispatch(TodoActions.loadTodos());
@@ -97,10 +102,6 @@ columnsToDisplay = [
     // ✅ takeUntil prevents memory leak; sort assigned once after view init
     this.todo$.pipe(takeUntil(this.destroy$)).subscribe((todos) => {
       this.dataSource.data = todos;
-      // Assign sort every time in case it wasn't ready on first emit
-      if (this.sort && !this.dataSource.sort) {
-        this.dataSource.sort = this.sort;
-      }
     });
   }
 
