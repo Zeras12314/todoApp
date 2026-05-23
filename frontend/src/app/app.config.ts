@@ -8,6 +8,8 @@ import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './store/auth/auth.reducer';
 import { AuthEffects } from './store/auth/auth.effects';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { TodoEffects } from './store/todo/todo.effects';
+import { todoReducer } from './store/todo/todo.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,9 +17,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStore({
       auth: authReducer,
+      todos: todoReducer,
     }),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    provideEffects([AuthEffects]),
+    provideEffects([AuthEffects, TodoEffects]),
     provideNativeDateAdapter(),
   ],
 };

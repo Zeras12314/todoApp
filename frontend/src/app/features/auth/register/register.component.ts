@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { Store } from '@ngrx/store';
 
-import { login, register, setAuthMode } from '../../../store/auth/auth.action';
+import { AuthActions } from '../../../store/auth/auth.action';
 
 import { selectAuthMode } from '../../../store/auth/auth.selector';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -75,7 +75,7 @@ export class RegisterComponent {
   toggleMode() {
     const next = this.mode() === 'login' ? 'signup' : 'login';
 
-    this.store.dispatch(setAuthMode({ mode: next }));
+    this.store.dispatch(AuthActions.setMode({ mode: next }));
   }
 
   // update validators
@@ -104,9 +104,9 @@ export class RegisterComponent {
     }
 
     if (this.mode() === 'login') {
-      this.store.dispatch(login({ username, password }));
+      this.store.dispatch(AuthActions.login({ username, password }));
     } else {
-      this.store.dispatch(register({ username, password }));
+      this.store.dispatch(AuthActions.register({ username, password }));
     }
   }
 
