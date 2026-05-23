@@ -3,7 +3,7 @@ import { TodoService } from '../../../services/todo.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { Todo } from '../../../models/todo.model';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,9 +12,9 @@ import { TodoFilterComponent } from '../todo-filter/todo-filter.component';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Store } from '@ngrx/store';
-import { TodoActions } from '../../../store/todo/todo.actions';
-import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
 import { CdkAutofill } from "@angular/cdk/text-field";
+import { StoreService } from '../../../store/store.service';
+import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
 
 // export interface PeriodicElement {
 //   name: string;
@@ -61,63 +61,79 @@ export class TodoListComponent implements OnInit, AfterViewInit {
   private _liveAnnouncer = inject(LiveAnnouncer);
   router = inject(Router);
   todoService = inject(TodoService);
+  storeService = inject(StoreService);
   store = inject(Store);
   todo$: Observable<Todo[]>;
+
+  allTodos$: Observable<Todo[]>;
+  filteredTodos$: Observable<Todo[]>;
+
+  hasTodos$: Observable<boolean>;
+  hasFilteredTodos$: Observable<boolean>;
+
   dataSource = new MatTableDataSource<Todo>();
-columnsToDisplay = [
-  'select',
-  // 'expand',
-  'title',
-  'dueDate',
-  'priority',
-  'status',
-  'edit'
-];
+  columnsToDisplay = [
+    'select',
+    // 'expand',
+    'title',
+    'dueDate',
+    'priority',
+    'status',
+    'edit'
+  ];
   columnsToDisplayWithExpand = [...this.columnsToDisplay];
-  // expandedElement: PeriodicElement | null = null;
-
-
-  // Expanded row state (Todo-based)
   expandedTodo: Todo | null = null;
 
   todoNotesByTitle: Record<string, string> = {
     'Buy groceries': 'Remember to include milk, eggs, and bread. Check budget.',
     'Finish report': 'Attach screenshots, verify totals, and send before EOD.',
   };
- private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   @ViewChild(MatSort)
-set matSort(sort: MatSort) {
-  if (sort) {
-    this.dataSource.sort = sort;
+  set matSort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
   }
+
+
+ngOnInit(): void {
+  this.storeService.loadTodos();
+  this.allTodos$ = this.store.select(selectAllTodos);
+  this.filteredTodos$ = this.store.select(selectFilteredTodos);
+  this.hasTodos$ = this.allTodos$.pipe(
+    map(todos => todos.length > 0)
+  );
+
+  this.hasFilteredTodos$ = this.filteredTodos$.pipe(
+    map(todos => todos.length > 0)
+  );
+
+  this.todo$ = this.filteredTodos$;
 }
 
-  ngOnInit(): void {
-    this.store.dispatch(TodoActions.loadTodos());
-    this.todo$ = this.store.select(selectFilteredTodos);
-  }
 
 
- ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     this.todo$.pipe(takeUntil(this.destroy$)).subscribe((todos) => {
       this.dataSource.data = todos;
     });
   }
 
-   ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  goToCreateTodo(){
+  goToCreateTodo() {
     this.router.navigate(['/todos/new']);
   }
-  /** Checks whether an element is expanded. */
+  // Checks whether an element is expanded.
   isExpanded(todo: Todo): boolean {
     return this.expandedTodo === todo;
   }
 
-  /** Toggles the expanded state of an element. */
+  // Toggles the expanded state of an element.
   toggle(todo: Todo): void {
     this.expandedTodo = this.isExpanded(todo) ? null : todo;
   }

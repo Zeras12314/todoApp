@@ -84,12 +84,12 @@ export const todoReducer = createReducer(
   // ── Filters ───────────────────────────────────────────────────────────────
   on(TodoActions.setStatusFilter, (state, { status }) => ({
     ...state,
-    filters: { ...state.filters, status },
+    filters: { ...state.filters, status: status || null },
   })),
 
   on(TodoActions.setPriorityFilter, (state, { priority }) => ({
     ...state,
-    filters: { ...state.filters, priority },
+    filters: { ...state.filters, priority: priority || null },
   })),
 
   on(TodoActions.clearFilters, (state) => ({

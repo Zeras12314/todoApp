@@ -1,7 +1,11 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from "@angular/router";
+import { selectTodoFilters } from '../../../store/todo/todo.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Store } from '@ngrx/store';
+import { TodoActions } from '../../../store/todo/todo.actions';
 
 @Component({
   selector: 'app-todo-filter',
@@ -11,39 +15,64 @@ import { RouterLink } from "@angular/router";
   styleUrl: './todo-filter.component.scss',
 })
 export class TodoFilterComponent {
+  private readonly store = inject(Store);
   isOpen = signal(false);
   activeMenu = signal<'priority' | 'status' | null>(null);
-  selectedPriority = signal<string | null>(null);
-  selectedStatus = signal<string | null>(null);
+
+
+  filters = toSignal(this.store.select(selectTodoFilters), {
+    initialValue: { priority: null, status: null },
+  });
+  selectedPriority = () => this.filters().priority;
+  selectedStatus = () => this.filters().status;
 
   // emit to parent / store
-  priorityChange = output<string | null>();
-  statusChange = output<string | null>();
+  // priorityChange = output<string | null>();
+  // statusChange = output<string | null>();
+
+  // Convenience getters so the template stays the same
+
 
   toggleFilter() {
     this.isOpen.update(v => !v);
     this.activeMenu.set(null);
   }
 
+  // selectPriority(value: string | null) {
+  //   this.selectedPriority.set(value);
+  //   this.priorityChange.emit(value);
+  //   this.isOpen.set(false);
+  // }
+
+  // resetFilter(value: 'priority' | 'status') {
+  //   if (value === 'priority') {
+  //     this.selectedPriority.set(null);
+  //     this.priorityChange.emit(null);
+  //   } else {
+  //     this.selectedStatus.set(null);
+  //     this.statusChange.emit(null);
+  //   }
+  // }
+
   selectPriority(value: string | null) {
-    this.selectedPriority.set(value);
-    this.priorityChange.emit(value);
+    value
+      ? this.store.dispatch(TodoActions.setPriorityFilter({ priority: value }))
+      : this.store.dispatch(TodoActions.clearFilters());
     this.isOpen.set(false);
   }
 
   selectStatus(value: string | null) {
-    this.selectedStatus.set(value);
-    this.statusChange.emit(value);
+    value
+      ? this.store.dispatch(TodoActions.setStatusFilter({ status: value }))
+      : this.store.dispatch(TodoActions.clearFilters());
     this.isOpen.set(false);
   }
 
-  resetFilter(value: 'priority' | 'status') {
-    if (value === 'priority') {
-      this.selectedPriority.set(null);
-      this.priorityChange.emit(null);
+  resetFilter(type: 'priority' | 'status') {
+    if (type === 'priority') {
+      this.store.dispatch(TodoActions.setPriorityFilter({ priority: '' }));
     } else {
-      this.selectedStatus.set(null);
-      this.statusChange.emit(null);
+      this.store.dispatch(TodoActions.setStatusFilter({ status: '' }));
     }
   }
 
@@ -66,7 +95,7 @@ export class TodoFilterComponent {
     const map: any = {
       NOT_STARTED: 'Chip_Not started.svg',
       IN_PROGRESS: 'Chip_In progress.svg',
-      COMPLETED: 'Chip_Completed.svg',
+      COMPLETED: 'Chip_Complete.svg',
       CANCELLED: 'Chip_Cancelled.svg'
     };
 
