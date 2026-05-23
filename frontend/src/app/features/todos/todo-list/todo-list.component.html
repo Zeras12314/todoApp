@@ -56,24 +56,6 @@
             <td mat-cell *matCellDef="let todo">
               {{ todo.title }}
             </td>
-            <!-- <td mat-cell *matCellDef="let todo">
-          <span
-            class="todo-title"
-            [class.todo-title--overdue]="isOverdue(todo)"
-            [class.todo-title--warning]="isWarning(todo)"
-          >
-            {{ todo.title }}
-          </span>
-          @if (isOverdue(todo)) {
-            <div class="due-label due-label--overdue">
-              {{ todo.dueDate | date: 'MM/dd/yyyy' }} · Overdue
-            </div>
-          } @else if (isWarning(todo)) {
-            <div class="due-label due-label--warning">
-              {{ todo.dueDate | date: 'MM/dd/yyyy' }} · Today
-            </div>
-          }
-        </td> -->
           </ng-container>
 
           <!-- Due Date -->
@@ -91,8 +73,19 @@
               ></span>
             </th>
             <td mat-cell *matCellDef="let todo">
-              @if (!isOverdue(todo) && !isWarning(todo)) {
+              <span
+                [ngClass]="{
+                  'due-date--overdue': isOverdue(todo),
+                  'due-date--warning': isWarning(todo),
+                }"
+              >
                 {{ todo.dueDate | date: 'MM/dd/yyyy' }}
+              </span>
+
+              @if (isOverdue(todo)) {
+                <div class="due-label due-label--overdue">Overdue</div>
+              } @else if (isWarning(todo)) {
+                <div class="due-label due-label--warning">Today</div>
               }
             </td>
           </ng-container>
@@ -230,11 +223,28 @@
 
         <!-- TITLE + DATE ROW -->
         <div class="todo-card__meta" (click)="toggle(todo)">
-          <span class="todo-card__title">{{ todo.title }}</span>
-          <span class="todo-card__date">
+          <span class="todo-card__title">
+            {{ todo.title }}
+          </span>
+
+          <span
+            class="todo-card__date"
+            [ngClass]="{
+              'todo-card__date--overdue': isOverdue(todo),
+              'todo-card__date--warning': isWarning(todo),
+            }"
+          >
             <mat-icon class="date-icon">schedule</mat-icon>
             {{ todo.dueDate | date: 'MM/dd/yyyy' }}
           </span>
+
+          @if (isOverdue(todo)) {
+            <div class="due-label due-label--overdue">Overdue</div>
+          } @else if (isWarning(todo)) {
+            <div class="due-label due-label--warning">
+              {{ todo.priority === 'CRITICAL' ? 'Critical · Due soon' : 'Due soon' }}
+            </div>
+          }
         </div>
 
         <!-- EXPANDED DETAIL -->
