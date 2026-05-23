@@ -62,22 +62,24 @@ tr.example-element-row {
 
 // ── TITLE ──
 .todo-title {
-  font-size: $text-14;
+  font-size: $text-12;
   font-weight: $fw-semibold;
   color: #212529;
   text-decoration: underline;
   cursor: pointer;
+}
 
-  &--overdue { color: #E24B4A; }
-  &--warning { color: #BA7517; }
+.due-date {
+  &--overdue { color: $error; }
+  &--warning { color: $warning; }
 }
 
 .due-label {
-  font-size: $text-14;
+  font-size: $text-12;
   margin-top: 2px;
 
-  &--overdue { color: #E24B4A; }
-  &--warning { color: #BA7517; }
+  &--overdue { color: $error; }
+  &--warning { color: $warning; }
 }
 
 // ── STATUS ──
@@ -239,6 +241,16 @@ tr.example-element-row {
     gap: 4px;
     font-size: 11px;
     color: #888780;
+
+
+    &--overdue {
+      color: $error !important;
+    }
+
+    &--warning {
+      color: $warning !important;
+    }
+
 
     .date-icon {
       font-size: 13px;

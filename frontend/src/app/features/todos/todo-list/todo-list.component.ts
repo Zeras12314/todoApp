@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { TodoService } from '../../../services/todo.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { Todo } from '../../../models/todo.model';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -16,42 +16,10 @@ import { CdkAutofill } from "@angular/cdk/text-field";
 import { StoreService } from '../../../store/store.service';
 import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
 
-// export interface PeriodicElement {
-//   name: string;
-//   position: number;
-//   weight: number;
-//   symbol: string;
-//   description: string;
-// }
-
-// const ELEMENT_DATA: PeriodicElement[] = [
-//   {
-//     position: 1,
-//     name: 'Todo 1',
-//     weight: 1,
-//     symbol: 'TD1',
-//     description: 'This is the first todo item description.',
-//   },
-//   {
-//     position: 2,
-//     name: 'Todo 2',
-//     weight: 2,
-//     symbol: 'TD2',
-//     description: 'This is the second todo item description.',
-//   },
-//   {
-//     position: 3,
-//     name: 'Todo 3',
-//     weight: 3,
-//     symbol: 'TD3',
-//     description: 'This is the third todo item description.',
-//   }
-// ];
-
 @Component({
   selector: 'app-todo-list',
   standalone: true,
-  imports: [MatSortModule, TodoFilterComponent, MatTableModule, MatButtonModule, MatIconModule, MatCheckboxModule, AsyncPipe, DatePipe, TitleCasePipe, CdkAutofill],
+  imports: [MatSortModule, TodoFilterComponent, MatTableModule, MatButtonModule, MatIconModule, MatCheckboxModule, AsyncPipe, DatePipe, TitleCasePipe, NgClass],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss',
 })
@@ -97,20 +65,20 @@ export class TodoListComponent implements OnInit, AfterViewInit {
   }
 
 
-ngOnInit(): void {
-  this.storeService.loadTodos();
-  this.allTodos$ = this.store.select(selectAllTodos);
-  this.filteredTodos$ = this.store.select(selectFilteredTodos);
-  this.hasTodos$ = this.allTodos$.pipe(
-    map(todos => todos.length > 0)
-  );
+  ngOnInit(): void {
+    this.storeService.loadTodos();
+    this.allTodos$ = this.store.select(selectAllTodos);
+    this.filteredTodos$ = this.store.select(selectFilteredTodos);
+    this.hasTodos$ = this.allTodos$.pipe(
+      map(todos => todos.length > 0)
+    );
 
-  this.hasFilteredTodos$ = this.filteredTodos$.pipe(
-    map(todos => todos.length > 0)
-  );
+    this.hasFilteredTodos$ = this.filteredTodos$.pipe(
+      map(todos => todos.length > 0)
+    );
 
-  this.todo$ = this.filteredTodos$;
-}
+    this.todo$ = this.filteredTodos$;
+  }
 
 
 
@@ -144,9 +112,16 @@ ngOnInit(): void {
   }
 
   isWarning(todo: Todo): boolean {
-    if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') return false;
-    const hours = (new Date(todo.dueDate).getTime() - Date.now()) / 3_600_000;
-    return hours >= 0 && hours <= 24;
+    if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') {
+      return false;
+    }
+    const hours =
+      (new Date(todo.dueDate).getTime() - Date.now()) / 3_600_000;
+    if (todo.priority === 'CRITICAL') {
+      return hours >= 0 && hours <= 48;
+    }
+
+    return hours >= 0 && hours <= 24; 
   }
 
   onEdit(todo: Todo) {
@@ -159,6 +134,7 @@ ngOnInit(): void {
     // If you have todo.id, you can do a map by id instead
     return this.todoNotesByTitle[todo.title] ?? 'No extra notes (static) yet.';
   }
+
 
   getStatusIcon(status: string): string {
     switch (status) {
@@ -173,7 +149,6 @@ ngOnInit(): void {
   getPriorityIcon(status: string): string {
     switch (status) {
       case 'LOW': return 'Icons/Low_table.svg';
-      case 'MEDIUM': return 'Icons/Medium_table.svg';
       case 'HIGH': return 'Icons/High_table.svg';
       case 'CRITICAL': return 'Icons/Critical_table.svg';
       default: return 'Icons/Unknown.svg';
