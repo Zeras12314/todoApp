@@ -80,52 +80,59 @@
                   pending: !passwordValue(),
                 }"
               >
-                <mat-icon>
-                  {{
-                    passwordValue()
-                      ? doesNotContainUsername(passwordValue(), usernameValue())
-                        ? 'check'
-                        : 'circle'
-                      : 'circle'
-                  }}
-                </mat-icon>
+                <img
+                  [src]="
+                    passwordValue() && doesNotContainUsername(passwordValue(), usernameValue())
+                      ? '/Icons/Check.svg'
+                      : '/Icons/Bullet.svg'
+                  "
+                  alt=""
+                  style="width: 12px"
+                />
                 <span>Cannot contain your username</span>
               </div>
 
               <!-- min length -->
               <div class="validation-list-item" [class.valid]="hasMinLength(passwordValue())">
-                <mat-icon>
-                  {{
-                    passwordValue()
-                      ? hasMinLength(passwordValue())
-                        ? 'check'
-                        : 'circle'
-                      : 'circle'
-                  }}
-                </mat-icon>
+                <img
+                  [src]="
+                    passwordValue() && hasMinLength(passwordValue())
+                      ? '/Icons/Check.svg'
+                      : '/Icons/Bullet.svg'
+                  "
+                  alt=""
+                  style="width: 12px"
+                />
                 <span>At least 8 characters</span>
               </div>
 
               <!-- number or symbol -->
               <div class="validation-list-item" [class.valid]="hasNumberOrSymbol(passwordValue())">
-                <mat-icon>
-                  {{
-                    passwordValue()
-                      ? hasNumberOrSymbol(passwordValue())
-                        ? 'check'
-                        : 'circle'
-                      : 'circle'
-                  }}
-                </mat-icon>
+                <img
+                  [src]="
+                    passwordValue() && hasNumberOrSymbol(passwordValue())
+                      ? '/Icons/Check.svg'
+                      : '/Icons/Bullet.svg'
+                  "
+                  alt=""
+                  style="width: 12px"
+                />
                 <span>Contains a number or symbol</span>
               </div>
             </div>
           }
 
           <!-- CTA -->
-          <button mat-raised-button color="primary" class="submit-btn" (click)="submit()">
-            {{ mode() === 'login' ? 'Sign in' : 'Sign up' }}
-          </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="submit-btn"
+          [class.disabled-btn]="!isPasswordStrong(password.value, username.value) && mode() !== 'login'"
+          (click)="submit()"
+          [disabled]="!isPasswordStrong(password.value, username.value) && mode() !== 'login'"
+        >
+          {{ mode() === 'login' ? 'Sign in' : 'Sign up' }}
+        </button>
         </form>
 
         <!-- SWITCH MODE -->
