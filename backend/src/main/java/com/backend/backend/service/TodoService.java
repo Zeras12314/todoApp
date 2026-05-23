@@ -35,6 +35,12 @@ public class TodoService {
         return todoRepository.findByUserId(user.getId());
     }
 
+    public Todo getTodoByIdAndUsername(Long id, String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        return todoRepository.findByIdAndUserId(id, user.getId()).orElse(null);
+    }
+
 //    public Todo updateTodo(Long id, Todo updated, String username){
 //        Todo existing = todoRepository.findById(id)
 //                .orElseThrow(() -> new RuntimeException("Todo not found"));

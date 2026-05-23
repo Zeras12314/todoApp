@@ -10,6 +10,8 @@ import { AuthEffects } from './store/auth/auth.effects';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { TodoEffects } from './store/todo/todo.effects';
 import { todoReducer } from './store/todo/todo.reducer';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,5 +24,6 @@ export const appConfig: ApplicationConfig = {
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideEffects([AuthEffects, TodoEffects]),
     provideNativeDateAdapter(),
+    provideHttpClient(withInterceptors([authInterceptor]))
   ],
 };

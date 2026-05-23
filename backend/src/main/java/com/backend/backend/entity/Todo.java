@@ -5,6 +5,7 @@ import com.backend.backend.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 
@@ -20,14 +21,20 @@ public class Todo {
 
     private Date dueDate;
 
+    @CreationTimestamp
+    private Date createdDate;
+
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore   // ✅ ADD THIS
     private User user;
+
 }

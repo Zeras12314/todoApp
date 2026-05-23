@@ -10,15 +10,13 @@ export class TodoService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = env.apiUrl;
 
+
   getTodos() {
-    const token = localStorage.getItem('todo_token');
-
-    console.log('TOKEN BEING SENT:', token);
-
-    return this.http.get<Todo[]>(`${this.apiUrl}/todos`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos`);
   }
+
+  getTodoById(id: number) {
+    return this.http.get<Todo>(`${this.apiUrl}/todos/${id}`);
+  }
+
 }
