@@ -99,7 +99,6 @@ set matSort(sort: MatSort) {
 
 
  ngAfterViewInit(): void {
-    // ✅ takeUntil prevents memory leak; sort assigned once after view init
     this.todo$.pipe(takeUntil(this.destroy$)).subscribe((todos) => {
       this.dataSource.data = todos;
     });
