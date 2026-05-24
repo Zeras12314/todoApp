@@ -19,24 +19,32 @@ export const routes: Routes = [
       {
         path: 'todos',
         loadComponent: () =>
-          import('./features/todos/todo-list/todo-list.component').then((m) => m.TodoListComponent),
+          import('./features/todos/todo-list/todo-list.component')
+            .then((m) => m.TodoListComponent),
       },
+
       {
         path: 'todos/new',
         loadComponent: () =>
-          import('./features/todos/todo-form/todo-form.component').then((m) => m.TodoFormComponent),
+          import('./features/todos/todo-form/todo-form.component')
+            .then((m) => m.TodoFormComponent),
+        data: { breadcrumb: 'New Task' },
       },
-      {
-        path: 'todos/:id',
-        loadComponent: () =>
-          import('./features/todos/todo-detail/todo-detail.component').then(
-            (m) => m.TodoDetailComponent,
-          ),
-      },
+
       {
         path: 'todos/:id/edit',
         loadComponent: () =>
-          import('./features/todos/todo-form/todo-form.component').then((m) => m.TodoFormComponent),
+          import('./features/todos/todo-form/todo-form.component')
+            .then((m) => m.TodoFormComponent),
+        data: { breadcrumb: 'View Task / Edit' },
+      },
+
+      {
+        path: 'todos/:id',
+        loadComponent: () =>
+          import('./features/todos/todo-detail/todo-detail.component')
+            .then((m) => m.TodoDetailComponent),
+        data: { breadcrumb: 'View Task' },
       },
     ],
   },

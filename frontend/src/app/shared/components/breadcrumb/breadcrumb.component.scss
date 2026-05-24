@@ -1,0 +1,38 @@
+@use '../../../styles/tokens.scss' as *;
+
+.breadcrumb-custom {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $text-14;
+  margin-bottom: $space-3;
+
+  .breadcrumb-back {
+    color: $primary-blue;
+    cursor: pointer;
+    font-size: $text-16;
+    font-weight: $fw-medium;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(1800%) hue-rotate(200deg)
+        brightness(95%) contrast(95%);
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .breadcrumb-separator {
+    color: $tertiary-grey;
+  }
+
+  .breadcrumb-current {
+    color: $primary-black;
+    font-size: $text-16;
+    font-weight: $fw-medium;
+  }
+}

@@ -4,7 +4,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable, of, switchMap, take } from 'rxjs';
 import { Todo } from '../../../models/todo.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
 import { TodoService } from '../../../services/todo.service';
@@ -16,7 +16,7 @@ interface Subtask {
 @Component({
   selector: 'app-todo-detail',
   standalone: true,
-  imports: [MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe],
+  imports: [RouterLink,MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe, RouterLink],
   templateUrl: './todo-detail.component.html',
   styleUrl: './todo-detail.component.scss',
 })

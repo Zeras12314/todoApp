@@ -19,7 +19,7 @@
         <div (click)="deleteTodo()">
           <img src="Icons/Delete_active.svg" alt="Delete" />
         </div>
-        <div (click)="editTodo()">
+        <div (click)="editTodo()" [routerLink]="['/todos', todo.id, 'edit']">
           <img src="Icons/Edit.svg" alt="Edit" />
         </div>
       </div>

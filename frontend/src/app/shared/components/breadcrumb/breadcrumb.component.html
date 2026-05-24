@@ -1,0 +1,16 @@
+<nav class="breadcrumb-custom">
+
+  <!-- CHILD ROUTE -->
+  @if (isChildRoute) {
+
+    <span class="breadcrumb-back" (click)="goBack()"><img src="Icons/Back.svg" alt="back" class="me-2"> Back</span>
+    <span class="breadcrumb-separator">|</span>
+    <span class="breadcrumb-current">{{ currentLabel }}</span>
+  }
+
+  <!-- ROOT ROUTE -->
+  @else {
+    <span class="breadcrumb-current">To-do</span>
+  }
+
+</nav>
