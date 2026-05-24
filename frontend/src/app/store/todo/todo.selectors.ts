@@ -9,7 +9,7 @@ export const selectTodoLoading = createSelector(selectTodoState, (s) => s.loadin
 export const selectTodoError   = createSelector(selectTodoState, (s) => s.error);
 export const selectTodoFilters = createSelector(selectTodoState, (s) => s.filters);
 
-// ── Filtered todos ──────────────────────────────────────────e──────────────────
+// ── Filtered todos ────────────────────────────────────────────────────────────
 export const selectFilteredTodos = createSelector(
   selectAllTodos,
   selectTodoFilters,

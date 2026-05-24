@@ -1,1 +1,67 @@
-<p>todo-detail works!</p>
+@if (todo$ | async; as todo) {
+  <div class="todo-detail">
+    <!-- HEADER ROW -->
+    <div class="todo-detail__header">
+      <div class="todo-detail__images">
+        <!-- PRIORITY -->
+        <div class="todo-detail__priority">
+          <img [src]="getPriorityIcon(todo?.priority)" [alt]="todo?.priority" />
+        </div>
+
+        <!-- STATUS -->
+        <div class="todo-detail__status">
+          <img [src]="getStatusIcon(todo?.status)" [alt]="todo?.status" />
+          <span class="ms-2">{{ todo?.status | titlecase }}</span>
+        </div>
+      </div>
+
+      <div class="todo-detail__actions">
+        <div (click)="deleteTodo()">
+          <img src="Icons/Delete_active.svg" alt="Delete" />
+        </div>
+        <div (click)="editTodo()">
+          <img src="Icons/Edit.svg" alt="Edit" />
+        </div>
+      </div>
+    </div>
+
+    <!-- TITLE + DATE -->
+    <h2 class="todo-detail__title">{{ todo.title }}</h2>
+    <p class="todo-detail__dates">
+      <small>{{ todo.createdDate | date: 'd MMM y' }}</small> -
+      <small>{{ todo.dueDate | date: 'd MMM y' }}</small>
+    </p>
+
+    <!-- DESCRIPTION (static placeholder) -->
+    <p class="todo-detail__desc primary-black">
+      {{ todo.description || 'No description provided.' }}
+    </p>
+
+    <mat-divider></mat-divider>
+
+    <!-- SUBTASKS (static) -->
+    <div class="todo-detail__subtasks">
+      <h3 class="todo-detail__subtasks-title">Subtask</h3>
+
+      <div class="subtask-list">
+        @for (subtask of staticSubtasks; track subtask.name) {
+          <div class="subtask-row">
+            <span class="subtask-row__name">{{ subtask.name }}</span>
+            <span class="subtask-row__status" [class.subtask-row__status--done]="subtask.done">
+              <img
+                [src]="subtask.done ? 'Icons/Done.svg' : 'Icons/Not Done.svg'"
+                alt="{{ subtask.done ? 'Done' : 'Not done' }}"
+                class="subtask-row__icon me-2"
+              />
+              {{ subtask.done ? 'Done' : 'Not done' }}
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="todo-detail__empty">
+    <p>Todo not found.</p>
+  </div>
+}

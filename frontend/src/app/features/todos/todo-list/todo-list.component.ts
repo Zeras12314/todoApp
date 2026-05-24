@@ -7,7 +7,7 @@ import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TodoFilterComponent } from '../todo-filter/todo-filter.component';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -19,7 +19,7 @@ import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.se
 @Component({
   selector: 'app-todo-list',
   standalone: true,
-  imports: [MatSortModule, TodoFilterComponent, MatTableModule, MatButtonModule, MatIconModule, MatCheckboxModule, AsyncPipe, DatePipe, TitleCasePipe, NgClass],
+  imports: [RouterLink, MatSortModule, TodoFilterComponent, MatTableModule, MatButtonModule, MatIconModule, MatCheckboxModule, AsyncPipe, DatePipe, TitleCasePipe, NgClass],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss',
 })
