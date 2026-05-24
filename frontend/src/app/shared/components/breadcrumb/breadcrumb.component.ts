@@ -30,7 +30,6 @@ export class BreadcrumbComponent {
 
   private buildBreadcrumbs() {
     const root = this.route.root;
-    console.log('Root route:', root);
 
     let currentRoute = root;
     let label = '';

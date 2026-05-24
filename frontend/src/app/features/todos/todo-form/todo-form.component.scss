@@ -1,133 +1,200 @@
 @use '../../../styles/tokens.scss' as *;
 
 .todo-form {
-//   max-width: 900px;
-margin-top: $space-4;
-  margin: 0 auto;
   padding: 24px;
-  background-color: $white;
+  max-width: 720px;
+  margin: 0 auto;
 
-  // ── HEADER ──
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-
-    h2 {
-      flex: 1;
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    &-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-  }
-
-  // ── BODY ──
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  // ── ROW ──
+  // ── ROWS ─────────────────────────────────────────────────────────────────────
   &__row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 16px;
+    width: 100%;
 
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+    &--two {
+      > .todo-form__field { flex: 1; }
+    }
+
+    &--half {
+      width: 50%;
+
+      > .todo-form__field { flex: 1; }
     }
   }
 
-  // ── FIELDS ──
+  // ── FIELDS ───────────────────────────────────────────────────────────────────
   &__field {
     width: 100%;
+    margin-bottom: 4px;
 
     &--full { width: 100%; }
   }
 
-  // ── ATTACHMENTS ──
+  // ── ATTACHMENTS ──────────────────────────────────────────────────────────────
   &__attachments {
-    position: relative;
-    border: 1px dashed #adb5bd;
-    border-radius: 8px;
-    padding: 24px;
+    width: 100%;
+    margin-bottom: 20px;
   }
 
   &__attachments-label {
-    position: absolute;
-    top: -10px;
-    left: 12px;
-    background: white;
-    padding: 0 4px;
-    font-size: 12px;
-    color: #6c757d;
+    font-size: $text-12;
+    color: $tertiary-grey;
+    display: block;
+    margin-bottom: 6px;
+    padding-left: 14px;
   }
 
   &__dropzone {
+    border: 1.5px dashed $tertiary-grey;
+    border-radius: 6px;
+    padding: 28px 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 14px;
-    color: #6c757d;
     cursor: pointer;
-    min-height: 60px;
+    transition: border-color 0.2s, background 0.2s;
 
-    mat-icon { color: #adb5bd; }
+    &:hover {
+      border-color: $primary-blue;
+      background: rgba($primary-blue, 0.02);
+    }
   }
 
-  &__browse {
+  &__dropzone-icon {
+    color: $tertiary-grey;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  &__dropzone-text {
+    font-size: $text-14;
+    color: $tertiary-grey;
+    margin: 0;
+  }
+
+  &__dropzone-browse {
     color: $primary-blue;
     cursor: pointer;
     text-decoration: underline;
   }
 
-  // ── SUBTASKS ──
+  // ── SUBTASKS ─────────────────────────────────────────────────────────────────
   &__subtasks {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding-top: 8px;
-    border-top: 1px solid #e9ecef;
+    margin-bottom: 16px;
   }
 
   &__subtasks-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-    }
+    margin-bottom: 12px;
   }
 
-  &__subtasks-col-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 48px;
-    gap: 12px;
-    padding: 0 4px;
-    font-size: 12px;
-    color: #6c757d;
-    font-weight: 500;
+  &__subtasks-title {
+    font-size: $text-16;
+    font-weight: $fw-semibold;
+    color: $primary-black;
+    margin: 0;
   }
 
-  &__subtask-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 48px;
-    gap: 12px;
+  &__subtasks-add {
+    font-size: $text-14;
+    color: $primary-blue;
+    border-color: $primary-blue !important;
+    display: flex;
     align-items: center;
+    gap: 4px;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+
+  // ── NOTICE ───────────────────────────────────────────────────────────────────
+  &__notice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: $text-12;
+    color: $tertiary-grey;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #FFF8E6;
+    border-left: 3px solid #EF9F27;
+    border-radius: 4px;
+  }
+
+  &__notice-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #EF9F27;
+  }
+
+  // ── ACTIONS ──────────────────────────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid $tertiary-grey;
+    margin-top: 8px;
   }
 }
 
-.delete-btn mat-icon { color: #E24B4A; }
-.delete-icon         { color: #adb5bd; }
+// ── SUBTASK ROW ───────────────────────────────────────────────────────────────
+.subtask-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  &__field {
+    flex: 1;
+  }
+
+  &__status-field {
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  &__delete {
+    color: $tertiary-grey;
+    margin-top: 6px;
+    flex-shrink: 0;
+
+    &:hover { color: #E24B4A; }
+  }
+}
+
+// ── MOBILE ────────────────────────────────────────────────────────────────────
+@media (max-width: 599px) {
+  .todo-form {
+    padding: 16px;
+
+    &__row--two,
+    &__row--half {
+      width: 100%;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    &__actions {
+      position: sticky;
+      bottom: 0;
+      background: $white;
+      padding: 12px 0;
+      margin: 0 -16px;
+      padding-left: 16px;
+      padding-right: 16px;
+      box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .subtask-row {
+    flex-wrap: wrap;
+
+    &__status-field { width: 100%; }
+  }
+}

@@ -9,6 +9,10 @@ a {
   text-decoration: none;
 }
 
+.pointer{
+  cursor: pointer;
+}
+
 .btn-primary {
   background-color: $primary-blue !important;
   color: $white !important;

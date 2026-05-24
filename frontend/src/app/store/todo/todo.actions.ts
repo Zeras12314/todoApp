@@ -25,6 +25,11 @@ export const TodoActions = createActionGroup({
     'Delete Todo Success': props<{ id: number }>(),
     'Delete Todo Failure': props<{ error: string }>(),
 
+    // Delete bulk
+    'Delete Todos': props<{ ids: number[] }>(),
+    'Delete Todos Success': props<{ ids: number[] }>(),
+    'Delete Todos Failure': props<{ error: string }>(),
+
     // Filter / UI
     'Set Status Filter': props<{ status: string }>(),
     'Set Priority Filter': props<{ priority: string }>(),

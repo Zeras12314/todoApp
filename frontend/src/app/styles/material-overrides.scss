@@ -17,16 +17,8 @@
   color: currentColor;
 }
 
-// add this at the bottom of styles.scss
-.mdc-evolution-chip {
-  border-radius: 2px !important;
-}
-
 
 // ── CHECKBOX ──
-.mdc-checkbox__background {
-  // border-color: #027CEC !important;
-}
 
 .mdc-checkbox--selected .mdc-checkbox__background,
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {

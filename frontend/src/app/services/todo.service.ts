@@ -11,12 +11,24 @@ export class TodoService {
   private readonly apiUrl = env.apiUrl;
 
 
-  getTodos() {
+  getAll() {
     return this.http.get<Todo[]>(`${this.apiUrl}/todos`);
   }
 
   getTodoById(id: number) {
     return this.http.get<Todo>(`${this.apiUrl}/todos/${id}`);
+  }
+
+  updateTodo(id: number, updatedTodo: Partial<Todo>) {
+    return this.http.put<Todo>(`${this.apiUrl}/todos/${id}`, updatedTodo);
+  }
+
+  createTodo(newTodo: Omit<Todo, 'id'>) {
+    return this.http.post<Todo>(`${this.apiUrl}/todos`, newTodo);
+  }
+
+  deleteTodo(ids: number[]) {
+    return this.http.delete(`${this.apiUrl}/todos`, { body: ids });
   }
 
 }

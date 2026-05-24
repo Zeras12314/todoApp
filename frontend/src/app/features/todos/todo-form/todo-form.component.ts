@@ -1,103 +1,143 @@
 import { Component, inject, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  FormsModule,
-  Validators
-} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { Observable, of, switchMap, take } from 'rxjs';
+import { Todo } from '../../../models/todo.model';
+import { TodoActions } from '../../../store/todo/todo.actions';
+import { selectTodoById } from '../../../store/todo/todo.selectors';
+import { TodoService } from '../../../services/todo.service';
 
 interface Subtask {
-  title:  string;
-  status: string;
+  name: string;
+  done: boolean;
 }
 
 @Component({
   selector: 'app-todo-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
-    FormsModule,
+    DatePipe,
+    MatButtonModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule,
   ],
   templateUrl: './todo-form.component.html',
-  styleUrl:    './todo-form.component.scss',
+  styleUrl: './todo-form.component.scss',
 })
 export class TodoFormComponent implements OnInit {
-  private fb     = inject(FormBuilder);
-  private router = inject(Router);
-  private route  = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly store = inject(Store);
+  private readonly todoService = inject(TodoService);
 
-  isEdit    = false;
-  todoId: string | null = null;
-  subtasks: Subtask[] = [];
+  isEditMode = false;
+  todoId: number | null = null;
+  todo: Todo | undefined;
+  today = new Date();
 
-  todoForm: FormGroup = this.fb.group({
-    title:         ['', [Validators.required, Validators.maxLength(25)]],
-    priority:      [{ value: '', disabled: true }],
-    status:        ['NOT_STARTED'],
-    createdAt:     [{ value: '', disabled: true }],
-    dueDate:       ['', Validators.required],
-    completedDate: [''],
-    details:       ['', Validators.maxLength(300)],
-  });
+  // Static subtasks until backend is ready
+  staticSubtasks: Subtask[] = [
+    { name: 'Working demo app check', done: false },
+    { name: 'Deck check', done: false },
+    { name: 'Reservation', done: true },
+  ];
 
-  ngOnInit() {
-    this.todoId = this.route.snapshot.paramMap.get('id');
-    this.isEdit = !!this.todoId;
+  form!: FormGroup;
 
-    if (this.isEdit) {
-      this.todoForm.get('title')!.disable();
-      this.todoForm.get('priority')!.disable();
-      // TODO: load todo from store and patch form
+  readonly statusOptions = [
+    { value: 'NOT_STARTED', label: 'Not Started' },
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'CANCELLED', label: 'Cancelled' },
+  ];
+
+  readonly priorityOptions = [
+    { value: 'LOW', label: 'Low' },
+    { value: 'HIGH', label: 'High' },
+    { value: 'CRITICAL', label: 'Critical' },
+  ];
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      title: ['', Validators.required],
+      priority: ['', Validators.required],
+      status: ['NOT_STARTED', Validators.required],
+      dueDate: [null, Validators.required],
+      description: ['', Validators.required],
+    });
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.isEditMode = true;
+      this.todoId = Number(idParam);
+
+      // Lock fields after confirming edit mode
+      this.form.get('title')?.disable();
+      this.form.get('priority')?.disable();
+
+      this.loadTodo(this.todoId);
     }
 
-    // auto-set completedDate when status changes to COMPLETED
-    this.todoForm.get('status')!.valueChanges.subscribe(val => {
-      const ctrl = this.todoForm.get('completedDate')!;
-      if (val === 'COMPLETED' && !ctrl.value) {
-        ctrl.setValue(new Date());
+
+  }
+
+  private loadTodo(id: number): void {
+    this.store.select(selectTodoById(id)).pipe(
+      take(1),
+      switchMap((todo) => todo ? of(todo) : this.todoService.getTodoById(id))
+    ).subscribe((todo) => {
+      if (todo) {
+        this.todo = todo;
+        this.form.patchValue({
+          title: todo.title,
+          priority: todo.priority,
+          status: todo.status,
+          dueDate: todo.dueDate,
+          description: todo.description ?? '',
+        });
       }
     });
   }
 
-  addSubtask()            { this.subtasks.push({ title: '', status: 'NOT_DONE' }); }
-  removeSubtask(i: number){ this.subtasks.splice(i, 1); }
-
-  onFileSelect(e: Event) {
-    const files = (e.target as HTMLInputElement).files;
-    console.log('files selected:', files);
+  get allSubtasksDone(): boolean {
+    return this.staticSubtasks.every((s) => s.done);
   }
 
-  onDrop(e: DragEvent) {
-    e.preventDefault();
-    console.log('files dropped:', e.dataTransfer?.files);
+  isStatusDisabled(value: string): boolean {
+    return value === 'COMPLETED' && !this.allSubtasksDone;
   }
 
-  onBack()   { this.router.navigate(['/todos']); }
-  onDelete() { /* dispatch delete + navigate back */ }
+  onSave(): void {
+    if (this.form.invalid) return;
 
-  onSubmit() {
-    if (this.todoForm.invalid) {
-      this.todoForm.markAllAsTouched();
-      return;
+    const formValue = this.form.getRawValue(); // getRawValue includes disabled fields
+
+    if (this.isEditMode && this.todoId) {
+      const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
+      this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
+    } else {
+      this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
     }
-    // TODO: dispatch createTodo or updateTodo
+
+    // this.router.navigate(['/todos']);
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/todos']);
   }
 }

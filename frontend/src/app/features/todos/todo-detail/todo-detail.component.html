@@ -16,10 +16,10 @@
       </div>
 
       <div class="todo-detail__actions">
-        <div (click)="deleteTodo()">
+        <div (click)="deleteTodo(todo.id)">
           <img src="Icons/Delete_active.svg" alt="Delete" />
         </div>
-        <div (click)="editTodo()" [routerLink]="['/todos', todo.id, 'edit']">
+        <div [routerLink]="['/todos', todo.id, 'edit']">
           <img src="Icons/Edit.svg" alt="Edit" />
         </div>
       </div>
@@ -62,6 +62,8 @@
   </div>
 } @else {
   <div class="todo-detail__empty">
-    <p>Todo not found.</p>
+   <p>The task may have been deleted or does not exist.</p>
+   <button class="btn btn-sm btn-primary rounded-pill px-3" routerLink="/todos">Back to List</button> 
+
   </div>
 }

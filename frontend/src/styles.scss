@@ -6,28 +6,30 @@
 
 @include mat.core();
 
-$my-theme: mat.define-theme(
-  (
-    color: (
-      primary: mat.$blue-palette,
-    ),
-  )
-);
+$custom-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+  ),
+  typography: (
+    brand-family: $font-primary,
+  ),
+));
 
-:root {
-  @include mat.all-component-themes($my-theme);
+html {
+  @include mat.all-component-themes($custom-theme);
+
+  // Override the generated primary with your exact blue
+  --mat-sys-primary: #027cec;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #d0e8ff;
+  --mat-sys-on-primary-container: #027cec;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: $font-primary;
   background: $white;
   color: $primary-black;
-  margin: 0;
-  padding: 0;
 }

@@ -13,7 +13,6 @@ public class RegisterRequest {
             regexp = "^[A-Za-z0-9 !#()_\\-]+$",
             message = "Only letters, numbers, spaces, and the symbols !#()_- are allowed"
     )
-
     private String username;
 
     @NotBlank(message = "Password is required")
