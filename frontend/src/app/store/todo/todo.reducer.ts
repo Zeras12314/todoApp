@@ -5,7 +5,7 @@ import { initialTodoState } from './todo.state';
 export const todoReducer = createReducer(
   initialTodoState,
 
-  // ── Load ──────────────────────────────────────────────────────────────────
+  // LOAD
   on(TodoActions.loadTodos, (state) => ({
     ...state,
     loading: true,
@@ -24,7 +24,7 @@ export const todoReducer = createReducer(
     error,
   })),
 
-  // ── Create ────────────────────────────────────────────────────────────────
+  // CREATE
   on(TodoActions.createTodo, (state) => ({
     ...state,
     loading: true,
@@ -43,7 +43,7 @@ export const todoReducer = createReducer(
     error,
   })),
 
-  // ── Update ────────────────────────────────────────────────────────────────
+  // UPDATE
   on(TodoActions.updateTodo, (state) => ({
     ...state,
     loading: true,
@@ -62,7 +62,7 @@ export const todoReducer = createReducer(
     error,
   })),
 
-  // ── Delete ────────────────────────────────────────────────────────────────
+  // DELETE
   on(TodoActions.deleteTodo, (state) => ({
     ...state,
     loading: true,
@@ -75,13 +75,19 @@ export const todoReducer = createReducer(
     loading: false,
   })),
 
+  on(TodoActions.deleteTodosSuccess, (state, { ids }) => ({
+    ...state,
+    todos: state.todos.filter((t) => !ids.includes(t.id)),
+    loading: false,
+  })),
+
   on(TodoActions.deleteTodoFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
   })),
 
-  // ── Filters ───────────────────────────────────────────────────────────────
+  // FILTERS
   on(TodoActions.setStatusFilter, (state, { status }) => ({
     ...state,
     filters: { ...state.filters, status: status || null },

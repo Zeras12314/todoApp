@@ -93,7 +93,12 @@
   &__empty {
     padding: $space-12 $space-6;
     text-align: center;
-    color: $tertiary-grey;
+    color: $secondary-grey;
+    font-size: $text-20;
+
+    // button{
+    //   border-radius: $space-4;
+    // }
   }
 }
 

@@ -19,10 +19,13 @@ public class Todo {
 
     private String title;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Date createdDate;
+
     private Date dueDate;
 
-    @CreationTimestamp
-    private Date createdDate;
+    private Date completedDate;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;

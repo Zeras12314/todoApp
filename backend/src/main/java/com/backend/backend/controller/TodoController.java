@@ -1,13 +1,16 @@
 package com.backend.backend.controller;
 
 import com.backend.backend.dao.TodoRepository;
+import com.backend.backend.dto.TodoRequest;
 import com.backend.backend.entity.Todo;
 import com.backend.backend.service.TodoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,29 +27,30 @@ public class TodoController {
     @Autowired
     private TodoRepository todoRepository;
 
-    @PostMapping("/todos") // ✅ THIS WAS MISSING
+    // CREATE TODO
+    @PostMapping("/todos")
     public ResponseEntity<?> createTodo(
-            @RequestBody Todo todo,
-            @AuthenticationPrincipal UserDetails userDetails)
-    {
-        Todo saved = todoService.createTodo(todo, userDetails.getUsername());
+            @Valid @RequestBody TodoRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(saved);
+        Todo saved = todoService.createTodo(request, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // GET ALL TODOS
     @GetMapping("/todos")
     public ResponseEntity<List<Todo>> getMyTodos(
-            @AuthenticationPrincipal UserDetails userDetails){
+            @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
                 todoService.getTodoByUsername(userDetails.getUsername()));
     }
 
+    // GET TODO BY ID
     @GetMapping("/todos/{id}")
     public ResponseEntity<?> getTodoById(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long id){
+            @PathVariable Long id) {
+
         String username = userDetails.getUsername();
         Todo todo = todoService.getTodoByIdAndUsername(id, username);
 
@@ -56,9 +60,26 @@ public class TodoController {
         }
 
         return ResponseEntity.ok(todo);
-
-
     }
 
+    // UPDATE TODO
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<?> updateTodo(
+            @PathVariable Long id,
+            @Valid @RequestBody TodoRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
+        Todo saved = todoService.updateTodo(id, request, userDetails.getUsername());
+        return ResponseEntity.ok(saved);
+    }
+
+    // DELETE TODO
+    @DeleteMapping("/todos")
+    public ResponseEntity<?> deleteTodos(
+            @RequestBody List<Long> ids,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String message = todoService.deleteTodos(ids, userDetails.getUsername());
+        return ResponseEntity.ok(Map.of("message", message));
+    }
 }

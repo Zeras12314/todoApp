@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TodoService } from '../../../services/todo.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AsyncPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
@@ -9,12 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import { TodoFilterComponent } from '../todo-filter/todo-filter.component';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Store } from '@ngrx/store';
-import { CdkAutofill } from "@angular/cdk/text-field";
 import { StoreService } from '../../../store/store.service';
 import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
+import { TodoActions } from '../../../store/todo/todo.actions';
 
 @Component({
   selector: 'app-todo-list',
@@ -25,13 +25,13 @@ import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.se
 })
 
 
-export class TodoListComponent implements OnInit, AfterViewInit {
+export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   private _liveAnnouncer = inject(LiveAnnouncer);
   router = inject(Router);
-  todoService = inject(TodoService);
   storeService = inject(StoreService);
   store = inject(Store);
   todo$: Observable<Todo[]>;
+  selectedIds: number[] = [];
 
   allTodos$: Observable<Todo[]>;
   filteredTodos$: Observable<Todo[]>;
@@ -78,6 +78,13 @@ export class TodoListComponent implements OnInit, AfterViewInit {
     );
 
     this.todo$ = this.filteredTodos$;
+
+    // Clear selection after bulk delete success
+    this.store.select(selectAllTodos).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.selectedIds = [];
+    });
   }
 
 
@@ -121,11 +128,25 @@ export class TodoListComponent implements OnInit, AfterViewInit {
       return hours >= 0 && hours <= 48;
     }
 
-    return hours >= 0 && hours <= 24; 
+    return hours >= 0 && hours <= 24;
   }
 
   onEdit(todo: Todo) {
     this.router.navigate(['/todos', todo.id, 'edit']);
+  }
+
+  onCheckboxChange(id: number, checked: boolean): void {
+    if (checked) {
+      this.selectedIds = [...this.selectedIds, id];
+    } else {
+      this.selectedIds = this.selectedIds.filter((i) => i !== id);
+    }
+  }
+
+  onBulkDelete(): void {
+    if (this.selectedIds.length === 0) return;
+    this.store.dispatch(TodoActions.deleteTodos({ ids: this.selectedIds }));
+    this.selectedIds = [];
   }
 
 

@@ -8,6 +8,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
 import { TodoService } from '../../../services/todo.service';
+import { TodoActions } from '../../../store/todo/todo.actions';
 
 interface Subtask {
   name: string;
@@ -16,7 +17,7 @@ interface Subtask {
 @Component({
   selector: 'app-todo-detail',
   standalone: true,
-  imports: [RouterLink,MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe, RouterLink],
+  imports: [RouterLink, MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe, RouterLink],
   templateUrl: './todo-detail.component.html',
   styleUrl: './todo-detail.component.scss',
 })
@@ -43,13 +44,10 @@ export class TodoDetailComponent {
       switchMap((todo) => todo ? of(todo) : this.todoService.getTodoById(id))
     );
   }
-  editTodo() {
-    // this.router.navigate(['/todos', this.todo?.id, 'edit']);
-    return '';
-  }
 
-  deleteTodo() {
-    return ''
+  deleteTodo(id: number): void {
+    this.store.dispatch(TodoActions.deleteTodo({ id }));
+    this.router.navigate(['/todos']);
   }
 
   getPriorityIcon(status: string): string {
