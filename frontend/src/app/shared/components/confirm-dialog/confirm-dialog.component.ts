@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogContent, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AuthActions } from '../../../store/auth/auth.action';
 import { Router } from '@angular/router';
+import { ConfirmDialogData } from '../../../models/confirm-dialog.model';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -16,8 +17,16 @@ import { Router } from '@angular/router';
 export class ConfirmDialogComponent {
   store = inject(Store);
   router = inject(Router);
+  matDialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
+  data = inject(MAT_DIALOG_DATA) as ConfirmDialogData;
 
-  logout() {
-    this.store.dispatch(AuthActions.logout());
+
+
+  onCancel() {
+    this.matDialogRef.close(false);
+  }
+
+  onConfirm() {
+    this.matDialogRef.close(true);
   }
 }

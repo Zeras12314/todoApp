@@ -62,8 +62,20 @@ public class TodoService {
         Todo existing = todoRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Todo not found or unauthorized"));
 
-        if (request.getStatus() != null)
-            existing.setStatus(Status.valueOf(request.getStatus()));
+        if (request.getStatus() != null) {
+            Status newStatus = Status.valueOf(request.getStatus());
+            existing.setStatus(newStatus);
+
+            if (newStatus == Status.COMPLETED) {
+                // Use provided completedDate or default to now
+                existing.setCompletedDate(
+                        request.getCompletedDate() != null ? request.getCompletedDate() : new Date()
+                );
+            } else {
+                // Always clear completedDate if status is not COMPLETED
+                existing.setCompletedDate(null);
+            }
+        }
 
         if (request.getDueDate() != null) {
             if (request.getDueDate().before(new Date()))

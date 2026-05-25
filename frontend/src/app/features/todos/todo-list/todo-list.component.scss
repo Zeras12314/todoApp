@@ -1,12 +1,17 @@
 @use '../../../styles/tokens.scss' as *;
 
-// ═══════════════════════════════════════
-// DESKTOP TABLE
-// ═══════════════════════════════════════
-.table-wrapper{
-  border-radius: 8px;
+
+// DESKTOP
+.table-wrapper {
+  border-radius: $space-2; 
   border: 1px solid $tertiary-grey;
   overflow: hidden;
+}
+
+.select-wrapper--active {
+  border-radius: $space-1 + 2px; 
+  border: 2px solid $tertiary-grey;
+  padding: 2px $space-1;
 }
 
 table {
@@ -20,24 +25,18 @@ table {
   min-width: 100% !important;
 }
 
-
 .mat-column-select.mat-header-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: red;
 }
 
-
-// ── COLUMN WIDTHS ──
-.mat-column-select   { width: 48px;  flex: none; }
-// .mat-column-expand   { width: 48px;  flex: none; }
+// COLUMN WIDTHS
+.mat-column-select   { width: $space-12; flex: none; } 
 .mat-column-dueDate  { width: 20%; flex: none; }
 .mat-column-priority { width: 10%; flex: none; }
-// .mat-column-status   { width: 160px; flex: none; }
-// .mat-column-edit     { width: 96px;  flex: none; }
 
-// ── HEADER CELL ──
+// HEADER CELL
 .header-cell {
   display: flex;
   align-items: center;
@@ -48,27 +47,28 @@ table {
   white-space: nowrap;
 }
 
-// ── ROWS ──
+// ROWS 
 tr.example-detail-row { height: 0; }
 
 tr.example-element-row {
   cursor: pointer;
 
-  &:not(.example-expanded-row):hover  { background: #f8f9fa; }
-  &:not(.example-expanded-row):active { background: #f1f3f5; }
+  &:not(.example-expanded-row):hover  { background: $surface-active; }
+  &:not(.example-expanded-row):active { background: $surface-hover; }
 
   td { border-bottom-width: 0; }
 }
 
-// ── TITLE ──
+// TITLE 
 .todo-title {
   font-size: $text-12;
   font-weight: $fw-semibold;
-  color: #212529;
+  color: $primary-black;
   text-decoration: underline;
   cursor: pointer;
 }
 
+//  DUE DATE 
 .due-date {
   &--overdue { color: $error; }
   &--warning { color: $warning; }
@@ -82,41 +82,40 @@ tr.example-element-row {
   &--warning { color: $warning; }
 }
 
-// ── STATUS ──
+// STATUS
 .status-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: $space-1 + 2px; 
   font-size: $text-14;
-  color: #495057;
+  color: $secondary-grey;
   white-space: nowrap;
 }
 
-
 .completed-date {
-  color: #378ADD;
+  color: $primary-blue; 
   margin-top: 2px;
 }
 
-// ── EDIT ICON ──
+//  EDIT ICON
 .edit-icon {
   font-size: $space-2;
-  color: #adb5bd;
+  color: $tertiary-grey;
   transition: color 0.2s;
 
-  &:hover { color: #495057; }
+  &:hover { color: $secondary-grey; }
 }
 
-// ── EXPAND ICON ──
+// EXPAND ICON
 .expand-icon {
-  font-size: 18px;
-  color: #adb5bd;
+  font-size: $text-16 + 2px;
+  color: $tertiary-grey;
   transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &--open { transform: rotate(90deg); }
 }
 
-// ── EXPANDED DETAIL ──
+// EXPANDED DETAIL
 .example-element-detail-wrapper {
   overflow: hidden;
   display: grid;
@@ -133,43 +132,43 @@ tr.example-element-row {
 }
 
 .example-element-description {
-  padding: 12px 16px;
-  font-size: 13px;
-  color: #495057;
+  padding: $space-3 $space-4; 
+  font-size: $text-12 + 1px;
+  color: $secondary-grey;
 
   &-attribution { opacity: 0.5; }
 }
 
-.no-todos{
+.no-todos {
   padding-bottom: $space-15;
-  img{
-    width: 240px;
-    height: 240px;
-     mix-blend-mode: multiply;
 
+  img {
+    width: $space-60;  
+    height: $space-60;
+    mix-blend-mode: multiply;
   }
 }
 
 
-// ═══════════════════════════════════════
+
 // MOBILE CARDS
-// ═══════════════════════════════════════
+
 
 .todo-card-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 12px;
+  gap: $space-2;
+  padding: 0 $space-3;
 }
 
 .todo-card {
-  background: white;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: $white;
+  border: 1px solid $surface-active;
+  border-radius: $space-2;
+  padding: $space-2 $space-3;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: $space-1;
   cursor: pointer;
 
   &--expanded { border-color: $primary-blue; }
@@ -177,60 +176,46 @@ tr.example-element-row {
   &__row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: $space-2;
   }
 
   &__checkbox { flex-shrink: 0; }
 
   &__priority {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
+    font-size: $text-12 - 1px;
+    font-weight: $fw-semibold;
+    padding: 2px $space-2;
+    border-radius: $space-1;
     border: 1px solid;
     flex-shrink: 0;
-
-    &.priority--high     { color: #854F0B; background: #FAEEDA; border-color: #EF9F27; }
-    &.priority--low      { color: #3B6D11; background: #EAF3DE; border-color: #639922; }
-    &.priority--critical { color: #791F1F; background: #FCEBEB; border-color: #E24B4A; }
   }
 
   &__status {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: #495057;
+    gap: $space-1;
+    font-size: $text-12;
+    color: $secondary-grey;
     flex: 1;
-
-    .status-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-
-      &.status--complete    { color: #378ADD; }
-      &.status--cancelled   { color: #888780; }
-      &.status--in-progress { color: #EF9F27; }
-    }
   }
 
   &__expand {
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
+    width: $space-8;
+    height: $space-8;
+    line-height: $space-8;
   }
 
   &__meta {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding-left: 40px;
+    padding-left: $space-10; 
   }
 
   &__title {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: $text-14 - 1px; 
+    font-weight: $fw-medium;
     color: $primary-black;
     text-decoration: underline;
   }
@@ -238,35 +223,27 @@ tr.example-element-row {
   &__date {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: #888780;
+    gap: $space-1;
+    font-size: $text-12 - 1px;
 
-
-    &--overdue {
-      color: $error !important;
-    }
-
-    &--warning {
-      color: $warning !important;
-    }
-
+    &--overdue { color: $error !important; }
+    &--warning { color: $warning !important; }
 
     .date-icon {
-      font-size: 13px;
-      width: 13px;
-      height: 13px;
+      font-size: $text-12 + 1px;
+      width: $text-12 + 1px;
+      height: $text-12 + 1px;
     }
   }
 
   &__detail {
-    padding: 10px 12px;
-    border-top: 1px solid #e9ecef;
-    margin-top: 6px;
-    font-size: 13px;
-    color: #495057;
+    padding: $space-2 $space-3;
+    border-top: 1px solid $surface-active;
+    margin-top: $space-2;
+    font-size: $text-14 - 1px;
+    color: $secondary-grey;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $space-1;
   }
 }

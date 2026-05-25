@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { TodoService } from '../../../services/todo.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AsyncPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { Todo } from '../../../models/todo.model';
@@ -15,6 +14,8 @@ import { Store } from '@ngrx/store';
 import { StoreService } from '../../../store/store.service';
 import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
 import { TodoActions } from '../../../store/todo/todo.actions';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-todo-list',
@@ -26,7 +27,7 @@ import { TodoActions } from '../../../store/todo/todo.actions';
 
 
 export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
-  private _liveAnnouncer = inject(LiveAnnouncer);
+  readonly dialog = inject(MatDialog);
   router = inject(Router);
   storeService = inject(StoreService);
   store = inject(Store);
@@ -175,4 +176,19 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
       default: return 'Icons/Unknown.svg';
     }
   }
+
+  openDeleteDialog() {
+  this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      title: 'Delete Task',
+      // message: 'Are you sure you want to delete this task?',
+      message: `${this.selectedIds.length} ${this.selectedIds.length === 1 ? 'Task' : 'Tasks'} will be deleted`,
+      confirmText: 'Delete'
+    }
+  }).afterClosed().subscribe(result => {
+    if (result) {
+      this.onBulkDelete();
+    }
+  });
+}
 }

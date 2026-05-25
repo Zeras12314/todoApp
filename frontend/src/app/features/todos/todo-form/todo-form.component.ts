@@ -74,11 +74,12 @@ export class TodoFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      title: ['', Validators.required],
+      title: ['Todo 01', Validators.required],
       priority: ['', Validators.required],
       status: ['NOT_STARTED', Validators.required],
       dueDate: [null, Validators.required],
       description: ['', Validators.required],
+      completedDate: [{ value: null, disabled: true }],
     });
 
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -92,7 +93,7 @@ export class TodoFormComponent implements OnInit {
 
       this.loadTodo(this.todoId);
     }
-
+    this.watchStatusChanges();
 
   }
 
@@ -103,38 +104,69 @@ export class TodoFormComponent implements OnInit {
     ).subscribe((todo) => {
       if (todo) {
         this.todo = todo;
+
         this.form.patchValue({
           title: todo.title,
           priority: todo.priority,
           status: todo.status,
           dueDate: todo.dueDate,
           description: todo.description ?? '',
-        });
+          completedDate: todo.completedDate ?? null,
+        }, { emitEvent: false });
+
+        // Enable completedDate if already completed
+        if (todo.status === 'COMPLETED') {
+          this.form.get('completedDate')?.enable();
+        }
       }
     });
   }
 
+  private watchStatusChanges(): void {
+    this.form.get('status')?.valueChanges.subscribe((status) => {
+      if (status !== 'COMPLETED') {
+        this.form.get('completedDate')?.setValue(null);
+        this.form.get('completedDate')?.disable();
+      }
+    });
+  }
+
+
+  get minDueDate(): Date {
+    if (this.isEditMode && this.todo?.createdDate) {
+      const d = new Date(this.todo.createdDate);
+      d.setDate(d.getDate() + 1); // must be after created date
+      return d;
+    }
+    return this.today;
+  }
+
+
+ get isCompleted(): boolean {
+  return this.form.get('status')?.value === 'COMPLETED';
+}
   get allSubtasksDone(): boolean {
     return this.staticSubtasks.every((s) => s.done);
   }
 
   isStatusDisabled(value: string): boolean {
-    return value === 'COMPLETED' && !this.allSubtasksDone;
+    // return value === 'COMPLETED' && !this.allSubtasksDone;
+    return false;
   }
 
   onSave(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.getRawValue(); // getRawValue includes disabled fields
+    const formValue = this.form.getRawValue();
+    console.log('completedDate being sent:', formValue.completedDate);
 
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
+      console.log('updated payload:', updated);
       this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
     } else {
       this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
     }
-
-    // this.router.navigate(['/todos']);
   }
 
   onCancel(): void {

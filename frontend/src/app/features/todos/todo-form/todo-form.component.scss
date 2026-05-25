@@ -6,21 +6,25 @@
   margin: 0 auto;
 
   // ── ROWS ─────────────────────────────────────────────────────────────────────
-  &__row {
-    display: flex;
-    gap: 16px;
-    width: 100%;
+&__row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
 
-    &--two {
-      > .todo-form__field { flex: 1; }
-    }
-
-    &--half {
-      width: 50%;
-
-      > .todo-form__field { flex: 1; }
-    }
+  &--two {
+    > .todo-form__field { flex: 1; }
   }
+
+  &--half {
+    width: 50%;
+    > .todo-form__field { flex: 1; }
+  }
+
+  &--three {
+    width: 70%;
+    > .todo-form__field { flex: 1; }
+  }
+}
 
   // ── FIELDS ───────────────────────────────────────────────────────────────────
   &__field {

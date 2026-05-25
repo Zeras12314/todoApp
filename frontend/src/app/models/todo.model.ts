@@ -5,5 +5,6 @@ export interface Todo {
   status: string;
   dueDate: Date;
   createdDate: Date;
+  completedDate?: Date;
   description?: string;
 }
