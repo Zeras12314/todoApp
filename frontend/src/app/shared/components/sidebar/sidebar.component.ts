@@ -5,6 +5,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { MatButtonModule } from '@angular/material/button';
 import { StoreService } from '../../../store/store.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AuthActions } from '../../../store/auth/auth.action';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,12 +20,24 @@ export class SidebarComponent {
   storeService = inject(StoreService);
   user$ = this.storeService.user$;
 
-  openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+
+  openLogoutDialog(): void {
     this.dialog.open(ConfirmDialogComponent, {
-      width: '420px',
-      maxWidth: '90vw',
-      enterAnimationDuration,
-      exitAnimationDuration,
+      data: {
+        title: 'Sign out',
+        message: 'Are you sure you want to sign out? All unsaved changes will be lost.',
+        confirmText: 'Sign out'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.logout();
+      }
     });
   }
+
+
+  logout(): void {
+    this.store.dispatch(AuthActions.logout());
+  }
+
 }

@@ -9,6 +9,8 @@ import { Store } from '@ngrx/store';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
 import { TodoService } from '../../../services/todo.service';
 import { TodoActions } from '../../../store/todo/todo.actions';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Subtask {
   name: string;
@@ -27,6 +29,8 @@ export class TodoDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly todoService = inject(TodoService);
+
+    readonly dialog = inject(MatDialog);
 
   // Static until subtasks are implemented in the backend
   staticSubtasks: Subtask[] = [
@@ -48,6 +52,21 @@ export class TodoDetailComponent {
   deleteTodo(id: number): void {
     this.store.dispatch(TodoActions.deleteTodo({ id }));
     this.router.navigate(['/todos']);
+  }
+
+    openDeleteDialog(id: number): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Task',
+        // message: 'Are you sure you want to delete this task?',
+        message: `Task will be deleted`,
+        confirmText: 'Delete'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteTodo(id);
+      }
+    });
   }
 
   getPriorityIcon(status: string): string {

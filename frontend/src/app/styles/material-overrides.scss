@@ -22,11 +22,12 @@
 
 .mdc-checkbox--selected .mdc-checkbox__background,
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {
-  background-color: #027CEC !important;
+  // background-color: #027CEC !important;
+  background-color: #0DCAF0 !important;
   // border-color: #027CEC !important;
 }
 
 .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
   // background-color: #027CEC !important;
-  border-color: #027CEC !important;
+  border-color: #0DCAF0 !important;
 }

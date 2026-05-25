@@ -2,6 +2,7 @@ package com.backend.backend.entity;
 
 import com.backend.backend.enums.Priority;
 import com.backend.backend.enums.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class Todo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore   // ✅ ADD THIS
+    @JsonIgnore
     private User user;
 
 }
