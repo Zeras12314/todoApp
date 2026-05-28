@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class TodoRequest {
@@ -23,4 +24,6 @@ public class TodoRequest {
     private String status;
 
     private Date completedDate;
+
+    private List<SubTaskRequest> subTasks;
 }

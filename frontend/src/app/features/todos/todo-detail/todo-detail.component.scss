@@ -95,10 +95,6 @@
     text-align: center;
     color: $secondary-grey;
     font-size: $text-20;
-
-    // button{
-    //   border-radius: $space-4;
-    // }
   }
 }
 
@@ -123,7 +119,7 @@
     align-items: center;
     gap: $space-1;
     font-size: $text-14;
-    color: $tertiary-grey;
+    color: $secondary-grey;
     white-space: nowrap;
     flex-shrink: 0;
   }

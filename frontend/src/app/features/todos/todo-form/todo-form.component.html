@@ -21,7 +21,9 @@
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           @for (opt of statusOptions; track opt.value) {
-            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            <mat-option [value]="opt.value" [disabled]="isStatusDisabled(opt.value)">{{
+              opt.label
+            }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -101,57 +103,67 @@
     </mat-form-field>
 
     <!-- ROW 5: Attachments (static UI) -->
-    <div class="todo-form__attachments">
-      <span class="todo-form__attachments-label">Attachments</span>
-      <div class="todo-form__dropzone">
-        <mat-icon class="todo-form__dropzone-icon">upload</mat-icon>
-        <p class="todo-form__dropzone-text">
-          Drop files to attach, or <span class="todo-form__dropzone-browse">browse</span>.
-        </p>
-      </div>
-    </div>
+    <app-file-uploader></app-file-uploader>
 
-    <!-- ROW 6: Subtasks (static) -->
-    <div class="todo-form__subtasks d-none">
+    <!-- Subtasks -->
+    <div class="todo-form__subtasks">
       <div class="todo-form__subtasks-header">
         <h3 class="todo-form__subtasks-title">Subtask</h3>
-        <button type="button" mat-stroked-button class="todo-form__subtasks-add">
-          <mat-icon>add</mat-icon> New Subtask
-        </button>
+        <img
+          [src]="
+            isCompleted
+              ? '/Buttons/Button_New Subtask_inactive.svg'
+              : isAddSubtaskPressed()
+                ? '/Buttons/Button_New Subtask_selected.svg'
+                : '/Buttons/Button_New Subtask_active.svg'
+          "
+          alt="new subtask"
+          [class.pointer]="!isCompleted"
+          [class.pointer-disabled]="isCompleted"
+          (mousedown)="!isCompleted && isAddSubtaskPressed.set(true)"
+          (mouseup)="isAddSubtaskPressed.set(false)"
+          (mouseleave)="isAddSubtaskPressed.set(false)"
+          (click)="!isCompleted && addSubTask()"
+        />
       </div>
 
-      @for (subtask of staticSubtasks; track subtask.name) {
-        <div class="subtask-row">
-          <!-- Subtask Title -->
+      @for (subtask of subTasks.controls; track $index) {
+        <div class="subtask-row" [formGroup]="$any(subtask)">
           <mat-form-field appearance="outline" class="subtask-row__field">
             <mat-label>Title</mat-label>
-            <input matInput [value]="subtask.name" readonly />
+            <input matInput formControlName="title" />
+            @if (
+              subtask.get('title')?.hasError('required') &&
+              (subtask.get('title')?.touched || subtask.get('title')?.dirty)
+            ) {
+              <mat-error>Must not be empty</mat-error>
+            }
           </mat-form-field>
 
-          <!-- Subtask Status -->
           <mat-form-field appearance="outline" class="subtask-row__status-field">
             <mat-label>Status</mat-label>
-            <mat-select [value]="subtask.done ? 'DONE' : 'NOT_DONE'" disabled>
-              <mat-option value="NOT_DONE">Not Done</mat-option>
-              <mat-option value="DONE">Done</mat-option>
+            <mat-select formControlName="completed">
+              <mat-option [value]="false">Not Done</mat-option>
+              <mat-option [value]="true">Done</mat-option>
             </mat-select>
           </mat-form-field>
 
-          <!-- Delete -->
-          <button
-            type="button"
-            mat-icon-button
+          <img
+            src="/Icons/Delete_active.svg"
+            alt="delete icon"
             class="subtask-row__delete"
-            aria-label="delete subtask"
-          >
-            <mat-icon>delete_outline</mat-icon>
-          </button>
+            [class.disabled]="isCompleted"
+            (click)="removeSubtask($index)"
+          />
         </div>
       }
-    </div>
 
+      @if (subTasks.length === 0) {
+        <p class="todo-form__subtasks-empty">No subtasks added yet.</p>
+      }
+    </div>
     <!-- COMPLETED notice -->
-    @if (!allSubtasksDone) {
+    @if (!allSubTasksDone) {
       <p class="todo-form__notice">
         <mat-icon class="todo-form__notice-icon">info_outline</mat-icon>
         Complete all subtasks to mark this todo as Completed.
@@ -160,10 +172,29 @@
 
     <!-- ACTIONS -->
     <div class="todo-form__actions">
-      <button type="button" mat-stroked-button (click)="onCancel()">Cancel</button>
-      <button type="submit" mat-flat-button class="btn-primary" [disabled]="form.invalid">
-        Save
-      </button>
+      <img
+        src="/Buttons/Button_Cancel.svg"
+        alt="cancel"
+        class="cancel pointer"
+        (click)="onCancel()"
+      />
+
+      @if (allSubTasksDone && form.get('status')?.value !== 'COMPLETED') {
+        <img
+          src="/Buttons/Button_Mark as Complete.svg"
+          alt="mark as complete"
+          class="mark_complete pointer"
+          (click)="onSave()"
+        />
+      } @else {
+        <img
+          src="/Buttons/Button_Save.svg"
+          alt="save"
+          class="save pointer"
+          [class.disabled]="form.invalid"
+          (click)="onSave()"
+        />
+      }
     </div>
   </form>
 </div>
