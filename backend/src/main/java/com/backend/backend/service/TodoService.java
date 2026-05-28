@@ -3,6 +3,7 @@ package com.backend.backend.service;
 import com.backend.backend.dao.TodoRepository;
 import com.backend.backend.dao.UserRepository;
 import com.backend.backend.dto.TodoRequest;
+import com.backend.backend.entity.SubTask;
 import com.backend.backend.entity.Todo;
 import com.backend.backend.entity.User;
 import com.backend.backend.enums.Priority;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
@@ -40,6 +42,17 @@ public class TodoService {
         todo.setDescription(request.getDescription());
         todo.setUser(user);
 
+        if (request.getSubTasks() != null) {
+            List<SubTask> subTasks = request.getSubTasks().stream().map(s -> {
+                SubTask st = new SubTask();
+                st.setTitle(s.getTitle());
+                st.setCompleted(s.isCompleted());
+                st.setTodo(todo);
+                return st;
+            }).collect(Collectors.toList());
+            todo.setSubTasks(subTasks);
+        }
+
         return todoRepository.save(todo);
     }
 
@@ -55,6 +68,7 @@ public class TodoService {
         return todoRepository.findByIdAndUserId(id, user.getId()).orElse(null);
     }
 
+    @Transactional
     public Todo updateTodo(Long id, TodoRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -86,6 +100,16 @@ public class TodoService {
         if (request.getDescription() != null)
             existing.setDescription(request.getDescription());
 
+        if (request.getSubTasks() != null) {
+            existing.getSubTasks().clear();  // orphanRemoval handles DB deletion
+            request.getSubTasks().forEach(s -> {
+                SubTask st = new SubTask();
+                st.setTitle(s.getTitle());
+                st.setCompleted(s.isCompleted());
+                st.setTodo(existing);
+                existing.getSubTasks().add(st);
+            });
+        }
         return todoRepository.save(existing);
     }
 

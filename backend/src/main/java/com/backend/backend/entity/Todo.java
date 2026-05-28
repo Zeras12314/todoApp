@@ -9,6 +9,7 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -40,5 +41,12 @@ public class Todo {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+
+    @OneToMany(
+            mappedBy = "todo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SubTask> subTasks;
 
 }
