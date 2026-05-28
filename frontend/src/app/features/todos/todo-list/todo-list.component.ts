@@ -150,14 +150,6 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedIds = [];
   }
 
-
-  // Helper to avoid undefined in template
-  getTodoNote(todo: Todo): string {
-    // If you have todo.id, you can do a map by id instead
-    return this.todoNotesByTitle[todo.title] ?? 'No extra notes (static) yet.';
-  }
-
-
   getStatusIcon(status: string): string {
     switch (status) {
       case 'COMPLETED': return 'Icons/Complete.svg';
@@ -178,17 +170,17 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openDeleteDialog() {
-  this.dialog.open(ConfirmDialogComponent, {
-    data: {
-      title: 'Delete Task',
-      // message: 'Are you sure you want to delete this task?',
-      message: `${this.selectedIds.length} ${this.selectedIds.length === 1 ? 'Task' : 'Tasks'} will be deleted`,
-      confirmText: 'Delete'
-    }
-  }).afterClosed().subscribe(result => {
-    if (result) {
-      this.onBulkDelete();
-    }
-  });
-}
+    if (this.selectedIds.length === 0) return
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Task',
+        message: `${this.selectedIds.length} ${this.selectedIds.length === 1 ? 'Task' : 'Tasks'} will be deleted`,
+        confirmText: 'Delete'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.onBulkDelete();
+      }
+    });
+  }
 }

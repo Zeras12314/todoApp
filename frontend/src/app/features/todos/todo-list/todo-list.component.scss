@@ -1,17 +1,17 @@
 @use '../../../styles/tokens.scss' as *;
 
-
-// DESKTOP
+// DESKTOP TABLE
 .table-wrapper {
-  border-radius: $space-2; 
+  border-radius: $space-2;
   border: 1px solid $tertiary-grey;
   overflow: hidden;
 }
 
 .select-wrapper--active {
-  border-radius: $space-1 + 2px; 
+  border-radius: $space-1 + 2px;
   border: 2px solid $tertiary-grey;
   padding: 2px $space-1;
+  cursor: pointer;
 }
 
 table {
@@ -19,7 +19,6 @@ table {
   background-color: $white;
 }
 
-// override Material's default min-width shrink behavior
 .mat-mdc-table {
   width: 100% !important;
   min-width: 100% !important;
@@ -32,9 +31,18 @@ table {
 }
 
 // COLUMN WIDTHS
-.mat-column-select   { width: $space-12; flex: none; } 
-.mat-column-dueDate  { width: 20%; flex: none; }
-.mat-column-priority { width: 10%; flex: none; }
+.mat-column-select {
+  width: $space-12;
+  flex: none;
+}
+.mat-column-dueDate {
+  width: 20%;
+  flex: none;
+}
+.mat-column-priority {
+  width: 10%;
+  flex: none;
+}
 
 // HEADER CELL
 .header-cell {
@@ -47,19 +55,28 @@ table {
   white-space: nowrap;
 }
 
-// ROWS 
-tr.example-detail-row { height: 0; }
+// ROWS
+tr.example-detail-row {
+  height: 0;
+}
 
 tr.example-element-row {
   cursor: pointer;
 
-  &:not(.example-expanded-row):hover  { background: $surface-active; }
-  &:not(.example-expanded-row):active { background: $surface-hover; }
+  &:not(.example-expanded-row):hover {
+    background: $surface-active;
+  }
+  &:not(.example-expanded-row):active {
+    background: $surface-hover;
+  }
 
-  td { border-bottom-width: 0; }
+  td {
+    border-bottom-width: 0;
+  }
 }
 
-// TITLE 
+// TITLE
+// TITLE
 .todo-title {
   font-size: $text-12;
   font-weight: $fw-semibold;
@@ -68,42 +85,63 @@ tr.example-element-row {
   cursor: pointer;
 }
 
-//  DUE DATE 
+.title-cell {
+  display: flex;
+  align-items: center;
+
+  &__icon {
+    width: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+}
+// DUE DATE
 .due-date {
-  &--overdue { color: $error; }
-  &--warning { color: $warning; }
+  &--overdue {
+    color: $error;
+  }
+  &--warning {
+    color: $warning;
+  }
 }
 
 .due-label {
   font-size: $text-12;
   margin-top: 2px;
 
-  &--overdue { color: $error; }
-  &--warning { color: $warning; }
+  &--overdue {
+    color: $error;
+  }
+  &--warning {
+    color: $warning;
+  }
 }
 
 // STATUS
 .status-cell {
   display: flex;
   align-items: center;
-  gap: $space-1 + 2px; 
+  gap: $space-1 + 2px;
   font-size: $text-14;
   color: $secondary-grey;
   white-space: nowrap;
 }
 
 .completed-date {
-  color: $primary-blue; 
+  color: $primary-blue;
   margin-top: 2px;
 }
 
-//  EDIT ICON
+// EDIT ICON
 .edit-icon {
   font-size: $space-2;
   color: $tertiary-grey;
   transition: color 0.2s;
 
-  &:hover { color: $secondary-grey; }
+  &:hover {
+    color: $secondary-grey;
+  }
 }
 
 // EXPAND ICON
@@ -112,7 +150,9 @@ tr.example-element-row {
   color: $tertiary-grey;
   transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  &--open { transform: rotate(90deg); }
+  &--open {
+    transform: rotate(90deg);
+  }
 }
 
 // EXPANDED DETAIL
@@ -123,37 +163,83 @@ tr.example-element-row {
   grid-template-columns: 100%;
   transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  &-expanded { grid-template-rows: 1fr; }
+  &-expanded {
+    grid-template-rows: 1fr;
+  }
 }
 
 .example-element-detail {
   display: flex;
   min-height: 0;
+  width: 100%;
 }
 
 .example-element-description {
-  padding: $space-3 $space-4; 
+  width: 100%;
   font-size: $text-12 + 1px;
   color: $secondary-grey;
 
-  &-attribution { opacity: 0.5; }
+  &-attribution {
+    opacity: 0.5;
+  }
 }
 
+.example-detail-row td.mat-mdc-cell {
+  padding: 0 !important;
+}
+
+// SUBTASK TABLE
+// .subtask-table {
+//   border-top: 1px solid $table-border;
+// }
+
+// :host ::ng-deep .subtask-table .subtask-title.mat-column-title.mat-mdc-cell {
+//   padding-left: $space-30 !important;
+// }
+
+// :host ::ng-deep .subtask-table .subtask-status.mat-column-status.mat-mdc-cell {
+//   text-align: right !important;
+//   padding-right: $space-30 !important;
+// }
+
+.subtask-row {
+  // padding: 15px 120px 15px 120px;
+  padding: 15px 15%;
+  border-bottom: 1px solid $table-border;
+
+  &:first-child {
+    border-top: 1px solid $table-border;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.subtask-title {
+  font-size: $text-14;
+  color: $primary-black;
+  flex: 1;
+}
+
+.subtask-status {
+  font-size: $text-14;
+  font-weight: $fw-medium;
+  white-space: nowrap;
+  width: 120px; // ← fixed width, aligns with status column above
+}
+// NO TODOS
 .no-todos {
   padding-bottom: $space-15;
 
   img {
-    width: $space-60;  
+    width: $space-60;
     height: $space-60;
     mix-blend-mode: multiply;
   }
 }
 
-
-
 // MOBILE CARDS
-
-
 .todo-card-list {
   display: flex;
   flex-direction: column;
@@ -171,7 +257,9 @@ tr.example-element-row {
   gap: $space-1;
   cursor: pointer;
 
-  &--expanded { border-color: $primary-blue; }
+  &--expanded {
+    border-color: $primary-blue;
+  }
 
   &__row {
     display: flex;
@@ -179,7 +267,9 @@ tr.example-element-row {
     gap: $space-2;
   }
 
-  &__checkbox { flex-shrink: 0; }
+  &__checkbox {
+    flex-shrink: 0;
+  }
 
   &__priority {
     font-size: $text-12 - 1px;
@@ -210,11 +300,11 @@ tr.example-element-row {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding-left: $space-10; 
+    padding-left: $space-10;
   }
 
   &__title {
-    font-size: $text-14 - 1px; 
+    font-size: $text-14 - 1px;
     font-weight: $fw-medium;
     color: $primary-black;
     text-decoration: underline;
@@ -226,8 +316,12 @@ tr.example-element-row {
     gap: $space-1;
     font-size: $text-12 - 1px;
 
-    &--overdue { color: $error !important; }
-    &--warning { color: $warning !important; }
+    &--overdue {
+      color: $error !important;
+    }
+    &--warning {
+      color: $warning !important;
+    }
 
     .date-icon {
       font-size: $text-12 + 1px;

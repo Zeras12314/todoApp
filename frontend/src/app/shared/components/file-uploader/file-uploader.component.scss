@@ -1,0 +1,149 @@
+@use '../../../styles/tokens.scss' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+// ATTACHMENTS WRAPPER
+.todo-form__attachments {
+  width: 100%;
+  margin-bottom: $space-5;
+}
+
+.todo-form__attachments-label {
+  font-size: $text-14;
+  color: $primary-black;
+  display: block;
+  margin-bottom: $space-2 - 2px;
+  padding-left: 14px;
+}
+
+// DROPZONE
+.todo-form__dropzone {
+  border: 1.5px solid $tertiary-grey;
+  border-radius: $space-2 - 2px;
+  padding: $space-7 $space-4;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  min-height: 90px;
+
+  &:hover {
+    border-color: $primary-blue;
+    background: rgba($primary-blue, 0.02);
+  }
+
+  &--loading {
+    border-color: $primary-blue;
+    background: rgba($primary-blue, 0.04);
+    cursor: not-allowed;
+  }
+}
+
+.todo-form__dropzone img {
+  width: $space-6;
+  height: $space-6;
+  opacity: 0.7;
+}
+
+// TEXT
+.todo-form__dropzone-text {
+  font-size: $text-14;
+  color: $tertiary-grey;
+  margin: 0;
+  text-align: center;
+}
+
+.todo-form__dropzone-browse {
+  color: $primary-blue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+// UPLOAD STATE
+.todo-form__upload-state {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  width: 30%;
+  min-width: 180px;
+}
+
+.todo-form__upload-filename {
+  font-size: $text-12;
+  color: $primary-black;
+  margin: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-form__upload-state mat-progress-bar {
+  width: 100%;
+  height: $space-2;
+  border-radius: $space-1;
+}
+
+// FILE LIST
+.todo-form__file-list {
+  margin-top: $space-2;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2 - 2px;
+}
+
+.todo-form__file-item {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border: 0.5px solid $tertiary-grey;
+  border-radius: $space-2 - 2px;
+}
+
+.todo-form__file-name {
+  flex: 1;
+  font-size: $text-12;
+  color: $primary-black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-form__file-size {
+  font-size: $text-12;
+  color: $tertiary-grey;
+  flex-shrink: 0;
+}
+
+.todo-form__file-remove {
+  width: $space-4;
+  height: $space-4;
+  cursor: pointer;
+  opacity: 0.6;
+  flex-shrink: 0;
+
+  &:hover { opacity: 1; }
+}
+
+// MATERIAL OVERRIDES
+:host ::ng-deep {
+  .mdc-linear-progress__bar-inner {
+    border-color: $primary-blue !important;
+  }
+
+  .mdc-linear-progress__buffer-bar {
+    background-color: $alice-blue !important;
+  }
+
+  .mdc-linear-progress__buffer-dots {
+    background-color: transparent !important;
+  }
+}

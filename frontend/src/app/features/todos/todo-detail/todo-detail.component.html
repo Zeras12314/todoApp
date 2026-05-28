@@ -11,8 +11,14 @@
         <!-- STATUS -->
         <div class="todo-detail__status">
           <img [src]="getStatusIcon(todo?.status)" [alt]="todo?.status" />
-          <span class="ms-2">{{ todo?.status | titlecase }}</span>
+          <span class="ms-2">{{ todo?.status | titlecase }}</span
+          ><span class="ms-2">
+            @if (todo?.status === 'COMPLETED') {
+              {{ todo.completedDate | date: 'd MMM y' }}
+            }
+          </span>
         </div>
+        <!-- COMPLETED -->
       </div>
 
       <div class="todo-detail__actions">
@@ -41,29 +47,38 @@
 
     <!-- SUBTASKS (static) -->
     <div class="todo-detail__subtasks">
-      <h3 class="todo-detail__subtasks-title">Subtask</h3>
-
-      <div class="subtask-list">
-        @for (subtask of staticSubtasks; track subtask.name) {
-          <div class="subtask-row">
-            <span class="subtask-row__name">{{ subtask.name }}</span>
-            <span class="subtask-row__status" [class.subtask-row__status--done]="subtask.done">
-              <img
-                [src]="subtask.done ? 'Icons/Done.svg' : 'Icons/Not Done.svg'"
-                alt="{{ subtask.done ? 'Done' : 'Not done' }}"
-                class="subtask-row__icon me-2"
-              />
-              {{ subtask.done ? 'Done' : 'Not done' }}
-            </span>
-          </div>
-        }
-      </div>
+      @if (todo.subTasks.length > 0) {
+        <h3 class="todo-detail__subtasks-title">Subtask</h3>
+        <div class="subtask-list">
+          @for (subtask of todo.subTasks; track subtask.id) {
+            <div class="subtask-row">
+              <span class="subtask-row__name">{{ subtask.title }}</span>
+              <span
+                class="subtask-row__status"
+                [class.subtask-row__status--done]="subtask.completed"
+              >
+                <img
+                  [src]="subtask.completed ? 'Icons/Done.svg' : 'Icons/Not Done.svg'"
+                  alt="{{ subtask.completed ? 'Done' : 'Not done' }}"
+                  class="subtask-row__icon me-2"
+                />
+                {{ subtask.completed ? 'Done' : 'Not done' }}
+              </span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="subtask-empty secondary-text">
+          <p>No subtasks have been added yet.</p>
+        </div>
+      }
     </div>
   </div>
 } @else {
   <div class="todo-detail__empty">
-   <p>The task may have been deleted or does not exist.</p>
-   <button class="btn btn-sm btn-primary rounded-pill px-3" routerLink="/todos">Back to List</button> 
-
+    <p>The task may have been deleted or does not exist.</p>
+    <button class="btn btn-sm btn-primary rounded-pill px-3" routerLink="/todos">
+      Back to List
+    </button>
   </div>
 }

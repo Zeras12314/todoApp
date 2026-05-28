@@ -1,0 +1,58 @@
+<div class="todo-form__attachments">
+  <span class="todo-form__attachments-label">Attachments</span>
+
+  <div
+    class="todo-form__dropzone"
+    [class.todo-form__dropzone--loading]="isUploading"
+    [class.todo-form__dropzone--has-files]="files.length > 0"
+    (click)="fileInput.click()"
+    (dragover)="onDragOver($event)"
+    (drop)="onFileDrop($event)"
+  >
+    @if (isUploading) {
+      <div class="todo-form__upload-state">
+        <p class="todo-form__upload-filename">{{ currentFileName }}</p>
+        <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+      </div>
+    } @else if (files.length > 0) {
+      <!-- File list inside dropzone -->
+      <div class="todo-form__file-list" (click)="$event.stopPropagation()">
+        @for (file of files; track $index) {
+          <div class="todo-form__file-item">
+            <span class="todo-form__file-name">{{ file.name }}</span>
+            <span class="todo-form__file-size">{{ (file.size / 1024).toFixed(1) }} KB</span>
+            <img
+              src="/Icons/Delete_active.svg"
+              alt="remove"
+              class="todo-form__file-remove"
+              (click)="removeFile($index); $event.stopPropagation()"
+            />
+          </div>
+        }
+        <!-- Add more files hint -->
+        <p class="todo-form__dropzone-text mt-2">
+          <img src="/Icons/Upload.svg" alt="upload" class="me-1" />
+          Drop more files or
+          <span
+            class="todo-form__dropzone-browse"
+            (click)="fileInput.click(); $event.stopPropagation()"
+            >browse</span
+          >.
+        </p>
+      </div>
+    } @else {
+      <img src="/Icons/Upload.svg" alt="upload icon" />
+      <p class="todo-form__dropzone-text">
+        Drop files to attach, or
+        <span
+          class="todo-form__dropzone-browse"
+          (click)="fileInput.click(); $event.stopPropagation()"
+        >
+          browse </span
+        >.
+      </p>
+    }
+
+    <input type="file" hidden #fileInput (change)="onFileSelected($event)" accept="image/*" />
+  </div>
+</div>

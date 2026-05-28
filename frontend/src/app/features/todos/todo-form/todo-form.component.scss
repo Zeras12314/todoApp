@@ -6,84 +6,42 @@
   margin: 0 auto;
 
   // ── ROWS ─────────────────────────────────────────────────────────────────────
-&__row {
-  display: flex;
-  gap: 16px;
-  width: 100%;
+  &__row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
 
-  &--two {
-    > .todo-form__field { flex: 1; }
-  }
+    &--two {
+      > .todo-form__field {
+        flex: 1;
+      }
+    }
 
-  &--half {
-    width: 50%;
-    > .todo-form__field { flex: 1; }
-  }
+    &--half {
+      width: 50%;
+      > .todo-form__field {
+        flex: 1;
+      }
+    }
 
-  &--three {
-    width: 70%;
-    > .todo-form__field { flex: 1; }
+    &--three {
+      width: 80%;
+      > .todo-form__field {
+        flex: 1;
+      }
+    }
   }
-}
 
   // ── FIELDS ───────────────────────────────────────────────────────────────────
   &__field {
     width: 100%;
     margin-bottom: 4px;
 
-    &--full { width: 100%; }
-  }
-
-  // ── ATTACHMENTS ──────────────────────────────────────────────────────────────
-  &__attachments {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-
-  &__attachments-label {
-    font-size: $text-12;
-    color: $tertiary-grey;
-    display: block;
-    margin-bottom: 6px;
-    padding-left: 14px;
-  }
-
-  &__dropzone {
-    border: 1.5px dashed $tertiary-grey;
-    border-radius: 6px;
-    padding: 28px 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-
-    &:hover {
-      border-color: $primary-blue;
-      background: rgba($primary-blue, 0.02);
+    &--full {
+      width: 100%;
     }
   }
 
-  &__dropzone-icon {
-    color: $tertiary-grey;
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-  }
-
-  &__dropzone-text {
-    font-size: $text-14;
-    color: $tertiary-grey;
-    margin: 0;
-  }
-
-  &__dropzone-browse {
-    color: $primary-blue;
-    cursor: pointer;
-    text-decoration: underline;
-  }
 
   // ── SUBTASKS ─────────────────────────────────────────────────────────────────
   &__subtasks {
@@ -112,7 +70,11 @@
     align-items: center;
     gap: 4px;
 
-    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
   }
 
   // ── NOTICE ───────────────────────────────────────────────────────────────────
@@ -124,8 +86,8 @@
     color: $tertiary-grey;
     margin-bottom: 16px;
     padding: 8px 12px;
-    background: #FFF8E6;
-    border-left: 3px solid #EF9F27;
+    background: #fff8e6;
+    border-left: 3px solid #ef9f27;
     border-radius: 4px;
   }
 
@@ -133,7 +95,7 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #EF9F27;
+    color: #ef9f27;
   }
 
   // ── ACTIONS ──────────────────────────────────────────────────────────────────
@@ -144,6 +106,11 @@
     padding-top: 8px;
     border-top: 1px solid $tertiary-grey;
     margin-top: 8px;
+  }
+
+img{
+    // width: 102px;
+    height: 36px;
   }
 }
 
@@ -164,11 +131,22 @@
   }
 
   &__delete {
+    padding-top: $space-3;
+    display: block;
     color: $tertiary-grey;
     margin-top: 6px;
     flex-shrink: 0;
+    cursor: pointer;
+    // transition:
+    //   color 0.2s ease,
+    //   opacity 0.2s ease;
 
-    &:hover { color: #E24B4A; }
+    &.disabled {
+      color: $tertiary-grey;
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none; // ✅ prevents click
+    }
   }
 }
 
@@ -199,6 +177,8 @@
   .subtask-row {
     flex-wrap: wrap;
 
-    &__status-field { width: 100%; }
+    &__status-field {
+      width: 100%;
+    }
   }
 }

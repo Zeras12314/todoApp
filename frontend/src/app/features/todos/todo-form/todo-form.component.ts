@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,11 +15,9 @@ import { Todo } from '../../../models/todo.model';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
 import { TodoService } from '../../../services/todo.service';
+import { ToastService } from '../../../services/toast.service';
+import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
 
-interface Subtask {
-  name: string;
-  done: boolean;
-}
 
 @Component({
   selector: 'app-todo-form',
@@ -34,9 +32,11 @@ interface Subtask {
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    FileUploaderComponent
   ],
   templateUrl: './todo-form.component.html',
   styleUrl: './todo-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -44,6 +44,9 @@ export class TodoFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly store = inject(Store);
   private readonly todoService = inject(TodoService);
+  private readonly toastService = inject(ToastService)
+
+  isAddSubtaskPressed = signal(false);
 
   isEditMode = false;
   todoId: number | null = null;
@@ -51,12 +54,6 @@ export class TodoFormComponent implements OnInit {
   today = new Date();
 
   // Static subtasks until backend is ready
-  staticSubtasks: Subtask[] = [
-    { name: 'Working demo app check', done: false },
-    { name: 'Deck check', done: false },
-    { name: 'Reservation', done: true },
-  ];
-
   form!: FormGroup;
 
   readonly statusOptions = [
@@ -80,6 +77,7 @@ export class TodoFormComponent implements OnInit {
       dueDate: [null, Validators.required],
       description: ['', Validators.required],
       completedDate: [{ value: null, disabled: true }],
+      subTasks: this.fb.array([]),
     });
 
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -104,7 +102,6 @@ export class TodoFormComponent implements OnInit {
     ).subscribe((todo) => {
       if (todo) {
         this.todo = todo;
-
         this.form.patchValue({
           title: todo.title,
           priority: todo.priority,
@@ -119,6 +116,17 @@ export class TodoFormComponent implements OnInit {
           this.form.get('completedDate')?.enable();
         }
       }
+
+      if (todo.subTasks?.length) {
+        todo.subTasks.forEach((s) => {
+          this.subTasks.push(this.fb.group({
+            id: [s.id],
+            title: [s.title, Validators.required],
+            completed: [s.completed],
+          }));
+        });
+      }
+
     });
   }
 
@@ -131,34 +139,26 @@ export class TodoFormComponent implements OnInit {
     });
   }
 
-
-  get minDueDate(): Date {
-    if (this.isEditMode && this.todo?.createdDate) {
-      const d = new Date(this.todo.createdDate);
-      d.setDate(d.getDate() + 1); // must be after created date
-      return d;
-    }
-    return this.today;
-  }
-
-
- get isCompleted(): boolean {
-  return this.form.get('status')?.value === 'COMPLETED';
-}
-  get allSubtasksDone(): boolean {
-    return this.staticSubtasks.every((s) => s.done);
-  }
-
   isStatusDisabled(value: string): boolean {
-    // return value === 'COMPLETED' && !this.allSubtasksDone;
-    return false;
+    return value === 'COMPLETED' && !this.allSubTasksDone;
+    // return false;
   }
 
   onSave(): void {
     if (this.form.invalid) return;
 
     const formValue = this.form.getRawValue();
-    console.log('completedDate being sent:', formValue.completedDate);
+    const allDone = formValue.subTasks.every((s: any) => s.completed);
+
+    if (allDone && formValue.status !== 'COMPLETED') {
+      formValue.status = 'COMPLETED';
+    }
+
+    if (formValue.status === 'COMPLETED' && !allDone) {
+      this.toastService.error('All subtasks must be completed before marking task as completed.');
+      return;
+    }
+
 
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
@@ -172,4 +172,42 @@ export class TodoFormComponent implements OnInit {
   onCancel(): void {
     this.router.navigate(['/todos']);
   }
+
+  addSubTask(): void {
+    console.log('HEYYYYY')
+    this.subTasks.push(this.fb.group({
+      title: ['', Validators.required],
+      completed: [false],
+    }));
+  }
+
+  removeSubtask(index: number): void {
+    this.subTasks.removeAt(index);
+  }
+
+
+  // GETTERS
+  // SUBTASK
+  get subTasks(): FormArray {
+    return this.form.get('subTasks') as FormArray;
+  }
+
+  get allSubTasksDone(): boolean {
+    return this.subTasks.controls.every((control) => control.value.completed);
+  }
+
+  get minDueDate(): Date {
+    if (this.isEditMode && this.todo?.createdDate) {
+      const d = new Date(this.todo.createdDate);
+      d.setDate(d.getDate() + 1); // must be after created date
+      return d;
+    }
+    return this.today;
+  }
+
+
+  get isCompleted(): boolean {
+    return this.form.get('status')?.value === 'COMPLETED';
+  }
+
 }

@@ -7,4 +7,11 @@ export interface Todo {
   createdDate: Date;
   completedDate?: Date;
   description?: string;
+  subTasks?: SubTask[];
+}
+
+export interface SubTask {
+  id?: number;
+  title: string;
+  completed: boolean;
 }
