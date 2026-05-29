@@ -29,7 +29,7 @@
       </mat-form-field>
 
       <!-- Completion Date — only when edit + COMPLETED, else empty placeholder -->
-      @if (isEditMode && isCompleted) {
+      @if (isEditMode && showCompletionDateField) {
         <mat-form-field appearance="outline" class="todo-form__field">
           <mat-label>Completion Date</mat-label>
           <input
@@ -102,8 +102,12 @@
       ></textarea>
     </mat-form-field>
 
-    <!-- ROW 5: Attachments (static UI) -->
-    <app-file-uploader></app-file-uploader>
+    <!--  Attachments / File Uploader-->
+    <app-file-uploader
+    #fileUploader
+      [existingFiles]="todo?.attachments || []"
+      (removeExisting)="onRemoveExisting($event)"
+    ></app-file-uploader>
 
     <!-- Subtasks -->
     <div class="todo-form__subtasks">
@@ -179,7 +183,7 @@
         (click)="onCancel()"
       />
 
-      @if (allSubTasksDone && form.get('status')?.value !== 'COMPLETED') {
+      @if (todo?.subTasks?.length > 0 && form.get('status')?.value !== 'COMPLETED') {
         <img
           src="/Buttons/Button_Mark as Complete.svg"
           alt="mark as complete"

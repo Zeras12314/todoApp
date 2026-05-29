@@ -1,6 +1,8 @@
 <div class="todo-form__attachments">
   <span class="todo-form__attachments-label">Attachments</span>
 
+  file number {{ files.length }}
+
   <div
     class="todo-form__dropzone"
     [class.todo-form__dropzone--loading]="isUploading"
@@ -14,43 +16,78 @@
         <p class="todo-form__upload-filename">{{ currentFileName }}</p>
         <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
       </div>
-    } @else if (files.length > 0) {
-      <!-- File list inside dropzone -->
+    } @else if (files.length > 0 || existingFiles.length > 0) {
+      <!-- hint -->
+      <!-- hint — always centered -->
+      <div class="todo-form__hint-row">
+        <img src="/Icons/Upload.svg" />
+        <p class="todo-form__dropzone-text">
+          Drop more files or
+          <span (click)="fileInput.click(); $event.stopPropagation()" class="primary-blue">
+            browse
+          </span>
+        </p>
+      </div>
+
       <div class="todo-form__file-list" (click)="$event.stopPropagation()">
-        @for (file of files; track $index) {
-          <div class="todo-form__file-item">
-            <span class="todo-form__file-name">{{ file.name }}</span>
-            <span class="todo-form__file-size">{{ (file.size / 1024).toFixed(1) }} KB</span>
+        <!-- EXISTING FILES -->
+        @for (file of existingFiles; track file.id) {
+          <div class="todo-form__file-item todo-form__file-item--existing">
+            <div class="todo-form__file-remove-wrapper">
+              <img
+                src="/Icons/Cancel.svg"
+                alt="remove"
+                class="todo-form__file-remove"
+                (click)="onRemoveExisting(file); $event.stopPropagation()"
+              />
+            </div>
             <img
-              src="/Icons/Delete_active.svg"
-              alt="remove"
-              class="todo-form__file-remove"
-              (click)="removeFile($index); $event.stopPropagation()"
+              class="todo-form__file-preview"
+              [src]="'http://localhost:8080/' + file.filePath"
+              alt="{{ file.fileName }}"
             />
+            <div class="todo-form__file-meta">
+              <span class="todo-form__file-name">{{ file.fileName }}</span>
+              <span class="todo-form__file-size">{{ (file.fileSize / 1024).toFixed(1) }} KB</span>
+            </div>
           </div>
         }
-        <!-- Add more files hint -->
-        <p class="todo-form__dropzone-text mt-2">
-          <img src="/Icons/Upload.svg" alt="upload" class="me-1" />
-          Drop more files or
+
+        <!-- NEW FILES -->
+        @for (file of files; track $index) {
+          <div class="todo-form__file-item">
+            <div class="todo-form__file-remove-wrapper">
+              <img
+                src="/Icons/Cancel.svg"
+                alt="remove"
+                class="todo-form__file-remove"
+                (click)="removeFile($index); $event.stopPropagation()"
+              />
+            </div>
+
+            <img class="todo-form__file-preview" [src]="getFilePreview(file)" [alt]="file.name" />
+
+            <div class="todo-form__file-meta">
+              <span class="todo-form__file-name">{{ file.name }}</span>
+
+              <span class="todo-form__file-size"> {{ (file.size / 1024).toFixed(1) }} KB </span>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="todo-form__empty-state">
+        <img src="/Icons/Upload.svg" alt="upload icon" />
+        <p class="todo-form__dropzone-text">
+          Drop files to attach, or
           <span
             class="todo-form__dropzone-browse"
             (click)="fileInput.click(); $event.stopPropagation()"
-            >browse</span
+          >
+            browse </span
           >.
         </p>
       </div>
-    } @else {
-      <img src="/Icons/Upload.svg" alt="upload icon" />
-      <p class="todo-form__dropzone-text">
-        Drop files to attach, or
-        <span
-          class="todo-form__dropzone-browse"
-          (click)="fileInput.click(); $event.stopPropagation()"
-        >
-          browse </span
-        >.
-      </p>
     }
 
     <input type="file" hidden #fileInput (change)="onFileSelected($event)" accept="image/*" />

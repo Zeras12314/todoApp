@@ -34,5 +34,15 @@ export const TodoActions = createActionGroup({
     'Set Status Filter': props<{ status: string }>(),
     'Set Priority Filter': props<{ priority: string }>(),
     'Clear Filters': emptyProps(),
+
+    // Attachments
+    'Upload Attachment': props<{ todoId: number; file: File }>(),
+    'Upload Attachment Success': props<{ todoId: number }>(),
+    'Upload Attachment Failure': props<{ error: string }>(),
+
+    // Delete Attachment
+    'Delete Attachment': props<{ todoId: number; attachmentId: number }>(),
+    'Delete Attachment Success': props<{ todoId: number; attachmentId: number }>(),
+    'Delete Attachment Failure': props<{ error: string }>(),
   },
 });

@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
         // authenticate every request
         .authorizeHttpRequests(request -> request
-                .requestMatchers("/api/register", "/api/login", "/api/hello")
+                .requestMatchers("/api/register", "/api/login", "/api/hello", "/uploads/**")
                 .permitAll()
                 .anyRequest().authenticated())
         // stateless session

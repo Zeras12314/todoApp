@@ -42,7 +42,7 @@
     gap: $space-6;
 
     div {
-        cursor: pointer;
+      cursor: pointer;
     }
   }
 
@@ -95,6 +95,29 @@
     text-align: center;
     color: $secondary-grey;
     font-size: $text-20;
+  }
+
+  // ATTACHMENTS
+  &__attachement {
+
+    img {
+      width: 120px;
+      height: 120px; // keep square
+      object-fit: cover; // crop nicely
+    }
+
+    .file-name{
+      padding: 0;
+      margin-top: 12px;
+      margin-bottom: 0;
+       font-size: $text-14;
+
+    }
+
+    .file-size{
+      color: $tertiary-grey;
+      font-size: $text-12;
+    }
   }
 }
 

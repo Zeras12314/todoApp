@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { env } from '../environment/env';
 import { Todo } from '../models/todo.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -31,4 +32,13 @@ export class TodoService {
     return this.http.delete(`${this.apiUrl}/todos`, { body: ids });
   }
 
+  uploadAttachment(todoId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/todos/${todoId}/attachments`, formData);
+  }
+
+  deleteAttachment(todoId: number, attachmentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/todos/${todoId}/attachments/${attachmentId}`);
+  }
 }

@@ -24,15 +24,19 @@
   border: 1.5px solid $tertiary-grey;
   border-radius: $space-2 - 2px;
   padding: $space-7 $space-4;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
   gap: 10px;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   position: relative;
   min-height: 90px;
+
+  // ← add these
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     border-color: $primary-blue;
@@ -44,12 +48,29 @@
     background: rgba($primary-blue, 0.04);
     cursor: not-allowed;
   }
+
+  // ← when files exist, switch to top-aligned
+  &--has-files {
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 0 auto;
+  }
 }
 
-.todo-form__dropzone img {
-  width: $space-6;
-  height: $space-6;
-  opacity: 0.7;
+.todo-form__empty-state {
+  display: flex;
+  flex-direction: row; // ← icon and text side by side
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+
+  img {
+    width: $space-6;
+    height: $space-6;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
 }
 
 // TEXT
@@ -70,16 +91,20 @@
 .todo-form__upload-state {
   display: flex;
   flex-direction: column;
-  gap: $space-1;
-  width: 30%;
-  min-width: 180px;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  max-width: $space-50;
+  margin: 0 auto;
 }
 
 .todo-form__upload-filename {
+  width: 100%;
   font-size: $text-12;
   color: $primary-black;
   margin: 0;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -93,44 +118,80 @@
 
 // FILE LIST
 .todo-form__file-list {
-  margin-top: $space-2;
+  width: 100%;
+  padding-top: $space-4;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: $space-4;
+}
+.todo-form__file-item {
+  position: relative;
+  width: $space-18;
+  flex-shrink: 0;
+}
+
+
+.todo-form__hint-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// IMAGE PREVIEW
+.todo-form__file-preview {
+  width: $space-18 !important;
+  height: $space-25 !important;
+  object-fit: cover;
+  border: 1px solid $tertiary-grey;
+  border-radius: $space-1 - 2px;
+  opacity: 1 !important;
+}
+
+// FILE META
+.todo-form__file-meta {
   display: flex;
   flex-direction: column;
-  gap: $space-2 - 2px;
-}
-
-.todo-form__file-item {
-  display: flex;
   align-items: center;
-  gap: $space-2;
-  padding: $space-2 $space-3;
-  border: 0.5px solid $tertiary-grey;
-  border-radius: $space-2 - 2px;
+  width: 100%;
+  margin-top: $space-1;
+  text-align: center;
 }
 
+// FILE NAME
 .todo-form__file-name {
-  flex: 1;
+  width: 100%;
   font-size: $text-12;
   color: $primary-black;
+  line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+// FILE SIZE
 .todo-form__file-size {
-  font-size: $text-12;
-  color: $tertiary-grey;
-  flex-shrink: 0;
+  font-size: $text-12 - 1px;
+  color: $secondary-grey;
+  line-height: 1.2;
 }
 
+// REMOVE BUTTON
 .todo-form__file-remove {
-  width: $space-4;
-  height: $space-4;
+  position: absolute;
+  top: -$space-5;
+  right: $space-1 - 3;
+  width: $space-4 !important;
+  height: $space-4 !important;
+  opacity: 1 !important;
   cursor: pointer;
-  opacity: 0.6;
-  flex-shrink: 0;
+  z-index: 2;
 
-  &:hover { opacity: 1; }
+  &:hover {
+    opacity: 0.8 !important;
+  }
 }
 
 // MATERIAL OVERRIDES
