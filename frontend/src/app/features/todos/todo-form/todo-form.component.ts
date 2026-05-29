@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
@@ -11,12 +11,15 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Store } from '@ngrx/store';
 import { Observable, of, switchMap, take } from 'rxjs';
-import { Todo } from '../../../models/todo.model';
+import { Todo, TodoAttachment } from '../../../models/todo.model';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
 import { TodoService } from '../../../services/todo.service';
 import { ToastService } from '../../../services/toast.service';
 import { FileUploaderComponent } from '../../../shared/components/file-uploader/file-uploader.component';
+import { Actions, ofType } from '@ngrx/effects';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 
 @Component({
@@ -45,6 +48,11 @@ export class TodoFormComponent implements OnInit {
   private readonly store = inject(Store);
   private readonly todoService = inject(TodoService);
   private readonly toastService = inject(ToastService)
+  private readonly actions$ = inject(Actions);
+  private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  @ViewChild('fileUploader') fileUploader!: FileUploaderComponent;
 
   isAddSubtaskPressed = signal(false);
 
@@ -145,30 +153,42 @@ export class TodoFormComponent implements OnInit {
   }
 
   onSave(): void {
-    if (this.form.invalid) return;
+  // only validate enabled controls
+  const enabledInvalid = Object.keys(this.form.controls).some(key => {
+    const ctrl = this.form.get(key);
+    return ctrl?.enabled && ctrl?.invalid;
+  });
 
-    const formValue = this.form.getRawValue();
-    const allDone = formValue.subTasks.every((s: any) => s.completed);
-
-    if (allDone && formValue.status !== 'COMPLETED') {
-      formValue.status = 'COMPLETED';
-    }
-
-    if (formValue.status === 'COMPLETED' && !allDone) {
-      this.toastService.error('All subtasks must be completed before marking task as completed.');
-      return;
-    }
-
-
-    if (this.isEditMode && this.todoId) {
-      const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
-      console.log('updated payload:', updated);
-      this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
-    } else {
-      this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
-    }
+  if (enabledInvalid) {
+    this.form.markAllAsTouched();
+    this.toastService.error('Please fill in all required fields.');
+    return;
   }
 
+  const formValue = this.form.getRawValue();
+  const allDone   = formValue.subTasks.every((s: any) => s.completed);
+
+  if (allDone && formValue.status !== 'COMPLETED') {
+    formValue.status = 'COMPLETED';
+  }
+
+  if (formValue.status === 'COMPLETED' && !allDone) {
+    this.toastService.error('All subtasks must be completed before marking as completed.');
+    return;
+  }
+
+  if (this.isEditMode && this.todoId) {
+    const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
+    this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
+    this.actions$.pipe(ofType(TodoActions.updateTodoSuccess), take(1))
+      .subscribe(() => this.uploadPendingFiles(this.todoId!));
+
+  } else {
+    this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
+    this.actions$.pipe(ofType(TodoActions.createTodoSuccess), take(1))
+      .subscribe(({ todo }) => this.uploadPendingFiles(todo.id));
+  }
+}
   onCancel(): void {
     this.router.navigate(['/todos']);
   }
@@ -184,6 +204,66 @@ export class TodoFormComponent implements OnInit {
   removeSubtask(index: number): void {
     this.subTasks.removeAt(index);
   }
+
+  // call uploadAll after todo is saved
+  private async uploadPendingFiles(todoId: number) {
+    console.log('uploadPendingFiles called, todoId:', todoId);
+    console.log('files to upload:', this.fileUploader?.files);
+
+    try {
+      if (this.fileUploader?.files?.length) {
+        await this.fileUploader.uploadAll(todoId);
+      } else {
+        console.log('no files to upload');
+      }
+    } catch {
+      this.toastService.error('Some files failed to upload');
+    } finally {
+      this.router.navigate(['/todos']);
+    }
+  }
+
+onDelete(): void {
+  if (!this.todoId) return;
+
+  this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      title:       'Delete Task',
+      message:     'This task will be permanently deleted.',
+      confirmText: 'Delete'
+    }
+  }).afterClosed().subscribe(result => {
+    if (result) {
+      this.store.dispatch(TodoActions.deleteTodo({ id: this.todoId! }));
+      this.actions$.pipe(ofType(TodoActions.deleteTodoSuccess), take(1))
+        .subscribe(() => this.router.navigate(['/todos']));
+    }
+  });
+}
+
+onRemoveExisting(att: TodoAttachment): void {
+  this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      title:       'Remove Attachment',
+      message:     `"${att.fileName}" will be removed.`,
+      confirmText: 'Remove'
+    }
+  }).afterClosed().subscribe(result => {
+    if (result) {
+      this.todoService.deleteAttachment(this.todoId!, att.id)
+        .subscribe(() => {
+          if (this.todo) {
+            // ← new object reference triggers OnPush
+            this.todo = {
+              ...this.todo,
+              attachments: this.todo.attachments.filter(a => a.id !== att.id)
+            };
+            this.cdr.markForCheck();   // ← tell OnPush to re-render
+          }
+        });
+    }
+  });
+}
 
 
   // GETTERS
@@ -202,12 +282,16 @@ export class TodoFormComponent implements OnInit {
       d.setDate(d.getDate() + 1); // must be after created date
       return d;
     }
-    return this.today;
+    return this.today;  
   }
 
 
   get isCompleted(): boolean {
     return this.form.get('status')?.value === 'COMPLETED';
   }
+
+  get showCompletionDateField(): boolean {
+  return this.isEditMode && this.todo?.status === 'COMPLETED' && this.form.get('status')?.value === 'COMPLETED';
+}
 
 }

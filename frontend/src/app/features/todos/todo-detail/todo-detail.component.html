@@ -43,6 +43,18 @@
       {{ todo.description || 'No description provided.' }}
     </p>
 
+    <div class="todo-detail__attachement">
+      <!-- <pre>{{ todo.attachments | json }}</pre> -->
+
+      <div class="todo-detail__attachement ">
+        @for (img of todo.attachments; track img.id) {
+          <img [src]="'http://localhost:8080/' + img?.filePath" alt="" />
+          <p>{{ img.fileName }}</p>
+          <p class="">{{ formatFileSize(img.fileSize) }}</p>
+        }
+      </div>
+    </div>
+
     <mat-divider></mat-divider>
 
     <!-- SUBTASKS (static) -->

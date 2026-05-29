@@ -44,16 +44,19 @@ export class TodoEffects {
   );
 
   // CREATE TODO
+  // listen for createTodoSuccess then upload all pending files
+  // REPLACE createTodoSuccessUpload$ with this
   createTodoSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TodoActions.createTodoSuccess),
       tap(() => {
         this.toastService.success('Todo created successfully');
-        this.router.navigate(['/todos']);
+        // NO navigation here — component handles it after uploads
       })
     ),
     { dispatch: false }
   );
+
 
   updateTodo$ = createEffect(() =>
     this.actions$.pipe(
@@ -79,7 +82,7 @@ export class TodoEffects {
       ofType(TodoActions.updateTodoSuccess),
       tap(() => {
         this.toastService.success('Todo updated successfully');
-        this.router.navigate(['/todos']);
+        // NO navigation here — component handles it after uploads
       })
     ),
     { dispatch: false }
@@ -125,6 +128,30 @@ export class TodoEffects {
       tap(({ ids }) => this.toastService.success(`${ids.length} todo(s) deleted successfully`))
     ),
     { dispatch: false }
+  );
+
+  uploadAttachment$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TodoActions.uploadAttachment),
+      mergeMap(({ todoId, file }) =>
+        this.todoService.uploadAttachment(todoId, file).pipe(
+          map(() => TodoActions.uploadAttachmentSuccess({ todoId })),
+          catchError(err => of(TodoActions.uploadAttachmentFailure({ error: err.message })))
+        )
+      )
+    )
+  );
+
+  deleteAttachment$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TodoActions.deleteAttachment),
+      mergeMap(({ todoId, attachmentId }) =>
+        this.todoService.deleteAttachment(todoId, attachmentId).pipe(
+          map(() => TodoActions.deleteAttachmentSuccess({ todoId, attachmentId })),
+          catchError(err => of(TodoActions.deleteAttachmentFailure({ error: err.message })))
+        )
+      )
+    )
   );
 
 }

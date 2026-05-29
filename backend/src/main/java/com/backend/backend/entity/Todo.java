@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,4 +50,6 @@ public class Todo {
     )
     private List<SubTask> subTasks;
 
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TodoAttachment> attachments = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
+import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe, NgClass, TitleCasePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +19,7 @@ interface Subtask {
 @Component({
   selector: 'app-todo-detail',
   standalone: true,
-  imports: [RouterLink, MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe, RouterLink],
+  imports: [DecimalPipe, RouterLink, MatDividerModule, MatIconModule, DatePipe, TitleCasePipe, AsyncPipe, RouterLink],
   templateUrl: './todo-detail.component.html',
   styleUrl: './todo-detail.component.scss',
 })
@@ -30,7 +30,7 @@ export class TodoDetailComponent {
   private readonly router = inject(Router);
   private readonly todoService = inject(TodoService);
 
-    readonly dialog = inject(MatDialog);
+  readonly dialog = inject(MatDialog);
 
   // Static until subtasks are implemented in the backend
   staticSubtasks: Subtask[] = [
@@ -54,7 +54,7 @@ export class TodoDetailComponent {
     this.router.navigate(['/todos']);
   }
 
-    openDeleteDialog(id: number): void {
+  openDeleteDialog(id: number): void {
     this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Delete Task',
@@ -86,5 +86,11 @@ export class TodoDetailComponent {
       case 'NOT_STARTED': return 'Icons/Not Started.svg';
       default: return '';
     }
+  }
+
+  formatFileSize(size: number): string {
+    if (size < 1024) return size + ' B';
+    if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+    return (size / (1024 * 1024)).toFixed(1) + ' MB';
   }
 }
