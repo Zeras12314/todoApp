@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
@@ -14,13 +14,18 @@ import { ConfirmDialogData } from '../../../models/confirm-dialog.model';
   styleUrl: './confirm-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConfirmDialogComponent {
+export class ConfirmDialogComponent implements OnInit {
+
   store = inject(Store);
   router = inject(Router);
   matDialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
   data = inject(MAT_DIALOG_DATA) as ConfirmDialogData;
 
 
+
+  ngOnInit(): void {
+    this.data.hasCloseButton = this.data.hasCloseButton ?? true;
+  }
 
   onCancel() {
     this.matDialogRef.close(false);

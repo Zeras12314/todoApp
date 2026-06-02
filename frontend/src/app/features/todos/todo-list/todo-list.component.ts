@@ -114,22 +114,38 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.expandedTodo = this.isExpanded(todo) ? null : todo;
   }
 
+
   isOverdue(todo: Todo): boolean {
     if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') return false;
-    return new Date(todo.dueDate) < new Date();
+
+    const due = new Date(todo.dueDate);
+    const today = new Date();
+
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return due < today;
   }
+
 
   isWarning(todo: Todo): boolean {
     if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') {
       return false;
     }
-    const hours =
-      (new Date(todo.dueDate).getTime() - Date.now()) / 3_600_000;
+
+    const due = new Date(todo.dueDate);
+    const today = new Date();
+
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const days = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
     if (todo.priority === 'CRITICAL') {
-      return hours >= 0 && hours <= 48;
+      return days >= 0 && days <= 2;
     }
 
-    return hours >= 0 && hours <= 24;
+    return days >= 0 && days <= 1;
   }
 
   onEdit(todo: Todo) {
@@ -173,8 +189,9 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedIds.length === 0) return
     this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete Task',
-        message: `${this.selectedIds.length} ${this.selectedIds.length === 1 ? 'Task' : 'Tasks'} will be deleted`,
+        image: '/Icons/Alert.svg',
+        span: `${this.selectedIds.length} `,
+        message: `${this.selectedIds.length === 1 ? 'Task' : 'Tasks'} will be deleted`,
         confirmText: 'Delete'
       }
     }).afterClosed().subscribe(result => {

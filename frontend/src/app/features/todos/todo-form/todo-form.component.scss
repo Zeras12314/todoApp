@@ -1,14 +1,19 @@
 @use '../../../styles/tokens.scss' as *;
 
 .todo-form {
-  padding: 24px;
-  max-width: 720px;
   margin: 0 auto;
+  max-width: 1024px;
 
+  &__wrapper{
+    background-color: $white;
+     padding: $space-6 $space-6 $space-15 $space-6;
+     margin-bottom: $space-6;
+     border-radius: $space-2;
+  }
   // ── ROWS ─────────────────────────────────────────────────────────────────────
   &__row {
     display: flex;
-    gap: 16px;
+    gap: $space-4;
     width: 100%;
 
     &--two {
@@ -35,7 +40,7 @@
   // ── FIELDS ───────────────────────────────────────────────────────────────────
   &__field {
     width: 100%;
-    margin-bottom: 4px;
+    margin-bottom: $space-1;
 
     &--full {
       width: 100%;
@@ -45,14 +50,16 @@
 
   // ── SUBTASKS ─────────────────────────────────────────────────────────────────
   &__subtasks {
-    margin-bottom: 16px;
+    margin-bottom: $space-4;
+    border-top: 1px solid $tertiary-grey;
+    padding-top: $space-5 ;
   }
 
   &__subtasks-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: $space-3;
   }
 
   &__subtasks-title {
@@ -68,49 +75,27 @@
     border-color: $primary-blue !important;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: $space-1;
 
     mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+      font-size: $text-16;
+      width: $space-4;
+      height: $space-4;
     }
-  }
-
-  // ── NOTICE ───────────────────────────────────────────────────────────────────
-  &__notice {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: $text-12;
-    color: $tertiary-grey;
-    margin-bottom: 16px;
-    padding: 8px 12px;
-    background: #fff8e6;
-    border-left: 3px solid #ef9f27;
-    border-radius: 4px;
-  }
-
-  &__notice-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: #ef9f27;
   }
 
   // ── ACTIONS ──────────────────────────────────────────────────────────────────
   &__actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    padding-top: 8px;
-    border-top: 1px solid $tertiary-grey;
-    margin-top: 8px;
+    gap: $space-3;
+    padding-top: $space-2;
+  
+    margin-top: $space-2;
   }
 
 img{
-    // width: 102px;
-    height: 36px;
+    height: $space-8;
   }
 }
 
@@ -166,10 +151,10 @@ img{
       position: sticky;
       bottom: 0;
       background: $white;
-      padding: 12px 0;
+      padding: $space-3 0;
       margin: 0 -16px;
-      padding-left: 16px;
-      padding-right: 16px;
+      padding-left: $space-4;
+      padding-right: $space-4;
       box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.08);
     }
   }

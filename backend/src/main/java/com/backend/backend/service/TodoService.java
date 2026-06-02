@@ -115,7 +115,7 @@ public class TodoService {
         }
 
         if (request.getDueDate() != null) {
-            if (request.getDueDate().before(new Date()))
+            if (request.getDueDate().before(startOfToday()))
                 throw new IllegalArgumentException("Due date cannot be in the past");
             existing.setDueDate(request.getDueDate());
         }

@@ -16,7 +16,11 @@ export const AuthActions = createActionGroup({
     // Register
     'Register': props<{ username: string; password: string }>(),
     'Register Success': props<{ message: string }>(),
-    'Register Failure': props<{ error: string }>(),
+    'Register Failure': props<{
+      error: string;
+      field?: 'username' | 'password' | 'email' | null;
+      code?: string;
+    }>(),
 
     // UI / State
     'Set Mode': props<{ mode: AuthMode }>(),

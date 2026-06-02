@@ -24,9 +24,12 @@ export class SidebarComponent {
   openLogoutDialog(): void {
     this.dialog.open(ConfirmDialogComponent, {
       data: {
+        hasCloseButton: false,
         title: 'Sign out',
         message: 'Are you sure you want to sign out? All unsaved changes will be lost.',
-        confirmText: 'Sign out'
+        dialogAlign: 'end',
+        confirmText: 'Sign out',
+        confirmAsText: true
       }
     }).afterClosed().subscribe(result => {
       if (result) {

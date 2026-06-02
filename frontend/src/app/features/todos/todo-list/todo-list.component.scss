@@ -76,10 +76,9 @@ tr.example-element-row {
 }
 
 // TITLE
-// TITLE
 .todo-title {
   font-size: $text-12;
-  font-weight: $fw-semibold;
+  font-weight: $fw-bold;
   color: $primary-black;
   text-decoration: underline;
   cursor: pointer;
@@ -188,22 +187,9 @@ tr.example-element-row {
   padding: 0 !important;
 }
 
-// SUBTASK TABLE
-// .subtask-table {
-//   border-top: 1px solid $table-border;
-// }
-
-// :host ::ng-deep .subtask-table .subtask-title.mat-column-title.mat-mdc-cell {
-//   padding-left: $space-30 !important;
-// }
-
-// :host ::ng-deep .subtask-table .subtask-status.mat-column-status.mat-mdc-cell {
-//   text-align: right !important;
-//   padding-right: $space-30 !important;
-// }
+// SUBTASK
 
 .subtask-row {
-  // padding: 15px 120px 15px 120px;
   padding: 15px 15%;
   border-bottom: 1px solid $table-border;
 
@@ -217,13 +203,14 @@ tr.example-element-row {
 }
 
 .subtask-title {
-  font-size: $text-14;
+  font-size: $text-12;
   color: $primary-black;
+  font-weight: $fw-semibold;;
   flex: 1;
 }
 
 .subtask-status {
-  font-size: $text-14;
+  font-size: $text-12;
   font-weight: $fw-medium;
   white-space: nowrap;
   width: 120px; // ← fixed width, aligns with status column above

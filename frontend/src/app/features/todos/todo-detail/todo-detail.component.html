@@ -48,16 +48,16 @@
 
       <div class="todo-detail__attachement ">
         @for (img of todo.attachments; track img.id) {
-          <img [src]="'http://localhost:8080/' + img?.filePath" alt="" />
-          <p>{{ img.fileName }}</p>
-          <p class="">{{ formatFileSize(img.fileSize) }}</p>
+          <img [src]="'http://localhost:8080/' + img?.filePath" alt="Attachment" />
+          <p class="file-name ">{{ img.fileName }}</p>
+          <p class="file-size">{{ formatFileSize(img.fileSize) }}</p>
         }
       </div>
     </div>
 
     <mat-divider></mat-divider>
 
-    <!-- SUBTASKS (static) -->
+    <!-- SUBTASKS -->
     <div class="todo-detail__subtasks">
       @if (todo.subTasks.length > 0) {
         <h3 class="todo-detail__subtasks-title">Subtask</h3>
