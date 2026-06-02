@@ -12,7 +12,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Store } from '@ngrx/store';
 import { StoreService } from '../../../store/store.service';
-import { selectAllTodos, selectFilteredTodos } from '../../../store/todo/todo.selectors';
+import { selectAllTodos, selectFilteredTodos, selectSortedFilteredTodos } from '../../../store/todo/todo.selectors';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -78,7 +78,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
       map(todos => todos.length > 0)
     );
 
-    this.todo$ = this.filteredTodos$;
+    this.todo$ = this.store.select(selectSortedFilteredTodos);
 
     // Clear selection after bulk delete success
     this.store.select(selectAllTodos).pipe(

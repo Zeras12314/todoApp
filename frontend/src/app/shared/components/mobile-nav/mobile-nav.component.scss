@@ -1,0 +1,21 @@
+@use '../../../styles/tokens.scss' as *;
+
+.mobile-nav {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  padding: 10px 0;
+  background: #fff;
+
+  border-top: 1px solid rgba($tertiary-grey, 0.5);
+
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+  z-index: 2000;
+}

@@ -1,58 +1,60 @@
-@if (data.hasCloseButton) {
-  <div class="dialog-close" (click)="onCancel()">
-    <img src="/Icons/Close.svg" alt="Close" />
-  </div>
-}
-
-@if (data.image) {
-  <div class="dialog-image">
-    <img [src]="data.image" alt="dialog image" />
-  </div>
-}
-
-@if (data.title) {
-  <h2 mat-dialog-title>{{ data.title }}</h2>
-}
-
-<mat-dialog-content>
-  @if (data.span) {
-    <span class="dialog-span">{{ data.span }}</span>
-  }
-  @if (data.message) {
-    <div class="dialog-message">
-      {{ data.message }}
+<div class="dialog-wrapper">
+  @if (data.hasCloseButton) {
+    <div class="dialog-close" (click)="onCancel()">
+      <img src="/Icons/Close.svg" alt="Close" />
     </div>
   }
 
-  @if (data.message2) {
-    <div class="dialog-message-2 d-block">
-      {{ data.message2 }}
+  @if (data.image) {
+    <div class="dialog-image">
+      <img [src]="data.image" alt="dialog image" />
     </div>
   }
-</mat-dialog-content>
 
-<mat-dialog-actions [align]="data?.dialogAlign || 'center'">
-  @if (data.confirmAsText) {
-    <span class="dialog-text-action me-4" (click)="onCancel()">
-      {{ data.cancelText || 'Cancel' }}
-    </span>
-
-    <span class="dialog-text-action" (click)="onConfirm()">
-      {{ data.confirmText || 'Confirm' }}
-    </span>
-  } @else {
-    <img
-      src="/Buttons/Button_Cancel.svg"
-      alt="Cancel"
-      class="dialog-action-image"
-      (click)="onCancel()"
-    />
-
-    <img
-      src="/Buttons/Button_Delete.svg"
-      alt="Delete"
-      class="dialog-action-image"
-      (click)="onConfirm()"
-    />
+  @if (data.title) {
+    <h2 mat-dialog-title>{{ data.title }}</h2>
   }
-</mat-dialog-actions>
+
+  <mat-dialog-content>
+    @if (data.span) {
+      <span class="dialog-span">{{ data.span }}</span>
+    }
+    @if (data.message) {
+      <div class="dialog-message">
+        {{ data.message }}
+      </div>
+    }
+
+    @if (data.message2) {
+      <div class="dialog-message-2 d-block">
+        {{ data.message2 }}
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions [align]="data?.dialogAlign || 'center'">
+    @if (data.confirmAsText) {
+      <span class="dialog-text-action me-4" (click)="onCancel()">
+        {{ data.cancelText || 'Cancel' }}
+      </span>
+
+      <span class="dialog-text-action" (click)="onConfirm()">
+        {{ data.confirmText || 'Confirm' }}
+      </span>
+    } @else {
+      <img
+        src="/Buttons/Button_Cancel.svg"
+        alt="Cancel"
+        class="dialog-action-image"
+        (click)="onCancel()"
+      />
+
+      <img
+        src="/Buttons/Button_Delete.svg"
+        alt="Delete"
+        class="dialog-action-image"
+        (click)="onConfirm()"
+      />
+    }
+  </mat-dialog-actions>
+</div>

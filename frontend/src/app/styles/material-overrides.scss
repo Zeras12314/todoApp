@@ -31,3 +31,9 @@
   // background-color: #027CEC !important;
   border-color: #0DCAF0 !important;
 }
+@media (max-width: 576px) {
+  .bottom-sheet-dialog .mat-mdc-dialog-surface {
+    border-radius: 12px !important;
+    overflow: hidden;
+  }
+}

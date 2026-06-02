@@ -1,0 +1,242 @@
+<div class="filter-mobile">
+  <!-- FILTER BAR -->
+  <div class="filter-mobile__bar">
+    <!-- FILTER BUTTON -->
+    <div class="filter-mobile__trigger" (click)="toggleFilter()">
+      <img src="/Icons/Filter.svg" alt="filter" />
+    </div>
+
+    <!-- ACTIVE CHIPS -->
+    @if (selectedPriority()) {
+      <img
+        [src]="getPriorityChip(selectedPriority())"
+        [alt]="selectedPriority() ?? ''"
+        class="filter-mobile__chip-img"
+        (click)="selectPriority(null)"
+      />
+    }
+
+    @if (selectedStatus()) {
+      <img
+        [src]="getStatusChip(selectedStatus())"
+        [alt]="selectedStatus() ?? ''"
+        class="filter-mobile__chip-img"
+        (click)="selectStatus(null)"
+      />
+    }
+
+    <!-- SORT BUTTON -->
+    <button
+      class="filter-mobile__sort"
+      [class.filter-mobile__sort--active]="selectedSort() !== 'dueDate'"
+      (click)="toggleSort()"
+    >
+      <img src="/Icons/Sort.svg" alt="sort" />
+    </button>
+  </div>
+
+  <!-- FILTER MODAL -->
+  @if (isMobileFilterOpen()) {
+    <div class="filter-modal" (click)="$event.stopPropagation()">
+      <div class="filter-modal__header pb-2">
+        <span></span>
+        <span>Filter</span>
+        <button class="filter-modal__close" (click)="isMobileFilterOpen.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="filter-modal__body">
+        <!-- PRIORITY COLUMN -->
+        <div class="filter-modal__col">
+          <p class="filter-modal__col-title">Priority</p>
+
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="priority"
+              [checked]="selectedPriority() === null"
+              (change)="pendingPriority.set(null)"
+            />
+            <span>All</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="priority"
+              [checked]="selectedPriority() === 'LOW'"
+              (change)="pendingPriority.set('LOW')"
+            />
+            <span>Low</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="priority"
+              [checked]="selectedPriority() === 'HIGH'"
+              (change)="pendingPriority.set('HIGH')"
+            />
+            <span>High</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="priority"
+              [checked]="selectedPriority() === 'CRITICAL'"
+              (change)="pendingPriority.set('CRITICAL')"
+            />
+            <span>Critical</span>
+          </label>
+        </div>
+
+        <!-- STATUS COLUMN -->
+        <div class="filter-modal__col">
+          <p class="filter-modal__col-title">Status</p>
+
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="status"
+              [checked]="selectedStatus() === null"
+              (change)="pendingStatus.set(null)"
+            />
+            <span>All</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="status"
+              [checked]="selectedStatus() === 'NOT_STARTED'"
+              (change)="pendingStatus.set('NOT_STARTED')"
+            />
+            <span>Not Started</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="status"
+              [checked]="selectedStatus() === 'IN_PROGRESS'"
+              (change)="pendingStatus.set('IN_PROGRESS')"
+            />
+            <span>In Progress</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="status"
+              [checked]="selectedStatus() === 'COMPLETED'"
+              (change)="pendingStatus.set('COMPLETED')"
+            />
+            <span>Complete</span>
+          </label>
+          <label class="filter-modal__option">
+            <input
+              type="radio"
+              name="status"
+              [checked]="selectedStatus() === 'CANCELLED'"
+              (change)="pendingStatus.set('CANCELLED')"
+            />
+            <span>Cancelled</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- APPLY -->
+      <button class="filter-modal__apply" (click)="applyFilters()">Apply</button>
+    </div>
+  }
+
+  <!-- SORT MODAL -->
+  @if (isSortOpen()) {
+    <div class="filter-modal" (click)="$event.stopPropagation()">
+      <div class="filter-modal__header pb-2">
+        <span></span>
+        <span>Sort by</span>
+        <button class="filter-modal__close" (click)="isSortOpen.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="filter-modal__body filter-modal__body--single">
+        <label class="filter-modal__option">
+          <input
+            type="radio"
+            name="sort"
+            [checked]="pendingSort() === 'none'"
+            (change)="setSortField('none')"
+          />
+          <span>None</span>
+        </label>
+
+        <label class="filter-modal__option">
+          <input
+            type="radio"
+            name="sort"
+            [checked]="pendingSort() === 'dueDate'"
+            (change)="setSortField('dueDate')"
+          />
+          <span>Due Date</span>
+        </label>
+
+        <label class="filter-modal__option">
+          <input
+            type="radio"
+            name="sort"
+            [checked]="pendingSort() === 'priority'"
+            (change)="setSortField('priority')"
+          />
+          <span>Priority</span>
+        </label>
+
+        <label class="filter-modal__option">
+          <input
+            type="radio"
+            name="sort"
+            [checked]="pendingSort() === 'status'"
+            (change)="setSortField('status')"
+          />
+          <span>Status</span>
+        </label>
+
+        <!-- DIVIDER -->
+        <div class="filter-modal__divider"></div>
+
+        <!-- DIRECTION — disabled until field is selected -->
+        <label
+          class="filter-modal__option"
+          [class.filter-modal__option--disabled]="pendingSort() === 'none'"
+        >
+          <input
+            type="radio"
+            name="sortDir"
+            [checked]="pendingSortDir() === 'asc'"
+            [disabled]="pendingSort() === 'none'"
+            (change)="pendingSortDir.set('asc')"
+          />
+          <span>Ascending</span>
+        </label>
+
+        <label
+          class="filter-modal__option"
+          [class.filter-modal__option--disabled]="pendingSort() === 'none'"
+        >
+          <input
+            type="radio"
+            name="sortDir"
+            [checked]="pendingSortDir() === 'desc'"
+            [disabled]="pendingSort() === 'none'"
+            (change)="pendingSortDir.set('desc')"
+          />
+          <span>Descending</span>
+        </label>
+      </div>
+
+      <button class="filter-modal__apply" (click)="applySort()">Apply</button>
+    </div>
+  }
+
+  <!-- BACKDROP -->
+  @if (isMobileFilterOpen() || isSortOpen()) {
+    <div class="filter-backdrop" (click)="closeAll()"></div>
+  }
+</div>
