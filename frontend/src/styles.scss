@@ -33,3 +33,7 @@ body {
   background: $white;
   color: $primary-black;
 }
+
+.cdk-overlay-container {
+  z-index: 1000 !important;
+}

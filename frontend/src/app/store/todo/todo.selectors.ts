@@ -33,3 +33,29 @@ export const selectTodosByPriority = (priority: string) =>
 // ── Single todo ───────────────────────────────────────────────────────────────
 export const selectTodoById = (id: number) =>
   createSelector(selectAllTodos, (todos) => todos.find((t) => t.id === id));
+
+export const selectTodoSort = createSelector(selectTodoState, (s) => s.sort);
+
+export const selectSortedFilteredTodos = createSelector(
+  selectFilteredTodos,
+  selectTodoSort,
+  (todos, sort) => {
+    if (sort.sortBy === 'none') return todos;
+
+    return [...todos].sort((a, b) => {
+      let cmp = 0;
+
+      if (sort.sortBy === 'dueDate') {
+        cmp = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      } else if (sort.sortBy === 'priority') {
+        const order = { LOW: 0, HIGH: 1, CRITICAL: 2 };
+        cmp = (order[a.priority] ?? 0) - (order[b.priority] ?? 0);
+      } else if (sort.sortBy === 'status') {
+        const order = { NOT_STARTED: 0, IN_PROGRESS: 1, COMPLETED: 2, CANCELLED: 3 };
+        cmp = (order[a.status] ?? 0) - (order[b.status] ?? 0);
+      }
+
+      return sort.sortDir === 'asc' ? cmp : -cmp;
+    });
+  }
+);

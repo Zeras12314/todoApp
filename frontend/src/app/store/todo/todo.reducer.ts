@@ -101,5 +101,10 @@ export const todoReducer = createReducer(
   on(TodoActions.clearFilters, (state) => ({
     ...state,
     filters: { status: null, priority: null },
-  }))
+  })),
+
+  on(TodoActions.setSort, (state, { sortBy, sortDir }) => ({
+  ...state,
+  sort: { sortBy, sortDir }
+})),
 );

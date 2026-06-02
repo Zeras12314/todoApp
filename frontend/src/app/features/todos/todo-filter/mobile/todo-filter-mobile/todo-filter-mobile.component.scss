@@ -1,0 +1,186 @@
+@use '../../../../../styles/tokens.scss' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+// ── FILTER BAR ──
+.filter-mobile {
+  width: 100%;
+ box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+ border: 1px solid rgba($tertiary-grey, 0.6);
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    background-color: $white;
+
+  
+
+    padding: $space-3;
+  }
+
+  // filter icon trigger
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $tertiary-grey;
+    border-radius: $space-1;
+    padding: $space-2 - 2;
+    background-color: $alice-blue;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    img {
+      display: block;
+      width: $space-4;
+      height: $space-4;
+    }
+  }
+
+  // chip images 
+  &__chip-img {
+    height: $space-5;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  // sort button — pushed to the right
+  &__sort {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    border: 1px solid $tertiary-grey;
+    border-radius: $space-1;
+    padding: $space-2 - 2;
+
+    img {
+      width: $space-5;
+      height: $space-5;
+    }
+
+    &--active img {
+      filter: invert(30%) sepia(100%) saturate(500%) hue-rotate(190deg);
+    }
+  }
+}
+
+// ── FILTER MODAL ──
+.filter-modal {
+  margin: $space-2;
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  background: $white;
+  border-radius: $space-2;
+  padding: $space-5 $space-7 $space-8;
+  z-index: 300;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-5;
+    border-bottom: 1px solid rgba($tertiary-grey, 0.6);
+
+    span {
+      font-size: $text-16;
+      font-weight: 600;
+      color: $primary-black;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      color: $secondary-grey;
+    }
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-4;
+    margin-bottom: $space-5;
+
+    &--single {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__col-title {
+    font-size: $text-14;
+    font-weight: 500;
+    color: $primary-black;
+    margin-bottom: $space-3;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 0;
+    cursor: pointer;
+    font-size: $text-14;
+    color: $primary-black;
+
+    input[type='radio'] {
+      width: 18px;
+      height: 18px;
+      accent-color: $primary-blue;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  }
+
+  &__apply {
+    width: 100%;
+    padding: $space-3;
+    background: $primary-blue;
+    color: $white;
+    border: none;
+    border-radius: $space-5;
+    font-size: $text-14;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+
+  &__divider {
+    height: 1px;
+    background-color: $tertiary-grey;
+    margin: $space-2 0;
+    width: 100%;
+  }
+
+  &__option--disabled {
+    opacity: 0.4;
+    pointer-events: none;
+
+    input[type='radio'] {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── BACKDROP ──
+.filter-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 299;
+  background: rgba(0, 0, 0, 0.4);
+}

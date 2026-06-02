@@ -44,5 +44,7 @@ export const TodoActions = createActionGroup({
     'Delete Attachment': props<{ todoId: number; attachmentId: number }>(),
     'Delete Attachment Success': props<{ todoId: number; attachmentId: number }>(),
     'Delete Attachment Failure': props<{ error: string }>(),
+
+    'Set Sort': props<{ sortBy: 'none' | 'dueDate' | 'priority' | 'status'; sortDir: 'asc' | 'desc' }>(),
   },
 });

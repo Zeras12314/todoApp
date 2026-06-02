@@ -111,3 +111,33 @@ button {
     opacity: 0.6;
   }
 }
+
+@media (max-width: 576px) {
+  .cdk-overlay-backdrop {
+  z-index: 1500;
+}
+
+  h2[mat-dialog-title] {
+    font-size: $text-20;
+
+  }
+
+  .dialog-close {
+    opacity: .8;
+    z-index: 99;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .dialog-message{
+    text-align: left;
+  }
+}

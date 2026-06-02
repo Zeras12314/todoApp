@@ -1,0 +1,9 @@
+@use '../../../styles/tokens.scss' as *;
+.mobile-header-wrapper{
+    background-color: $primary-blue;
+    padding: 16px;
+
+    img{
+        width: 120px;
+    }
+}

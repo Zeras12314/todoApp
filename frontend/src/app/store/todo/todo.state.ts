@@ -8,6 +8,10 @@ export interface TodoState {
     status: string | null;
     priority: string | null;
   };
+  sort: {
+    sortBy: 'none' | 'dueDate' | 'priority' | 'status';
+    sortDir: 'asc' | 'desc';
+  };
 }
 
 export const initialTodoState: TodoState = {
@@ -18,4 +22,5 @@ export const initialTodoState: TodoState = {
     status: null,
     priority: null,
   },
+  sort: { sortBy: 'none', sortDir: 'asc' },
 };
