@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -14,6 +14,10 @@ import { AuthActions } from '../../../store/auth/auth.action';
 import { selectAuthMode } from '../../../store/auth/auth.selector';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
+import { Actions, ofType } from '@ngrx/effects';
+import { filter } from 'rxjs/internal/operators/filter';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { Subject } from 'rxjs/internal/Subject';
 
 type AuthMode = 'login' | 'signup' | 'success';
 
@@ -32,14 +36,16 @@ type AuthMode = 'login' | 'signup' | 'success';
   styleUrl: './register.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit, OnDestroy {
   private readonly store = inject(Store);
+  private readonly actions$ = inject(Actions);
+  private destroy$ = new Subject<void>();
   hide = true;
   mode = signal<AuthMode>('signup');
 
   // form
   userForm = new FormGroup({
-    username: new FormControl('', [Validators.required]),
+    username: new FormControl('', [Validators.required],),
     password: new FormControl(''),
   });
 
@@ -54,6 +60,12 @@ export class RegisterComponent {
       !password.includes(username)
     );
   });
+  private readonly usernameLoginValidators = [Validators.required];
+  private readonly usernameSignupValidators = [
+    Validators.required,
+    Validators.pattern(/^[a-zA-Z0-9 !#()_-]+$/),
+  ];
+
   private readonly loginValidators = [Validators.required];
   private readonly signupValidators = [
     Validators.required,
@@ -61,17 +73,37 @@ export class RegisterComponent {
     Validators.pattern(/^[a-zA-Z0-9 !#()_-]+$/),
   ];
 
+  rememberMe: boolean = false;
   constructor() {
     this.store.select(selectAuthMode).subscribe((m) => this.mode.set(m));
 
     // react to mode changes
     effect(() => {
       this.updatePasswordValidators();
+      this.updateUsernameValidators();
     });
   }
-  // validators
 
-  // toggle mode (FIXED)
+
+  ngOnInit(): void {
+    this.actions$.pipe(
+      ofType(AuthActions.registerFailure),
+      filter(({ field }) => !!field),
+      takeUntil(this.destroy$),
+    ).subscribe(({ field, code }) => {
+      const control = field === 'username'
+        ? this.userForm.get('username')
+        : this.userForm.get('password');
+
+      control?.setErrors({
+        ...(control?.errors || {}),
+        serverError: code || 'not_valid',
+      });
+      control?.markAsTouched();
+    });
+  }
+
+  // toggle mode
   toggleMode() {
     const next = this.mode() === 'login' ? 'signup' : 'login';
 
@@ -88,6 +120,20 @@ export class RegisterComponent {
     control.setValidators(validators);
     control.updateValueAndValidity({ emitEvent: false });
   }
+
+  private updateUsernameValidators() {
+    const control = this.userForm.get('username');
+    if (!control) return;
+
+    const validators =
+      this.mode() === 'signup'
+        ? this.usernameSignupValidators
+        : this.usernameLoginValidators;
+
+    control.setValidators(validators);
+    control.updateValueAndValidity({ emitEvent: false });
+  }
+
 
   // submit
   submit() {
@@ -110,26 +156,26 @@ export class RegisterComponent {
     }
   }
 
-doesNotContainUsername(password: string | null, username: string | null): boolean {
-  if (!password || !username) return true;
-  return !password.toLowerCase().includes(username.toLowerCase());
-}
+  doesNotContainUsername(password: string | null, username: string | null): boolean {
+    if (!password || !username) return true;
+    return !password.toLowerCase().includes(username.toLowerCase());
+  }
 
-hasMinLength(password: string | null): boolean {
-  return (password || '').length >= 8;
-}
+  hasMinLength(password: string | null): boolean {
+    return (password || '').length >= 8;
+  }
 
-hasNumberOrSymbol(password: string | null): boolean {
-  return /[0-9!#()_\-]/.test(password || '');
-}
+  hasNumberOrSymbol(password: string | null): boolean {
+    return /[0-9!#()_\-]/.test(password || '');
+  }
 
-isPasswordStrong(password: string | null, username: string | null): boolean {
-  return (
-    this.hasMinLength(password) &&
-    this.hasNumberOrSymbol(password) &&
-    this.doesNotContainUsername(password, username)
-  );
-}
+  isPasswordStrong(password: string | null, username: string | null): boolean {
+    return (
+      this.hasMinLength(password) &&
+      this.hasNumberOrSymbol(password) &&
+      this.doesNotContainUsername(password, username)
+    );
+  }
 
   // getters
   get username() {
@@ -153,4 +199,15 @@ isPasswordStrong(password: string | null, username: string | null): boolean {
         return '';
     }
   }
+
+  remember(){
+    this.rememberMe = !this.rememberMe
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
+
+

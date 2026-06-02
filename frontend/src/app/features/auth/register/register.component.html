@@ -25,6 +25,13 @@
 
             @if (username.hasError('required')) {
               <mat-error>Username is required</mat-error>
+            } @else if (username.hasError('pattern')) {
+              <mat-error>
+                Only letters, numbers, spaces, and the symbols !#()_- are allowed
+              </mat-error>
+            }
+            @if (username.touched && username.hasError('serverError')) {
+              <mat-error>Username already exists</mat-error>
             }
           </mat-form-field>
 
@@ -53,7 +60,7 @@
 
             <!-- SIGNUP ERRORS ONLY -->
             @if (mode() === 'signup' && password.hasError('minlength')) {
-              <mat-error>Password must be at least 8 characters</mat-error>
+              <mat-error>Password is weak</mat-error>
             } @else if (mode() === 'signup' && password.hasError('pattern')) {
               <mat-error>
                 Only letters, numbers, spaces, and the symbols !#()_- are allowed
@@ -66,6 +73,17 @@
               <mat-hint class="password-strong text-primary">Password strength: Strong</mat-hint>
             }
           </mat-form-field>
+
+          @if (mode() === 'login') {
+            <div class="remember pointer d-md-none mb-4 ms-4" (click)="remember()">
+              <img
+                [src]="rememberMe ? '/Icons/Checkbox_selected.svg' : '/Icons/Checkbox_active.svg'"
+                alt="remember checkbox"
+                class="me-2"
+              />
+              <span>Remember Me</span>
+            </div>
+          }
 
           <!-- VALIDATION CHECKLIST -->
           @if (mode() === 'signup') {
@@ -123,16 +141,18 @@
           }
 
           <!-- CTA -->
-        <button
-          mat-raised-button
-          color="primary"
-          class="submit-btn"
-          [class.disabled-btn]="!isPasswordStrong(password.value, username.value) && mode() !== 'login'"
-          (click)="submit()"
-          [disabled]="!isPasswordStrong(password.value, username.value) && mode() !== 'login'"
-        >
-          {{ mode() === 'login' ? 'Sign in' : 'Sign up' }}
-        </button>
+          <button
+            mat-raised-button
+            color="primary"
+            class="submit-btn"
+            [class.disabled-btn]="
+              !isPasswordStrong(password.value, username.value) && mode() !== 'login'
+            "
+            (click)="submit()"
+            [disabled]="!isPasswordStrong(password.value, username.value) && mode() !== 'login'"
+          >
+            {{ mode() === 'login' ? 'Sign in' : 'Sign up' }}
+          </button>
         </form>
 
         <!-- SWITCH MODE -->

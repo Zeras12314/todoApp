@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import {AuthActions} from './auth.action';
-import { catchError, map, mergeMap, of, switchMap, tap } from 'rxjs';
+import { AuthActions } from './auth.action';
+import { catchError, filter, map, mergeMap, of, switchMap, tap } from 'rxjs';
 import { ToastService } from '../../services/toast.service';
 import { Router } from '@angular/router';
 
@@ -83,10 +83,6 @@ export class AuthEffects {
 
       switchMap((action) =>
         this.authService.register(action.username, action.password).pipe(
-          tap((res) => {
-            console.log('REGISTER RESPONSE:', res);
-          }),
-
           map((res: any) =>
             AuthActions.registerSuccess({
               message: res.message || 'Account successfully created',
@@ -94,11 +90,18 @@ export class AuthEffects {
           ),
 
           catchError((err) => {
-            console.log('REGISTER ERROR:', err);
+            const apiError = err.error;
+            const errorMessage = apiError?.error || apiError?.message || 'Register failed';
+
+            // detect username conflict from the message
+            const isUsernameTaken = errorMessage.toLowerCase().includes('username') ||
+              err.status === 409;
 
             return of(
               AuthActions.registerFailure({
-                error: err.error?.error || err.error?.message || 'Register failed',
+                error: errorMessage,
+                field: isUsernameTaken ? 'username' : null,
+                code: isUsernameTaken ? 'already_exists' : null,
               }),
             );
           }),
@@ -122,9 +125,10 @@ export class AuthEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthActions.registerFailure),
+        filter(({ field }) => !field),
 
         tap(({ error }) => {
-          this.toastService.error(error);
+          this.toastService.error(error || 'Register failed');
         }),
       ),
     { dispatch: false },

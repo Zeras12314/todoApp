@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -55,14 +55,14 @@ export class TodoFormComponent implements OnInit {
   @ViewChild('fileUploader') fileUploader!: FileUploaderComponent;
 
   isAddSubtaskPressed = signal(false);
-
   isEditMode = false;
   todoId: number | null = null;
   todo: Todo | undefined;
   today = new Date();
 
-  // Static subtasks until backend is ready
   form!: FormGroup;
+  autoCompletedBySubtasks: boolean
+  minDueDate: Date = new Date();
 
   readonly statusOptions = [
     { value: 'NOT_STARTED', label: 'Not Started' },
@@ -76,6 +76,10 @@ export class TodoFormComponent implements OnInit {
     { value: 'HIGH', label: 'High' },
     { value: 'CRITICAL', label: 'Critical' },
   ];
+
+  constructor() {
+    this.today.setHours(0, 0, 0, 0);
+  }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -101,6 +105,11 @@ export class TodoFormComponent implements OnInit {
     }
     this.watchStatusChanges();
 
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // ✅ normalize time
+    this.minDueDate = today;
+
   }
 
   private loadTodo(id: number): void {
@@ -116,7 +125,9 @@ export class TodoFormComponent implements OnInit {
           status: todo.status,
           dueDate: todo.dueDate,
           description: todo.description ?? '',
-          completedDate: todo.completedDate ?? null,
+          completedDate: todo.completedDate
+            ? new Date(todo.completedDate)
+            : null,
         }, { emitEvent: false });
 
         // Enable completedDate if already completed
@@ -134,7 +145,6 @@ export class TodoFormComponent implements OnInit {
           }));
         });
       }
-
     });
   }
 
@@ -153,53 +163,81 @@ export class TodoFormComponent implements OnInit {
   }
 
   onSave(): void {
-  // only validate enabled controls
-  const enabledInvalid = Object.keys(this.form.controls).some(key => {
-    const ctrl = this.form.get(key);
-    return ctrl?.enabled && ctrl?.invalid;
-  });
+    const enabledInvalid = Object.keys(this.form.controls).some(key => {
+      const ctrl = this.form.get(key);
+      return ctrl?.enabled && ctrl?.invalid;
+    });
 
-  if (enabledInvalid) {
-    this.form.markAllAsTouched();
-    this.toastService.error('Please fill in all required fields.');
-    return;
+    if (enabledInvalid) {
+      this.form.markAllAsTouched();
+      this.toastService.error('Please fill in all required fields.');
+      return;
+    }
+
+    const formValue = this.form.getRawValue();
+
+    const { status, autoCompleted } = this.resolveTodoStatus(formValue);
+
+    formValue.status = status;
+
+    if (autoCompleted) {
+      this.toastService.success('All subtasks completed — marking todo as Completed.');
+    }
+
+    if (this.isEditMode && this.todoId) {
+      const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
+
+      this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
+
+      this.actions$
+        .pipe(ofType(TodoActions.updateTodoSuccess), take(1))
+        .subscribe(() => this.uploadPendingFiles(this.todoId!));
+
+    } else {
+      this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
+
+      this.actions$
+        .pipe(ofType(TodoActions.createTodoSuccess), take(1))
+        .subscribe(({ todo }) => this.uploadPendingFiles(todo.id));
+    }
   }
 
-  const formValue = this.form.getRawValue();
-  const allDone   = formValue.subTasks.every((s: any) => s.completed);
+  // helper to determine if status should be auto-completed by subtasks
+  private resolveTodoStatus(formValue: any): {
+    status: string;
+    autoCompleted: boolean;
+  } {
+    const allDone =
+      formValue.subTasks?.length > 0 &&
+      formValue.subTasks.every((s: any) => s.completed);
 
-  if (allDone && formValue.status !== 'COMPLETED') {
-    formValue.status = 'COMPLETED';
+    const shouldAutoComplete =
+      allDone && formValue.status !== 'COMPLETED';
+
+    return {
+      status: shouldAutoComplete ? 'COMPLETED' : formValue.status,
+      autoCompleted: shouldAutoComplete
+    };
   }
 
-  if (formValue.status === 'COMPLETED' && !allDone) {
-    this.toastService.error('All subtasks must be completed before marking as completed.');
-    return;
-  }
-
-  if (this.isEditMode && this.todoId) {
-    const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
-    this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
-    this.actions$.pipe(ofType(TodoActions.updateTodoSuccess), take(1))
-      .subscribe(() => this.uploadPendingFiles(this.todoId!));
-
-  } else {
-    this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
-    this.actions$.pipe(ofType(TodoActions.createTodoSuccess), take(1))
-      .subscribe(({ todo }) => this.uploadPendingFiles(todo.id));
-  }
-}
   onCancel(): void {
     this.router.navigate(['/todos']);
   }
 
   addSubTask(): void {
-    console.log('HEYYYYY')
+    if (this.subTasks.length >= 10) {
+      this.toastService.error('Maximum of 10 subtasks allowed.');
+      return;
+    }
+
+    const nextIndex = this.subTasks.length + 1;
+
     this.subTasks.push(this.fb.group({
-      title: ['', Validators.required],
+      title: [`Task 0${nextIndex}`, Validators.required],
       completed: [false],
     }));
   }
+
 
   removeSubtask(index: number): void {
     this.subTasks.removeAt(index);
@@ -223,47 +261,70 @@ export class TodoFormComponent implements OnInit {
     }
   }
 
-onDelete(): void {
-  if (!this.todoId) return;
+  onDelete(): void {
+    if (!this.todoId) return;
 
-  this.dialog.open(ConfirmDialogComponent, {
-    data: {
-      title:       'Delete Task',
-      message:     'This task will be permanently deleted.',
-      confirmText: 'Delete'
-    }
-  }).afterClosed().subscribe(result => {
-    if (result) {
-      this.store.dispatch(TodoActions.deleteTodo({ id: this.todoId! }));
-      this.actions$.pipe(ofType(TodoActions.deleteTodoSuccess), take(1))
-        .subscribe(() => this.router.navigate(['/todos']));
-    }
-  });
-}
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Task',
+        message: 'This task will be permanently deleted.',
+        confirmText: 'Delete'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(TodoActions.deleteTodo({ id: this.todoId! }));
+        this.actions$.pipe(ofType(TodoActions.deleteTodoSuccess), take(1))
+          .subscribe(() => this.router.navigate(['/todos']));
+      }
+    });
+  }
 
-onRemoveExisting(att: TodoAttachment): void {
-  this.dialog.open(ConfirmDialogComponent, {
-    data: {
-      title:       'Remove Attachment',
-      message:     `"${att.fileName}" will be removed.`,
-      confirmText: 'Remove'
-    }
-  }).afterClosed().subscribe(result => {
-    if (result) {
-      this.todoService.deleteAttachment(this.todoId!, att.id)
-        .subscribe(() => {
-          if (this.todo) {
-            // ← new object reference triggers OnPush
-            this.todo = {
-              ...this.todo,
-              attachments: this.todo.attachments.filter(a => a.id !== att.id)
-            };
-            this.cdr.markForCheck();   // ← tell OnPush to re-render
-          }
-        });
-    }
-  });
-}
+  OnRemoveSubtask(index: number): void {
+    const subtaskTitle = this.subTasks.at(index)?.value?.title;
+
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          image: '/Icons/Alert.svg',
+          message: 'Delete this subtask?',
+          message2: subtaskTitle,
+          confirmText: 'Remove'
+        }
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (!result) return;
+
+        this.subTasks.removeAt(index);
+
+        // for OnPush
+        this.cdr.markForCheck();
+      });
+  }
+
+  onRemoveExisting(att: TodoAttachment): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Remove Attachment',
+        message: `"${att.fileName}" will be removed.`,
+        confirmText: 'Remove'
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.todoService.deleteAttachment(this.todoId!, att.id)
+          .subscribe(() => {
+            if (this.todo) {
+              // new object reference triggers OnPush
+              this.todo = {
+                ...this.todo,
+                attachments: this.todo.attachments.filter(a => a.id !== att.id)
+              };
+              this.cdr.markForCheck();   // tell OnPush to re-render
+            }
+          });
+      }
+    });
+  }
 
 
   // GETTERS
@@ -276,22 +337,12 @@ onRemoveExisting(att: TodoAttachment): void {
     return this.subTasks.controls.every((control) => control.value.completed);
   }
 
-  get minDueDate(): Date {
-    if (this.isEditMode && this.todo?.createdDate) {
-      const d = new Date(this.todo.createdDate);
-      d.setDate(d.getDate() + 1); // must be after created date
-      return d;
-    }
-    return this.today;  
-  }
-
-
   get isCompleted(): boolean {
     return this.form.get('status')?.value === 'COMPLETED';
   }
 
   get showCompletionDateField(): boolean {
-  return this.isEditMode && this.todo?.status === 'COMPLETED' && this.form.get('status')?.value === 'COMPLETED';
-}
+    return this.isEditMode && this.todo?.status === 'COMPLETED' && this.form.get('status')?.value === 'COMPLETED';
+  }
 
 }

@@ -74,12 +74,11 @@
     font-size: $text-14;
     color: $secondary-grey;
     line-height: 1.65;
-    padding-bottom: $space-10;
   }
 
   // ── SUBTASKS ───────────────────────────────────────────
   &__subtasks {
-    margin-top: $space-5;
+    margin-top: $space-4;
   }
 
   &__subtasks-title {
@@ -99,26 +98,28 @@
 
   // ATTACHMENTS
   &__attachement {
-
     img {
       width: 120px;
       height: 120px; // keep square
       object-fit: cover; // crop nicely
     }
 
-    .file-name{
+    .file-name {
       padding: 0;
       margin-top: 12px;
       margin-bottom: 0;
-       font-size: $text-14;
-
+      font-size: $text-14;
     }
 
-    .file-size{
+    .file-size {
       color: $tertiary-grey;
       font-size: $text-12;
     }
   }
+}
+
+mat-divider {
+  margin-top: $space-8;
 }
 
 // ── SUBTASK LIST ─────────────────────────────────────────

@@ -8,7 +8,7 @@
 // ATTACHMENTS WRAPPER
 .todo-form__attachments {
   width: 100%;
-  margin-bottom: $space-5;
+  margin-bottom: $space-10;
 }
 
 .todo-form__attachments-label {
@@ -32,7 +32,6 @@
   position: relative;
   min-height: 90px;
 
-  // ← add these
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,7 +48,7 @@
     cursor: not-allowed;
   }
 
-  // ← when files exist, switch to top-aligned
+  // when files exist, switch to top-aligned
   &--has-files {
     justify-content: flex-start;
     align-items: flex-start;
@@ -84,7 +83,6 @@
 .todo-form__dropzone-browse {
   color: $primary-blue;
   cursor: pointer;
-  text-decoration: underline;
 }
 
 // UPLOAD STATE
@@ -154,10 +152,10 @@
 .todo-form__file-meta {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
-  margin-top: $space-1;
-  text-align: center;
+  margin-top: $space-2;
+  text-align: left;
+  gap: $space-2 - 2;
 }
 
 // FILE NAME
@@ -165,10 +163,7 @@
   width: 100%;
   font-size: $text-12;
   color: $primary-black;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2
 }
 
 // FILE SIZE
