@@ -16,14 +16,14 @@ export class TodoFilterMobileComponent {
   private readonly store = inject(Store);
 
   isMobileFilterOpen = signal(false);
-  isSortOpen         = signal(false);
+  isSortOpen = signal(false);
 
   // pending filter values
   pendingPriority = signal<string | null>(null);
-  pendingStatus   = signal<string | null>(null);
+  pendingStatus = signal<string | null>(null);
 
   // pending sort values
-  pendingSort    = signal<'none' | 'dueDate' | 'priority' | 'status'>('none');
+  pendingSort = signal<'none' | 'dueDate' | 'priority' | 'status'>('none');
   pendingSortDir = signal<'asc' | 'desc'>('asc');
 
   filters = toSignal(this.store.select(selectTodoFilters), {
@@ -35,9 +35,9 @@ export class TodoFilterMobileComponent {
   });
 
   selectedPriority = () => this.filters().priority;
-  selectedStatus   = () => this.filters().status;
-  selectedSort     = () => this.sort().sortBy;
-  selectedSortDir  = () => this.sort().sortDir;
+  selectedStatus = () => this.filters().status;
+  selectedSort = () => this.sort().sortBy;
+  selectedSortDir = () => this.sort().sortDir;
 
   toggleFilter() {
     this.pendingPriority.set(this.selectedPriority());
@@ -64,7 +64,7 @@ export class TodoFilterMobileComponent {
 
   applySort() {
     this.store.dispatch(TodoActions.setSort({
-      sortBy:  this.pendingSort(),
+      sortBy: this.pendingSort(),
       sortDir: this.pendingSortDir(),
     }));
     this.isSortOpen.set(false);
@@ -108,17 +108,17 @@ export class TodoFilterMobileComponent {
     const map: Record<string, string> = {
       NOT_STARTED: 'Chip_Not started.svg',
       IN_PROGRESS: 'Chip_In progress.svg',
-      COMPLETED:   'Chip_Complete.svg',
-      CANCELLED:   'Chip_Cancelled.svg',
+      COMPLETED: 'Chip_Complete.svg',
+      CANCELLED: 'Chip_Cancelled.svg',
     };
     return '/Chips/' + map[value];
   }
 
   setSortField(value: 'none' | 'dueDate' | 'priority' | 'status') {
-  this.pendingSort.set(value);
-  // auto-select ascending when a field is first chosen
-  if (value !== 'none' && !this.pendingSortDir()) {
-    this.pendingSortDir.set('asc');
+    this.pendingSort.set(value);
+    // auto-select ascending when a field is first chosen
+    if (value !== 'none' && !this.pendingSortDir()) {
+      this.pendingSortDir.set('asc');
+    }
   }
-}
 }

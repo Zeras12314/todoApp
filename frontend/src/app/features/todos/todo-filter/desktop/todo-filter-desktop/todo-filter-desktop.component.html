@@ -1,8 +1,6 @@
 <div class="filter filter-wrapper">
-
   <!-- LEFT: filter trigger + active chips -->
   <div class="filter-content-left">
-
     <div class="filter-content-left-btn" (click)="toggleFilter()">
       <span class="filter-image">
         <img src="/Icons/Filter.svg" alt="filter icon" />
@@ -33,7 +31,6 @@
   <!-- DROPDOWN -->
   @if (isOpen()) {
     <div class="filter-dropdown" (click)="$event.stopPropagation()">
-
       <!-- PRIORITY -->
       <div class="filter-dropdown__group">
         <div class="filter-dropdown__item">
@@ -41,18 +38,34 @@
           <mat-icon>chevron_right</mat-icon>
         </div>
         <div class="filter-dropdown__submenu">
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedPriority() === null"
-               (click)="selectPriority(null)">All</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedPriority() === 'LOW'"
-               (click)="selectPriority('LOW')">Low</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedPriority() === 'HIGH'"
-               (click)="selectPriority('HIGH')">High</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedPriority() === 'CRITICAL'"
-               (click)="selectPriority('CRITICAL')">Critical</div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedPriority() === null"
+            (click)="selectPriority(null)"
+          >
+            All
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedPriority() === 'LOW'"
+            (click)="selectPriority('LOW')"
+          >
+            Low
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedPriority() === 'HIGH'"
+            (click)="selectPriority('HIGH')"
+          >
+            High
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedPriority() === 'CRITICAL'"
+            (click)="selectPriority('CRITICAL')"
+          >
+            Critical
+          </div>
         </div>
       </div>
 
@@ -63,24 +76,43 @@
           <mat-icon>chevron_right</mat-icon>
         </div>
         <div class="filter-dropdown__submenu">
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedStatus() === null"
-               (click)="selectStatus(null)">All</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedStatus() === 'NOT_STARTED'"
-               (click)="selectStatus('NOT_STARTED')">Not Started</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedStatus() === 'IN_PROGRESS'"
-               (click)="selectStatus('IN_PROGRESS')">In Progress</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedStatus() === 'COMPLETED'"
-               (click)="selectStatus('COMPLETED')">Completed</div>
-          <div class="filter-dropdown__subitem"
-               [class.active]="selectedStatus() === 'CANCELLED'"
-               (click)="selectStatus('CANCELLED')">Cancelled</div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedStatus() === null"
+            (click)="selectStatus(null)"
+          >
+            All
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedStatus() === 'NOT_STARTED'"
+            (click)="selectStatus('NOT_STARTED')"
+          >
+            Not Started
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedStatus() === 'IN_PROGRESS'"
+            (click)="selectStatus('IN_PROGRESS')"
+          >
+            In Progress
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedStatus() === 'COMPLETED'"
+            (click)="selectStatus('COMPLETED')"
+          >
+            Completed
+          </div>
+          <div
+            class="filter-dropdown__subitem"
+            [class.active]="selectedStatus() === 'CANCELLED'"
+            (click)="selectStatus('CANCELLED')"
+          >
+            Cancelled
+          </div>
         </div>
       </div>
-
     </div>
   }
 
@@ -88,7 +120,6 @@
   <div class="filter-content-right" routerLink="/todos/new">
     <img src="/Buttons/Button_New Task.svg" alt="new task" />
   </div>
-
 </div>
 
 @if (isOpen()) {

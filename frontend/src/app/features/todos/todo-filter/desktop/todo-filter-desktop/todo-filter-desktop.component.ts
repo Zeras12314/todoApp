@@ -17,7 +17,7 @@ import { TodoActions } from '../../../../../store/todo/todo.actions';
 export class TodoFilterDesktopComponent {
   private readonly store = inject(Store);
 
-  isOpen     = signal(false);
+  isOpen = signal(false);
   activeMenu = signal<'priority' | 'status' | null>(null);
 
   filters = toSignal(this.store.select(selectTodoFilters), {
@@ -25,7 +25,7 @@ export class TodoFilterDesktopComponent {
   });
 
   selectedPriority = () => this.filters().priority;
-  selectedStatus   = () => this.filters().status;
+  selectedStatus = () => this.filters().status;
 
   toggleFilter() {
     this.isOpen.update(v => !v);
@@ -57,8 +57,8 @@ export class TodoFilterDesktopComponent {
   getPriorityChip(value: string | null) {
     if (!value) return null;
     const map: Record<string, string> = {
-      LOW:      'Chip_Low.svg',
-      HIGH:     'Chip_High.svg',
+      LOW: 'Chip_Low.svg',
+      HIGH: 'Chip_High.svg',
       CRITICAL: 'Chip_Critical.svg',
     };
     return '/Chips/' + map[value];
@@ -69,8 +69,8 @@ export class TodoFilterDesktopComponent {
     const map: Record<string, string> = {
       NOT_STARTED: 'Chip_Not started.svg',
       IN_PROGRESS: 'Chip_In progress.svg',
-      COMPLETED:   'Chip_Complete.svg',
-      CANCELLED:   'Chip_Cancelled.svg',
+      COMPLETED: 'Chip_Complete.svg',
+      CANCELLED: 'Chip_Cancelled.svg',
     };
     return '/Chips/' + map[value];
   }
