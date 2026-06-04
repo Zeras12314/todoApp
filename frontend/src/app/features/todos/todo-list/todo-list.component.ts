@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import { TodoFilterComponent } from '../todo-filter/todo-filter.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Store } from '@ngrx/store';
 import { StoreService } from '../../../store/store.service';
 import { selectAllTodos, selectFilteredTodos, selectSortedFilteredTodos } from '../../../store/todo/todo.selectors';
@@ -53,10 +52,6 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   columnsToDisplayWithExpand = [...this.columnsToDisplay];
   expandedTodo: Todo | null = null;
 
-  todoNotesByTitle: Record<string, string> = {
-    'Buy groceries': 'Remember to include milk, eggs, and bread. Check budget.',
-    'Finish report': 'Attach screenshots, verify totals, and send before EOD.',
-  };
   private readonly destroy$ = new Subject<void>();
   @ViewChild(MatSort)
   set matSort(sort: MatSort) {
@@ -153,13 +148,21 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onCheckboxChange(id: number, checked: boolean): void {
-    if (checked) {
-      this.selectedIds = [...this.selectedIds, id];
-    } else {
-      this.selectedIds = this.selectedIds.filter((i) => i !== id);
-    }
+    const current = this.selectedIds;
+    const updated = checked
+      ? [...current, id]
+      : current.filter(i => i !== id);
+
+    this.selectedIds = updated;
+    this.store.dispatch(TodoActions.setSelectedIds({ ids: updated }));
   }
 
+  goToTodoDetailsPage(id: number) {
+    // clear first, then navigate
+    this.selectedIds = [];
+    this.store.dispatch(TodoActions.setSelectedIds({ ids: [] }));
+    this.router.navigate(['/todos', id]);
+  }
   onBulkDelete(): void {
     if (this.selectedIds.length === 0) return;
     this.store.dispatch(TodoActions.deleteTodos({ ids: this.selectedIds }));

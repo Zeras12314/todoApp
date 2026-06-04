@@ -139,6 +139,16 @@
 
         @for (subtask of subTasks.controls; track $index) {
           <div class="subtask-row" [formGroup]="$any(subtask)">
+            <!-- DELETE MOBILE -->
+            <img
+              src="/Icons/Delete_active.svg"
+              alt="delete icon"
+              class="subtask-row__delete delete_mobile d-block d-lg-none"
+              [class.disabled]="isCompleted"
+              (click)="OnRemoveSubtask($index)"
+            />
+
+            <!-- TITLE -->
             <mat-form-field appearance="outline" class="subtask-row__field">
               <mat-label>Title</mat-label>
               <input matInput formControlName="title" />
@@ -150,7 +160,11 @@
               }
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="subtask-row__status-field">
+            <!-- DESKTOP SELECT -->
+            <mat-form-field
+              appearance="outline"
+              class="subtask-row__status-field d-none d-md-block"
+            >
               <mat-label>Status</mat-label>
               <mat-select formControlName="completed">
                 <mat-option [value]="false">Not Done</mat-option>
@@ -158,19 +172,40 @@
               </mat-select>
             </mat-form-field>
 
+            <!-- FORM SWITCH MOBILE -->
+            <div class="form-check form-switch subtask-row__switch d-block d-md-none">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                [id]="'subtaskSwitch' + $index"
+                formControlName="completed"
+              />
+
+              <label class="form-check-label" [for]="'subtaskSwitch' + $index">
+                {{ subtask.get('completed')?.value ? 'Done' : 'Not Done' }}
+              </label>
+            </div>
+
+            <!-- DELETE DEKSTOP -->
             <img
               src="/Icons/Delete_active.svg"
               alt="delete icon"
-              class="subtask-row__delete"
+              class="subtask-row__delete delete_desktop"
               [class.disabled]="isCompleted"
               (click)="OnRemoveSubtask($index)"
             />
           </div>
         }
 
-        <!-- @if (subTasks.length === 0) {
-          <p class="todo-form__subtasks-empty">No subtasks added yet.</p>
-        } -->
+        @if (allSubTasksDone && subTasks.length > 0) {
+          <div class="subtasks-done-message d-sm-none m-auto text-center">
+            <p>All Subtask are <strong>Done</strong>!</p>
+            <div class="mark-as-complete" (click)="onSave()">
+              <img src="Buttons/Button_Mark as Complete.svg" alt="mark as complete" />
+            </div>
+          </div>
+        }
       </div>
     </div>
 

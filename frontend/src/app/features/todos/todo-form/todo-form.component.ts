@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
@@ -20,6 +20,8 @@ import { FileUploaderComponent } from '../../../shared/components/file-uploader/
 import { Actions, ofType } from '@ngrx/effects';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { StoreService } from '../../../store/store.service';
 
 
 @Component({
@@ -35,7 +37,9 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FileUploaderComponent
+    FileUploaderComponent,
+    MatSlideToggleModule,
+    JsonPipe
   ],
   templateUrl: './todo-form.component.html',
   styleUrl: './todo-form.component.scss',
@@ -51,6 +55,7 @@ export class TodoFormComponent implements OnInit {
   private readonly actions$ = inject(Actions);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly storeService = inject(StoreService)
 
   @ViewChild('fileUploader') fileUploader!: FileUploaderComponent;
 
@@ -79,6 +84,17 @@ export class TodoFormComponent implements OnInit {
 
   constructor() {
     this.today.setHours(0, 0, 0, 0);
+    let initialized = false;
+    effect(() => {
+      const trigger = this.storeService.saveTrigger();
+      if (!initialized) {
+        initialized = true;
+        return;
+      }
+      this.onSave();
+    });
+
+
   }
 
   ngOnInit(): void {
@@ -107,7 +123,7 @@ export class TodoFormComponent implements OnInit {
 
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // ✅ normalize time
+    today.setHours(0, 0, 0, 0);
     this.minDueDate = today;
 
   }
@@ -176,13 +192,9 @@ export class TodoFormComponent implements OnInit {
 
     const formValue = this.form.getRawValue();
 
-    const { status, autoCompleted } = this.resolveTodoStatus(formValue);
+    const { status } = this.resolveTodoStatus(formValue);
 
     formValue.status = status;
-
-    if (autoCompleted) {
-      this.toastService.success('All subtasks completed — marking todo as Completed.');
-    }
 
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };

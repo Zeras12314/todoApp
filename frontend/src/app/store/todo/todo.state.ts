@@ -12,6 +12,7 @@ export interface TodoState {
     sortBy: 'none' | 'dueDate' | 'priority' | 'status';
     sortDir: 'asc' | 'desc';
   };
+  selectedIds: number[];
 }
 
 export const initialTodoState: TodoState = {
@@ -23,4 +24,5 @@ export const initialTodoState: TodoState = {
     priority: null,
   },
   sort: { sortBy: 'none', sortDir: 'asc' },
+  selectedIds: null
 };
