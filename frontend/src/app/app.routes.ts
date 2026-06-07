@@ -11,6 +11,12 @@ export const routes: Routes = [
       import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
   },
   {
+    path: 'oauth2/callback',
+    loadComponent: () =>
+      import('./features/auth/o-auth2-callback/o-auth2-callback.component')
+        .then(m => m.OAuth2CallbackComponent),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>

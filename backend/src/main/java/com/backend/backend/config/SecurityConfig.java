@@ -27,6 +27,11 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
+
+
     @Bean
     public AuthenticationProvider authProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
@@ -41,13 +46,24 @@ public class SecurityConfig {
         // disable csrf
         http.csrf(customizer -> customizer.disable())
                 .cors(Customizer.withDefaults())
-        // authenticate every request
-        .authorizeHttpRequests(request -> request
-                .requestMatchers("/api/register", "/api/login", "/api/hello", "/uploads/**")
-                .permitAll()
-                .anyRequest().authenticated())
-        // stateless session
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // authenticate every request
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/api/register",
+                                "/api/login",
+                                "/api/hello",
+                                "/uploads/**",
+                                "/login/oauth2/**",       // ← OAuth2 callback
+                                "/oauth2/**" )
+                        .permitAll()
+                        .anyRequest().authenticated())
+                // stateless session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2SuccessHandler)
+                )
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -57,11 +73,8 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
-
-
 }
