@@ -31,6 +31,9 @@
       [class.filter-mobile__sort--active]="selectedSort() !== 'dueDate'"
       (click)="toggleSort()"
     >
+      @if (isSortActive()) {
+        <i class="bi bi-circle-fill text-success me-1 filter-mobile__sort__active"></i>
+      }
       <img src="/Icons/Sort.svg" alt="sort" />
     </button>
   </div>

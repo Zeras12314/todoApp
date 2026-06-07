@@ -1,6 +1,8 @@
 <div class="d-block d-md-none">
   <app-mobile-header></app-mobile-header>
-  <app-todo-filter-mobile></app-todo-filter-mobile>
+  @if (isTodoListPage()) {
+    <app-todo-filter-mobile></app-todo-filter-mobile>
+  }
 </div>
 
 <div class="container-fluid p-0">
@@ -11,8 +13,10 @@
     </div>
     <!-- Main Content -->
     <div class="col-12 col-md-10 main-wrapper">
-      <main class="content p-3 p-md-4">
-        <app-breadcrumb></app-breadcrumb>
+      <main class="content p-0 p-md-3 p-md-4">
+        @if (!hideBreadCrumb()) {
+          <app-breadcrumb ></app-breadcrumb>
+        }
         <router-outlet></router-outlet>
       </main>
     </div>

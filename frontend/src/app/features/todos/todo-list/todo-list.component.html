@@ -1,10 +1,12 @@
-<app-todo-filter></app-todo-filter>
+<div class="d-none d-md-block">
+  <app-todo-filter></app-todo-filter>
+</div>
 
 @if (todo$ | async; as todos) {
   @if (hasTodos$ | async) {
     @if (hasFilteredTodos$ | async) {
+      <!-- DESKTOP TABLE -->
       <div class="d-none d-md-block w-100 mt-3 table-wrapper">
-        <!--  DESKTOP  -->
         <table
           mat-table
           [dataSource]="dataSource"
@@ -44,7 +46,7 @@
             </td>
           </ng-container>
 
-          <!-- Expand toggle column -->
+          <!-- Expand toggle -->
           <ng-container matColumnDef="expand">
             <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
             <td mat-cell *matCellDef="let todo">
@@ -70,9 +72,9 @@
             >
               <span class="header-cell">
                 Title
-                <span matSortHeaderIcon
-                  ><img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon"
-                /></span>
+                <span matSortHeaderIcon>
+                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" />
+                </span>
               </span>
             </th>
             <td mat-cell *matCellDef="let todo">
@@ -92,6 +94,13 @@
                 <span class="todo-title" [routerLink]="['/todos', todo.id]">
                   {{ todo.title }}
                 </span>
+                @if (todo?.attachments?.length > 0) {
+                  <img
+                    src="/Icons/attachment.svg"
+                    class="todo-card__attachment-icon"
+                    alt="attachment"
+                  />
+                }
               </div>
             </td>
           </ng-container>
@@ -107,8 +116,9 @@
               <span class="header-cell">
                 Due Date
                 <span matSortHeaderIcon>
-                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" /></span
-              ></span>
+                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" />
+                </span>
+              </span>
             </th>
             <td mat-cell *matCellDef="let todo">
               <span
@@ -119,7 +129,6 @@
               >
                 {{ todo.dueDate | date: 'MM/dd/yyyy' }}
               </span>
-
               @if (isOverdue(todo)) {
                 <div class="due-label due-label--overdue">Overdue</div>
               } @else if (isWarning(todo)) {
@@ -134,12 +143,11 @@
               <span class="header-cell">
                 Priority
                 <span matSortHeaderIcon>
-                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon"
-                /></span>
+                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" />
+                </span>
               </span>
             </th>
             <td mat-cell *matCellDef="let todo">
-              <!-- Priority badge -->
               <img [src]="getPriorityIcon(todo.priority)" alt="{{ todo.priority }}" />
             </td>
           </ng-container>
@@ -150,22 +158,19 @@
               <span class="header-cell">
                 Status
                 <span matSortHeaderIcon>
-                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon"
-                /></span>
+                  <img src="/Icons/Sort_desktop.svg" alt="sort" class="sort-icon" />
+                </span>
               </span>
             </th>
             <td mat-cell *matCellDef="let todo" class="status-content">
-              <!-- Priority badge -->
               <div class="status-content-wrapper d-flex gap-2">
                 <div><img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" /></div>
-                <div class="">
-                  <span class="status-cell d-inline">
-                    {{ todo.status | titlecase }}
-                  </span>
+                <div>
+                  <span class="status-cell d-inline">{{ todo.status | titlecase }}</span>
                   @if (todo.status === 'COMPLETED' && todo.completedDate) {
-                    <small class="completed-date secondary-text d-block">{{
-                      todo.completedDate | date: 'MM/dd/yyyy'
-                    }}</small>
+                    <small class="completed-date secondary-text d-block">
+                      {{ todo.completedDate | date: 'MM/dd/yyyy' }}
+                    </small>
                   }
                 </div>
               </div>
@@ -229,7 +234,6 @@
         </table>
       </div>
     } @else {
-      <!-- FILTER EMPTY STATE -->
       <div class="no-todos text-center mt-5">
         <h3>No results found</h3>
         <p>Try adjusting your filters</p>
@@ -239,83 +243,109 @@
     <div class="no-todos d-flex flex-column align-items-center gap-4 mt-5">
       <img src="no_todos.png" alt="No todos" class="no-todos__image" />
       <h3 class="no-todos__message">No todos found</h3>
-      <!-- // create cta and route to todos.new-->
       <button mat-raised-button color="primary" (click)="goToCreateTodo()">
         Create your first todo
       </button>
     </div>
   }
 
-  <!-- MOBILE -->
-  <!-- MOBILE CARDS — hidden on desktop -->
-  <div class="d-md-none todo-card-list mt-3">
+  <!-- MOBILE CARDS -->
+  <div class="d-md-none todo-card-list">
     @for (todo of todos; track todo.id) {
       <div class="todo-card" [class.todo-card--expanded]="isExpanded(todo)">
-        <!-- MAIN ROW -->
-        <div class="todo-card__row" (click)="toggle(todo)">
-          <!-- Checkbox -->
-          <mat-checkbox
-            (click)="$event.stopPropagation()"
-            (change)="onCheckboxChange(todo.id, $event.checked)"
-            [checked]="selectedIds.includes(todo.id)"
-            class="todo-card__checkbox"
-          >
-          </mat-checkbox>
+        <div class="todo-card__inner">
+          <!-- LEFT: checkbox column -->
+          <div class="todo-card__check-col">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="onCheckboxChange(todo.id, $event.checked)"
+              [checked]="selectedIds.includes(todo.id)"
+            ></mat-checkbox>
+          </div>
 
-          <!-- Priority badge -->
-          <img [src]="getPriorityIcon(todo.priority)" alt="" />
+          <!-- RIGHT: all content -->
+          <div class="todo-card__content" (click)="todo.subTasks?.length > 0 ? toggle(todo) : null">
+            <!-- ROW 1: priority + status -->
+            <div class="todo-card__badges">
+              <div class="todo-card__priority me-3">
+                <img [src]="getPriorityIcon(todo.priority)" alt="{{ todo.priority }}" />
+              </div>
 
-          <!-- Status -->
-          <span class="todo-card__status">
-            <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
-            {{ todo.status | titlecase }}
-          </span>
-
-          <!-- Expand arrow -->
-          <button
-            mat-icon-button
-            class="todo-card__expand"
-            (click)="toggle(todo); $event.stopPropagation()"
-          >
-            <mat-icon>
-              {{ isExpanded(todo) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-            </mat-icon>
-          </button>
-        </div>
-
-        <!-- TITLE + DATE ROW -->
-        <div class="todo-card__meta" (click)="toggle(todo)">
-          <span class="todo-card__title">
-            {{ todo.title }}
-          </span>
-
-          <span
-            class="todo-card__date"
-            [ngClass]="{
-              'todo-card__date--overdue': isOverdue(todo),
-              'todo-card__date--warning': isWarning(todo),
-            }"
-          >
-            <mat-icon class="date-icon">schedule</mat-icon>
-            {{ todo.dueDate | date: 'MM/dd/yyyy' }}
-          </span>
-
-          @if (isOverdue(todo)) {
-            <div class="due-label due-label--overdue">Overdue</div>
-          } @else if (isWarning(todo)) {
-            <div class="due-label due-label--warning">
-              {{ todo.priority === 'CRITICAL' ? 'Critical · Due soon' : 'Due soon' }}
+              <span class="todo-card__status">
+                <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
+                <span>{{ todo.status | titlecase }}</span>
+              </span>
             </div>
-          }
+
+            <!-- ROW 2: expand icon + title -->
+            <div class="todo-card__title-row">
+              <span class="todo-card__title-icon">
+                @if (todo.subTasks?.length > 0) {
+                  <img
+                    [src]="
+                      isExpanded(todo)
+                        ? '/Icons/Accordion_expand.svg'
+                        : '/Icons/Accordion_supress.svg'
+                    "
+                    alt="expand"
+                  />
+                }
+              </span>
+              <span class="todo-card__title" (click)="goToTodoDetailsPage(todo.id)">{{
+                todo.title
+              }}</span>
+              @if (todo?.attachments?.length > 0) {
+                <img
+                  src="/Icons/attachment.svg"
+                  class="todo-card__attachment-icon"
+                  alt="attachment"
+                />
+              }
+            </div>
+
+            <!-- ROW 3: date -->
+            <div class="todo-card__date-row">
+              <img src="/Icons/Due Date.svg" alt="due date" />
+              <span
+                class="todo-card__date"
+                [ngClass]="{
+                  'todo-card__date--overdue': isOverdue(todo),
+                  'todo-card__date--warning': isWarning(todo),
+                }"
+              >
+                {{ todo.dueDate | date: 'MM/dd/yyyy' }}
+              </span>
+              @if (isOverdue(todo)) {
+                <span class="due-label due-label--overdue">Overdue</span>
+              } @else if (isWarning(todo)) {
+                <span class="due-label due-label--warning">Today </span>
+              }
+            </div>
+          </div>
         </div>
 
-        <!-- EXPANDED DETAIL -->
-        @if (isExpanded(todo)) {
-          <div class="todo-card__detail">
-            <div><strong>Status:</strong> {{ todo.status }}</div>
-            <div><strong>Priority:</strong> {{ todo.priority }}</div>
-            <div><strong>Due:</strong> {{ todo.dueDate | date }}</div>
-            <!-- <div class="mt-2">{{ getTodoNote(todo) }}</div> -->
+        <!-- EXPANDED SUBTASKS -->
+        @if (isExpanded(todo) && todo.subTasks?.length > 0) {
+          <div class="todo-card__subtasks">
+            @for (subTask of todo.subTasks; track subTask.id) {
+              <div class="todo-card__subtask">
+                <!-- STATUS on top -->
+                <div
+                  class="todo-card__subtask-status"
+                  [class.done]="subTask.completed"
+                  [class.not-done]="!subTask.completed"
+                >
+                  <img
+                    [src]="subTask.completed ? '/Icons/Done.svg' : '/Icons/Not Done.svg'"
+                    alt="status"
+                  />
+                  <span>{{ subTask.completed ? 'Done' : 'Not Done' }}</span>
+                </div>
+
+                <!-- TITLE below -->
+                <span class="todo-card__subtask-title">{{ subTask.title }}</span>
+              </div>
+            }
           </div>
         }
       </div>

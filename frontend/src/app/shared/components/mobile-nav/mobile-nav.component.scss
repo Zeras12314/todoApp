@@ -2,6 +2,7 @@
 
 .mobile-nav {
   width: 100%;
+  min-height: $space-18;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -18,4 +19,21 @@
 
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
   z-index: 2000;
+
+  .select-wrapper {
+    display: flex;
+  }
+
+  .select-wrapper--active {
+    border-radius: $space-1 + 2px;
+    border: 2px solid $tertiary-grey;
+    padding: 2px $space-1;
+    cursor: pointer;
+  }
+
+  .mobile-nav__actions-edit {
+    // width: 27px;
+    height: $space-6;
+    display: flex;
+  }
 }

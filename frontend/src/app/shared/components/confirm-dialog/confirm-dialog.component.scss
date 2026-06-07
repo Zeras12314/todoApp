@@ -113,6 +113,9 @@ button {
 }
 
 @media (max-width: 576px) {
+  .dialog-wrapper{
+    padding-top: $space-6;
+  }
   .cdk-overlay-backdrop {
   z-index: 1500;
 }

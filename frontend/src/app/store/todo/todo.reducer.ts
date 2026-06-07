@@ -104,7 +104,13 @@ export const todoReducer = createReducer(
   })),
 
   on(TodoActions.setSort, (state, { sortBy, sortDir }) => ({
-  ...state,
-  sort: { sortBy, sortDir }
-})),
+    ...state,
+    sort: { sortBy, sortDir }
+  })),
+
+  on(TodoActions.setSelectedIds, (state, { ids }) => ({
+    ...state,
+    selectedIds: ids
+  }))
+
 );

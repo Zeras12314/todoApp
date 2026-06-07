@@ -3,25 +3,25 @@ import { TodoState } from './todo.state';
 
 export const selectTodoState = createFeatureSelector<TodoState>('todos');
 
-// ── Raw slices ───────────────────────────────────────────────────────────────
-export const selectAllTodos    = createSelector(selectTodoState, (s) => s.todos);
+// ── Raw slices 
+export const selectAllTodos = createSelector(selectTodoState, (s) => s.todos);
 export const selectTodoLoading = createSelector(selectTodoState, (s) => s.loading);
-export const selectTodoError   = createSelector(selectTodoState, (s) => s.error);
+export const selectTodoError = createSelector(selectTodoState, (s) => s.error);
 export const selectTodoFilters = createSelector(selectTodoState, (s) => s.filters);
 
-// ── Filtered todos ────────────────────────────────────────────────────────────
+// ── Filtered todos 
 export const selectFilteredTodos = createSelector(
   selectAllTodos,
   selectTodoFilters,
   (todos, filters) =>
     todos.filter((t) => {
-      const matchesStatus   = !filters.status   || t.status   === filters.status;
+      const matchesStatus = !filters.status || t.status === filters.status;
       const matchesPriority = !filters.priority || t.priority === filters.priority;
       return matchesStatus && matchesPriority;
     })
 );
 
-// ── Derived counts ────────────────────────────────────────────────────────────
+// ── Derived counts
 export const selectTodoCount = createSelector(selectAllTodos, (todos) => todos.length);
 
 export const selectTodosByStatus = (status: string) =>
@@ -30,7 +30,7 @@ export const selectTodosByStatus = (status: string) =>
 export const selectTodosByPriority = (priority: string) =>
   createSelector(selectAllTodos, (todos) => todos.filter((t) => t.priority === priority));
 
-// ── Single todo ───────────────────────────────────────────────────────────────
+// ── Single todo 
 export const selectTodoById = (id: number) =>
   createSelector(selectAllTodos, (todos) => todos.find((t) => t.id === id));
 
@@ -58,4 +58,10 @@ export const selectSortedFilteredTodos = createSelector(
       return sort.sortDir === 'asc' ? cmp : -cmp;
     });
   }
+);
+
+
+export const selectSelectedIds = createSelector(
+  selectTodoState,
+  state => state.selectedIds
 );
