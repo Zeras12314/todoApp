@@ -200,7 +200,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  remember(){
+  remember() {
     this.rememberMe = !this.rememberMe
   }
 

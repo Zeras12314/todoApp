@@ -22,10 +22,6 @@ export class AuthEffects {
 
       switchMap((action) =>
         this.authService.login(action.username, action.password).pipe(
-          tap((res) => {
-            console.log('LOGIN RESPONSE:', res);
-          }),
-
           map((res: any) =>
             AuthActions.loginSuccess({
               token: res.token,
@@ -36,7 +32,6 @@ export class AuthEffects {
 
           catchError((err) => {
             console.log('LOGIN ERROR:', err);
-
             return of(
               AuthActions.loginFailure({
                 error: err.error?.error || err.error?.message || 'Login failed',

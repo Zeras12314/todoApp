@@ -183,7 +183,7 @@
         (click)="onCancel()"
       />
 
-      @if (todo?.subTasks?.length > 0 && form.get('status')?.value !== 'COMPLETED') {
+      @if (todo?.subTasks?.length > 0 && allSubTasksDone) {
         <img
           src="/Buttons/Button_Mark as Complete.svg"
           alt="mark as complete"

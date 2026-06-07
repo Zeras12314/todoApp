@@ -61,8 +61,10 @@
       font-size: $text-20;
       font-weight: $fw-medium;
       color: $primary-black;
-      line-height: 1;
+      line-height: 1.2;
       text-align: center;
+
+      word-break: break-word;
     }
   }
 

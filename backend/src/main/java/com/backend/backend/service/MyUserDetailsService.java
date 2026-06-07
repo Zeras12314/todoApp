@@ -18,10 +18,22 @@ public class MyUserDetailsService implements UserDetailsService {
         this.userRepo = userRepo;
     }
 
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepo.findByUsername(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User 404"));
+//        return new UserPrincipal(user);
+//    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User 404"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String password = user.getPassword() != null
+                ? user.getPassword()
+                : "{noop}oauth2_no_password";
+
         return new UserPrincipal(user);
     }
 }
