@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
@@ -20,6 +20,11 @@ import { FileUploaderComponent } from '../../../shared/components/file-uploader/
 import { Actions, ofType } from '@ngrx/effects';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { StoreService } from '../../../store/store.service';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { StatusLabelPipe } from '../../../pipes/status.label.pipe';
+import { StatusBottomSheetComponent } from '../../../shared/components/status-bottom-sheet/status-bottom-sheet.component';
 
 
 @Component({
@@ -35,7 +40,11 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FileUploaderComponent
+    FileUploaderComponent,
+    MatSlideToggleModule,
+    JsonPipe,
+    StatusLabelPipe,
+    MatBottomSheetModule
   ],
   templateUrl: './todo-form.component.html',
   styleUrl: './todo-form.component.scss',
@@ -51,6 +60,8 @@ export class TodoFormComponent implements OnInit {
   private readonly actions$ = inject(Actions);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly storeService = inject(StoreService)
+  private readonly bottomSheet = inject(MatBottomSheet);
 
   @ViewChild('fileUploader') fileUploader!: FileUploaderComponent;
 
@@ -63,6 +74,7 @@ export class TodoFormComponent implements OnInit {
   form!: FormGroup;
   autoCompletedBySubtasks: boolean
   minDueDate: Date = new Date();
+  hasUserCompletedSubtasks = false;
 
   readonly statusOptions = [
     { value: 'NOT_STARTED', label: 'Not Started' },
@@ -79,15 +91,24 @@ export class TodoFormComponent implements OnInit {
 
   constructor() {
     this.today.setHours(0, 0, 0, 0);
+    let initialized = false;
+    effect(() => {
+      const trigger = this.storeService.saveTrigger();
+      if (!initialized) {
+        initialized = true;
+        return;
+      }
+      this.onSave();
+    });
   }
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      title: ['Todo 01', Validators.required],
+      title: ['Todo 01', [Validators.required, Validators.maxLength(25)]],
       priority: ['', Validators.required],
       status: ['NOT_STARTED', Validators.required],
       dueDate: [null, Validators.required],
-      description: ['', Validators.required],
+      description: ['', [Validators.required, Validators.maxLength(300)]],
       completedDate: [{ value: null, disabled: true }],
       subTasks: this.fb.array([]),
     });
@@ -104,12 +125,53 @@ export class TodoFormComponent implements OnInit {
       this.loadTodo(this.todoId);
     }
     this.watchStatusChanges();
+    this.watchSubtaskChanges();
 
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // ✅ normalize time
+    today.setHours(0, 0, 0, 0);
     this.minDueDate = today;
 
+  }
+
+  openStatusSheet(): void {
+    if (!this.isMobile) return;
+
+    this.bottomSheet.open(StatusBottomSheetComponent, {
+      panelClass: 'custom-bottom-sheet',
+      data: {
+        options: this.statusOptions,
+        current: this.form.get('status')?.value,
+        isDisabled: (value: string) => this.isStatusDisabled(value)
+      }
+    }).afterDismissed().subscribe(result => {
+      if (result) {
+        this.form.get('status')?.setValue(result);
+        this.form.get('status')?.markAsDirty();
+        this.form.get('status')?.markAsTouched();
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  openPrioritySheet(): void {
+    if (!this.isMobile) return;
+
+    this.bottomSheet.open(StatusBottomSheetComponent, {
+      panelClass: 'custom-bottom-sheet',
+      data: {
+        options: this.priorityOptions,
+        current: this.form.get('priority')?.value,
+        isDisabled: () => false
+      }
+    }).afterDismissed().subscribe(result => {
+      if (result) {
+        this.form.get('priority')?.setValue(result);
+        this.form.get('priority')?.markAsDirty();
+        this.form.get('priority')?.markAsTouched();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   private loadTodo(id: number): void {
@@ -131,9 +193,9 @@ export class TodoFormComponent implements OnInit {
         }, { emitEvent: false });
 
         // Enable completedDate if already completed
-        if (todo.status === 'COMPLETED') {
-          this.form.get('completedDate')?.enable();
-        }
+        // if (todo.status === 'COMPLETED') {
+        //   this.form.get('completedDate')?.enable();
+        // }
       }
 
       if (todo.subTasks?.length) {
@@ -150,11 +212,34 @@ export class TodoFormComponent implements OnInit {
 
   private watchStatusChanges(): void {
     this.form.get('status')?.valueChanges.subscribe((status) => {
-      if (status !== 'COMPLETED') {
-        this.form.get('completedDate')?.setValue(null);
-        this.form.get('completedDate')?.disable();
+      const completedDateCtrl = this.form.get('completedDate');
+
+      if (status === 'COMPLETED') {
+        // set default value but keep disabled
+        if (!completedDateCtrl?.value) {
+          completedDateCtrl?.setValue(new Date());
+        }
+        // do NOT enable, keep disabled
+      } else {
+        completedDateCtrl?.setValue(null);
+        completedDateCtrl?.disable();
       }
     });
+  }
+
+  private watchSubtaskChanges(): void {
+    this.subTasks.valueChanges.subscribe((subtasks) => {
+      const allDone =
+        subtasks?.length > 0 &&
+        subtasks.every((s: any) => s.completed === true);
+
+      //  only set flag when user completes all
+      if (allDone) {
+        this.hasUserCompletedSubtasks = true;
+        this.cdr.markForCheck();
+      }
+    });
+
   }
 
   isStatusDisabled(value: string): boolean {
@@ -163,6 +248,10 @@ export class TodoFormComponent implements OnInit {
   }
 
   onSave(): void {
+    console.log('status value:', this.form.get('status')?.value);
+    console.log('form valid:', this.form.valid);
+    console.log('form value:', this.form.getRawValue());
+
     const enabledInvalid = Object.keys(this.form.controls).some(key => {
       const ctrl = this.form.get(key);
       return ctrl?.enabled && ctrl?.invalid;
@@ -176,13 +265,9 @@ export class TodoFormComponent implements OnInit {
 
     const formValue = this.form.getRawValue();
 
-    const { status, autoCompleted } = this.resolveTodoStatus(formValue);
+    const { status } = this.resolveTodoStatus(formValue);
 
     formValue.status = status;
-
-    if (autoCompleted) {
-      this.toastService.success('All subtasks completed — marking todo as Completed.');
-    }
 
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
@@ -230,12 +315,26 @@ export class TodoFormComponent implements OnInit {
       return;
     }
 
-    const nextIndex = this.subTasks.length + 1;
+    const existingIndexes = this.subTasks.controls.map(control => {
+      const title = control.get('title')?.value || '';
+      const match = title.match(/Task\s*(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
 
-    this.subTasks.push(this.fb.group({
-      title: [`Task 0${nextIndex}`, Validators.required],
+    const nextIndex = existingIndexes.length
+      ? Math.max(...existingIndexes) + 1
+      : 1;
+
+    const formattedIndex = nextIndex.toString().padStart(2, '0');
+
+    this.subTasks.insert(0, this.fb.group({
+      title: [`Subtask ${formattedIndex}`, Validators.required],
       completed: [false],
     }));
+  }
+
+  get isSubtaskLimitReached(): boolean {
+    return this.subTasks.length >= 10;
   }
 
 
@@ -342,7 +441,16 @@ export class TodoFormComponent implements OnInit {
   }
 
   get showCompletionDateField(): boolean {
-    return this.isEditMode && this.todo?.status === 'COMPLETED' && this.form.get('status')?.value === 'COMPLETED';
+    return this.form.get('status')?.value === 'COMPLETED';
   }
 
+  get shouldShowMarkAsComplete(): boolean {
+    return this.subTasks.length > 0 &&
+      this.allSubTasksDone &&
+      this.hasUserCompletedSubtasks;
+  }
+
+  get isMobile(): boolean {
+    return this.storeService.isMobile() ?? false;
+  }
 }

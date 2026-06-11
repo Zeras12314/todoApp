@@ -8,16 +8,14 @@
 // ── FILTER BAR ──
 .filter-mobile {
   width: 100%;
- box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
- border: 1px solid rgba($tertiary-grey, 0.6);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba($tertiary-grey, 0.6);
 
   &__bar {
     display: flex;
     align-items: center;
     gap: $space-2;
     background-color: $white;
-
-  
 
     padding: $space-3;
   }
@@ -41,7 +39,7 @@
     }
   }
 
-  // chip images 
+  // chip images
   &__chip-img {
     height: $space-5;
     cursor: pointer;
@@ -63,14 +61,17 @@
     border-radius: $space-1;
     padding: $space-2 - 2;
 
+    i{
+     font-size: $text-12 - 2;
+    }
     img {
       width: $space-5;
       height: $space-5;
     }
 
-    &--active img {
-      filter: invert(30%) sepia(100%) saturate(500%) hue-rotate(190deg);
-    }
+    // &--active img {
+    //   filter: invert(30%) sepia(100%) saturate(500%) hue-rotate(190deg);
+    // }
   }
 }
 
@@ -115,7 +116,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: $space-4;
-    margin-bottom: $space-5;
+    margin-bottom: $space-6;
+    padding-bottom: $space-3;
+    border-bottom: 1px solid rgba($tertiary-grey, 0.6);
 
     &--single {
       grid-template-columns: 1fr;

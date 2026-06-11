@@ -3,9 +3,9 @@ import {
   Component, inject, Input, Output, EventEmitter
 } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ToastService }        from '../../../services/toast.service';
-import { TodoAttachment }      from '../../../models/todo.model';
-import { TodoService }         from '../../../services/todo.service';
+import { ToastService } from '../../../services/toast.service';
+import { TodoAttachment } from '../../../models/todo.model';
+import { TodoService } from '../../../services/todo.service';
 
 @Component({
   selector: 'app-file-uploader',
@@ -16,23 +16,28 @@ import { TodoService }         from '../../../services/todo.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileUploaderComponent {
-  private readonly cdr          = inject(ChangeDetectorRef);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly toastService = inject(ToastService);
-  private readonly todoService  = inject(TodoService);
+  private readonly todoService = inject(TodoService);
+  private readonly MAX_FILES = 5;
+  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  private readonly ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+
 
   @Input() existingFiles: TodoAttachment[] = [];
 
   // emit when an existing file is removed so parent can call API
   @Output() removeExisting = new EventEmitter<TodoAttachment>();
 
-  uploadProgress  = 0;
-  isUploading     = false;
+  uploadProgress = 0;
+  isUploading = false;
   currentFileName = '';
-  files: File[]   = [];           // ← staged files, parent reads this
+  files: File[] = [];
   uploadInterval: any;
+  validationMessage = '';
 
   // ── DRAG & DROP ──
-  onDragOver(event: DragEvent)  { event.preventDefault(); }
+  onDragOver(event: DragEvent) { event.preventDefault(); }
 
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
@@ -47,21 +52,49 @@ export class FileUploaderComponent {
     input.value = '';
   }
 
-  // ── STAGE FILES (fake progress bar) ──
   stageFiles(files: File[]): void {
     if (this.isUploading) return;
+    if (!files.length) return;
 
-    const file = files[0];
-    if (!file) return;
+    this.validationMessage = '';
 
-    const allowed = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
-    if (!allowed.includes(file.type)) {
-      this.toastService.error('Only PNG and JPG images are allowed.');
-      return;
+    // filter valid files first
+    const validFiles: File[] = [];
+
+    for (const file of files) {
+      const totalFiles = this.existingFiles.length + this.files.length + validFiles.length;
+
+      if (totalFiles >= this.MAX_FILES) {
+        this.validationMessage = `Maximum of ${this.MAX_FILES} attachments allowed.`;
+        this.toastService.error(this.validationMessage);
+        break;
+      }
+
+      if (!this.ALLOWED_TYPES.includes(file.type)) {
+        this.toastService.error(`${file.name}: Only PNG, JPG, GIF, or WEBP images are allowed.`);
+        continue;
+      }
+
+      if (file.size > this.MAX_FILE_SIZE) {
+        this.toastService.error(`${file.name}: File size must not exceed 10MB.`);
+        continue;
+      }
+
+      validFiles.push(file);
     }
 
-    this.isUploading     = true;
-    this.uploadProgress  = 0;
+    if (!validFiles.length) return;
+
+    // stage all valid files one by one with progress
+    this.uploadQueue(validFiles, 0);
+  }
+
+  private uploadQueue(files: File[], index: number): void {
+    if (index >= files.length) return;
+
+    const file = files[index];
+    this.isUploading = true;
+    this.uploadProgress = 0;
     this.currentFileName = file.name;
     this.cdr.markForCheck();
 
@@ -73,10 +106,17 @@ export class FileUploaderComponent {
 
       if (this.uploadProgress >= 100) {
         clearInterval(this.uploadInterval);
-        this.files           = [...this.files, file];
-        this.isUploading     = false;
-        this.uploadProgress  = 0;
+        this.files = [...this.files, file];
+        this.uploadProgress = 0;
         this.currentFileName = '';
+
+        // check if more files to process
+        if (index + 1 < files.length) {
+          this.uploadQueue(files, index + 1);
+        } else {
+          this.isUploading = false;
+        }
+
         this.cdr.markForCheck();
       }
     }, 100);
@@ -104,6 +144,7 @@ export class FileUploaderComponent {
   // ── REMOVE STAGED FILE ──
   removeFile(index: number): void {
     this.files = this.files.filter((_, i) => i !== index);
+    this.validationMessage = '';
     this.cdr.markForCheck();
   }
 

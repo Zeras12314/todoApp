@@ -30,7 +30,6 @@ table {
   align-items: center;
 }
 
-// COLUMN WIDTHS
 .mat-column-select {
   width: $space-12;
   flex: none;
@@ -44,7 +43,6 @@ table {
   flex: none;
 }
 
-// HEADER CELL
 .header-cell {
   display: flex;
   align-items: center;
@@ -55,7 +53,6 @@ table {
   white-space: nowrap;
 }
 
-// ROWS
 tr.example-detail-row {
   height: 0;
 }
@@ -75,7 +72,6 @@ tr.example-element-row {
   }
 }
 
-// TITLE
 .todo-title {
   font-size: $text-12;
   font-weight: $fw-bold;
@@ -95,12 +91,15 @@ tr.example-element-row {
     align-items: center;
   }
 }
-// DUE DATE
+
 .due-date {
   &--overdue {
     color: $error;
   }
   &--warning {
+    color: $warning;
+  }
+  &--soon{
     color: $warning;
   }
 }
@@ -115,9 +114,11 @@ tr.example-element-row {
   &--warning {
     color: $warning;
   }
+    &--soon{
+    color: $warning;
+  }
 }
 
-// STATUS
 .status-cell {
   display: flex;
   align-items: center;
@@ -132,36 +133,30 @@ tr.example-element-row {
   margin-top: 2px;
 }
 
-// EDIT ICON
 .edit-icon {
   font-size: $space-2;
   color: $tertiary-grey;
   transition: color 0.2s;
-
   &:hover {
     color: $secondary-grey;
   }
 }
 
-// EXPAND ICON
 .expand-icon {
   font-size: $text-16 + 2px;
   color: $tertiary-grey;
   transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
-
   &--open {
     transform: rotate(90deg);
   }
 }
 
-// EXPANDED DETAIL
 .example-element-detail-wrapper {
   overflow: hidden;
   display: grid;
   grid-template-rows: 0fr;
   grid-template-columns: 100%;
   transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1);
-
   &-expanded {
     grid-template-rows: 1fr;
   }
@@ -177,7 +172,6 @@ tr.example-element-row {
   width: 100%;
   font-size: $text-12 + 1px;
   color: $secondary-grey;
-
   &-attribution {
     opacity: 0.5;
   }
@@ -187,16 +181,12 @@ tr.example-element-row {
   padding: 0 !important;
 }
 
-// SUBTASK
-
 .subtask-row {
   padding: 15px 15%;
   border-bottom: 1px solid $table-border;
-
   &:first-child {
     border-top: 1px solid $table-border;
   }
-
   &:last-child {
     border-bottom: none;
   }
@@ -205,7 +195,7 @@ tr.example-element-row {
 .subtask-title {
   font-size: $text-12;
   color: $primary-black;
-  font-weight: $fw-semibold;;
+  font-weight: $fw-semibold;
   flex: 1;
 }
 
@@ -213,12 +203,11 @@ tr.example-element-row {
   font-size: $text-12;
   font-weight: $fw-medium;
   white-space: nowrap;
-  width: 120px; // ← fixed width, aligns with status column above
+  width: 120px;
 }
-// NO TODOS
+
 .no-todos {
   padding-bottom: $space-15;
-
   img {
     width: $space-60;
     height: $space-60;
@@ -226,45 +215,60 @@ tr.example-element-row {
   }
 }
 
+// ═══════════════════════════════════════
 // MOBILE CARDS
+// ═══════════════════════════════════════
+
 .todo-card-list {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-  padding: 0 $space-3;
+  margin-left: calc(-1 * var(--mobile-padding, 1rem));
+  margin-right: calc(-1 * var(--mobile-padding, 1rem));
+  width: calc(100% + 2 * var(--mobile-padding, 1rem));
+  padding-bottom: $space-20;
 }
 
 .todo-card {
   background: $white;
-  border: 1px solid $surface-active;
-  border-radius: $space-2;
-  padding: $space-2 $space-3;
-  display: flex;
-  flex-direction: column;
-  gap: $space-1;
-  cursor: pointer;
+  border-bottom: 1px solid $surface-active;
+  cursor: default;
 
   &--expanded {
-    border-color: $primary-blue;
+    background: rgba($primary-blue, 0.02);
   }
 
-  &__row {
+  // ── INNER: checkbox | content ──
+  &__inner {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: $space-3 $space-4;
     gap: $space-2;
   }
 
-  &__checkbox {
+  // ── CHECKBOX COLUMN ──
+  &__check-col {
     flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 2px;
   }
 
-  &__priority {
-    font-size: $text-12 - 1px;
-    font-weight: $fw-semibold;
-    padding: 2px $space-2;
-    border-radius: $space-1;
-    border: 1px solid;
-    flex-shrink: 0;
+  // ── CONTENT COLUMN ──
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  // ── ROW 1: priority + status ──
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-left: $space-5 - 2;
+    margin-bottom: $space-2 - 2;
   }
 
   &__status {
@@ -273,58 +277,114 @@ tr.example-element-row {
     gap: $space-1;
     font-size: $text-12;
     color: $secondary-grey;
-    flex: 1;
+
+    img {
+      width: $space-3;
+      height: $space-3;
+      flex-shrink: 0;
+    }
   }
 
-  &__expand {
-    flex-shrink: 0;
-    width: $space-8;
-    height: $space-8;
-    line-height: $space-8;
-  }
-
-  &__meta {
+  // ── ROW 2: expand icon + title ──
+  &__title-row {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding-left: $space-10;
+    align-items: flex-start;
+    gap: $space-1;
+  }
+
+  &__title-icon {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+
+    img {
+      width: 14px;
+      height: 14px;
+    }
   }
 
   &__title {
     font-size: $text-14 - 1px;
-    font-weight: $fw-medium;
+    font-weight: $fw-bold;
     color: $primary-black;
     text-decoration: underline;
+    // flex: 1;
+    min-width: 0;
+  }
+
+  &__attachment-icon {
+    margin-left: $space-3;
+  }
+
+  // ── ROW 3: date ──
+  &__date-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: $space-5 - 2;
+
+    .due-label{
+      font-size: $text-12 - 1px;
+      margin: 0;
+    }
   }
 
   &__date {
+    font-size: $text-12 - 1px;
+    color: $secondary-grey;
+
+    &--overdue {
+      color: $error;
+    }
+    &--warning {
+      color: $warning;
+    }
+    &--soon {
+      color: $warning;
+    }
+  }
+
+  // ── SUBTASKS ──
+  &__subtasks {
+    border-top: 1px solid $surface-active;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__subtask {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: $space-2;
+    padding-bottom: $space-2;
+    padding-block: $space-3;
+    padding-right: $space-4;
+    padding-left: $space-30;
+    border-bottom: 1px solid $surface-active;
+
+    // full bleed — breaks out of card padding
+    margin-left: calc(-1 * var(--mobile-padding, 1rem));
+    margin-right: calc(-1 * var(--mobile-padding, 1rem));
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__subtask-status {
     display: flex;
     align-items: center;
     gap: $space-1;
     font-size: $text-12 - 1px;
-
-    &--overdue {
-      color: $error !important;
-    }
-    &--warning {
-      color: $warning !important;
-    }
-
-    .date-icon {
-      font-size: $text-12 + 1px;
-      width: $text-12 + 1px;
-      height: $text-12 + 1px;
-    }
+    margin-bottom: $space-2;
+    color: $secondary-grey;
   }
 
-  &__detail {
-    padding: $space-2 $space-3;
-    border-top: 1px solid $surface-active;
-    margin-top: $space-2;
-    font-size: $text-14 - 1px;
-    color: $secondary-grey;
-    display: flex;
-    flex-direction: column;
-    gap: $space-1;
+  &__subtask-title {
+    font-size: $text-12;
+    font-weight: $fw-semibold;
+    color: $primary-black;
   }
 }

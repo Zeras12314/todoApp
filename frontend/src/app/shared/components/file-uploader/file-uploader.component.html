@@ -26,6 +26,9 @@
           </span>
         </p>
       </div>
+      @if (validationMessage) {
+        <small class="text-danger m-auto"> {{ validationMessage }}</small>
+      }
 
       <div class="todo-form__file-list" (click)="$event.stopPropagation()">
         <!-- EXISTING FILES -->
@@ -88,6 +91,13 @@
       </div>
     }
 
-    <input type="file" hidden #fileInput (change)="onFileSelected($event)" accept="image/*" />
+    <input
+      type="file"
+      hidden
+      #fileInput
+      (change)="onFileSelected($event)"
+      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+      multiple
+    />
   </div>
 </div>

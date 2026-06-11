@@ -21,8 +21,8 @@
         <!-- COMPLETED -->
       </div>
 
-      <div class="todo-detail__actions">
-        <div (click)="openDeleteDialog(todo.id)">
+      <div class="todo-detail__actions d-none d-md-flex">
+        <div (click)="openDelete(todo.id)">
           <img src="Icons/Delete_active.svg" alt="Delete" />
         </div>
         <div [routerLink]="['/todos', todo.id, 'edit']">
@@ -34,8 +34,10 @@
     <!-- TITLE + DATE -->
     <h2 class="todo-detail__title">{{ todo.title }}</h2>
     <p class="todo-detail__dates">
-      <small>{{ todo.createdDate | date: 'd MMM y' }}</small> -
-      <small>{{ todo.dueDate | date: 'd MMM y' }}</small>
+      <small>
+        {{ todo.createdDate | date: 'd MMM y' }} ·
+        {{ todo.dueDate | date: 'd MMM y' }}
+      </small>
     </p>
 
     <!-- DESCRIPTION (static placeholder) -->
@@ -46,10 +48,10 @@
     <div class="todo-detail__attachement">
       <!-- <pre>{{ todo.attachments | json }}</pre> -->
 
-      <div class="todo-detail__attachement ">
+      <div class="todo-detail__attachement">
         @for (img of todo.attachments; track img.id) {
           <img [src]="'http://localhost:8080/' + img?.filePath" alt="Attachment" />
-          <p class="file-name ">{{ img.fileName }}</p>
+          <p class="file-name">{{ img.fileName }}</p>
           <p class="file-size">{{ formatFileSize(img.fileSize) }}</p>
         }
       </div>
@@ -81,7 +83,7 @@
         </div>
       } @else {
         <div class="subtask-empty secondary-text">
-          <p>No subtasks have been added yet.</p>
+          <!-- <p>No subtasks have been added yet.</p> -->
         </div>
       }
     </div>

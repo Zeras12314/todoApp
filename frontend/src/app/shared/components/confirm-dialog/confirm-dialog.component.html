@@ -20,9 +20,8 @@
       <span class="dialog-span">{{ data.span }}</span>
     }
     @if (data.message) {
-      <div class="dialog-message">
-        {{ data.message }}
-      </div>
+      <div class="dialog-message" [innerHTML]="data.message"></div>
+
     }
 
     @if (data.message2) {

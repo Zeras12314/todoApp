@@ -37,6 +37,12 @@ public class TodoService {
     @Autowired
     private TodoAttachmentRepository attachmentRepository;
 
+    private static final int MAX_ATTACHMENTS = 5;
+    private static final long MAX_FILE_SIZE  = 10 * 1024 * 1024; // 10MB
+    private static final List<String> ALLOWED_TYPES = List.of(
+            "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
+    );
+
     public Todo createTodo(TodoRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -153,6 +159,31 @@ public class TodoService {
 
         Todo todo = todoRepository.findByIdAndUserId(todoId, user.getId())
                 .orElseThrow(() -> new RuntimeException("Todo not found or unauthorized"));
+
+        // ── VALIDATION
+
+        // max 5 attachments
+        long existingCount = attachmentRepository.findByTodoId(todoId).size();
+        if (existingCount >= MAX_ATTACHMENTS) {
+            throw new IllegalArgumentException(
+                    "Maximum of " + MAX_ATTACHMENTS + " attachments allowed per todo"
+            );
+        }
+
+        // max 10MB per file
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new IllegalArgumentException(
+                    "File size exceeds the maximum allowed size of 10MB"
+            );
+        }
+
+        // valid image type
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_TYPES.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException(
+                    "Invalid file type. Allowed types: JPEG, PNG, GIF, WEBP"
+            );
+        }
 
         try {
             String filePath = fileStorageService.saveFile(file);

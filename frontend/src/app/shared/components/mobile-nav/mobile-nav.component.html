@@ -1,11 +1,52 @@
 <div class="mobile-nav">
-   <div class="delete">
-    <img src="/Icons/Delete_inactive.svg" alt="delete">
-   </div>
-   <div class="new">
-    <img src="/Buttons/Button_New Task_mobile.svg" alt="new task">
-   </div>
-   <div class="user">
-    <img src="/Icons/Avatar.svg" alt="avatar" (click)="openLogoutDialog()">
-   </div>
+  @if (!isEditPage() && !isCreateTodoPage()) {
+    <div class="delete">
+      <div
+        class="select-wrapper"
+        [ngClass]="{ 'select-wrapper--active': (selectedIds() ?? []).length > 0 && isTodosListPage() }"
+        (click)="openDeleteDialogMobile()"
+      >
+        <img
+          [src]="
+            (selectedIds() ?? []).length > 0 || isTodoDetailPage()
+              ? '/Icons/Delete_active.svg'
+              : '/Icons/Delete_inactive.svg'
+          "
+          alt="delete"
+          class="d-block m-auto"
+          [class.cursor-pointer]="(selectedIds() ?? []).length > 0 || isTodoDetailPage()"
+        />
+
+        @if ((selectedIds() ?? []).length > 0 && isTodosListPage()) {
+          <span class="badge rounded-pill ms-1 bg-info">
+            {{ (selectedIds() ?? []).length }}
+          </span>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="placeholder-div"></div>
+  }
+
+  <div class="mobile-nav__actions">
+    @if (isTodosListPage()) {
+      <div class="mobile-nav__actions-create" (click)="goToCreateTodoPage()">
+        <img src="/Buttons/Button_New Task_mobile.svg" alt="new task" />
+      </div>
+    }
+    @if (isTodoDetailPage()) {
+      <div (click)="goToEditPage()" class="mobile-nav__actions-edit">
+        <img src="/Icons/Edit.svg" alt="Edit" />
+      </div>
+    }
+    @if (isEditPage() || isCreateTodoPage()) {
+      <div class="mobile-nav__actions-save" >
+        <img src="/Buttons/Button_Save.svg" alt="save" (click)="onSaveClick()"/>
+      </div>
+    }
+  </div>
+
+  <div class="user">
+    <img src="/Icons/Avatar.svg" alt="avatar" (click)="openLogoutDialog()" />
+  </div>
 </div>
