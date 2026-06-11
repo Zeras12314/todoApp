@@ -45,16 +45,16 @@
       {{ todo.description || 'No description provided.' }}
     </p>
 
-    <div class="todo-detail__attachement">
-      <!-- <pre>{{ todo.attachments | json }}</pre> -->
+    <!-- <pre>{{ todo.attachments | json }}</pre> -->
 
-      <div class="todo-detail__attachement">
-        @for (img of todo.attachments; track img.id) {
+    <div class="todo-detail__attachement d-flex flex-wrap gap-3">
+      @for (img of todo.attachments; track img.id) {
+        <div class="todo-detail__attachement-content">
           <img [src]="'http://localhost:8080/' + img?.filePath" alt="Attachment" />
           <p class="file-name">{{ img.fileName }}</p>
           <p class="file-size">{{ formatFileSize(img.fileSize) }}</p>
-        }
-      </div>
+        </div>
+      }
     </div>
 
     <mat-divider></mat-divider>

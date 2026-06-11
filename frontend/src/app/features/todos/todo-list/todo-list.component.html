@@ -125,7 +125,7 @@
                 [ngClass]="{
                   'due-date--overdue': isOverdue(todo),
                   'due-date--warning': isWarning(todo),
-                  'due-date--soon': isWarning(todo),
+                  'due-date--soon': isDueSoon(todo),
                 }"
               >
                 {{ todo.dueDate | date: 'MM/dd/yyyy' }}
