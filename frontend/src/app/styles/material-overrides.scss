@@ -1,3 +1,4 @@
+@use '.././styles/tokens.scss' as *;
 @use '@angular/material' as mat;
 
 // ── BUTTONS ──
@@ -17,23 +18,64 @@
   color: currentColor;
 }
 
-
 // ── CHECKBOX ──
 
 .mdc-checkbox--selected .mdc-checkbox__background,
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {
   // background-color: #027CEC !important;
-  background-color: #0DCAF0 !important;
+  background-color: #0dcaf0 !important;
   // border-color: #027CEC !important;
 }
 
 .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
   // background-color: #027CEC !important;
-  border-color: #0DCAF0 !important;
+  border-color: #0dcaf0 !important;
 }
+
+.custom-bottom-sheet {
+  margin: 0 $space-4 !important;
+  margin-bottom: $space-20 !important;
+  width: calc(100% - #{$space-8}) !important;
+  max-width: calc(100% - #{$space-8}) !important;
+
+  .mat-bottom-sheet-container {
+    border-radius: $space-4 !important;
+    padding: 0 !important;
+    min-width: unset !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .cdk-overlay-container {
+    .mat-datepicker-content-touch {
+      position: fixed !important;
+      bottom: $space-20 !important;
+      left: $space-4 !important;
+      right: $space-4 !important;
+      top: auto !important;
+      width: calc(100% - #{$space-8}) !important;
+      max-width: unset !important;
+      border-radius: $space-4 !important;
+      overflow: hidden !important;
+    }
+
+    .cdk-overlay-pane:has(.mat-datepicker-content-touch) {
+      position: fixed !important;
+      bottom: $space-20 !important;
+      left: $space-4 !important;
+      right: $space-4 !important;
+      top: auto !important;
+      width: calc(100% - #{$space-8}) !important;
+      max-width: unset !important;
+      transform: none !important;
+    }
+  }
+}
+
 @media (max-width: 576px) {
   .bottom-sheet-dialog .mat-mdc-dialog-surface {
-    border-radius: 12px !important;
+    border-radius: $space-3 !important;
     overflow: hidden;
   }
 }

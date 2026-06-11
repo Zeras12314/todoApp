@@ -1,0 +1,30 @@
+<div class="status-sheet">
+  <div class="status-sheet__header">
+    <h3 class="status-sheet__title">Select Status</h3>
+    <button class="status-sheet__close" (click)="dismiss()">✕</button>
+  </div>
+
+  <div class="status-sheet__options">
+    @for (opt of data.options; track opt.value) {
+      <label
+        class="status-sheet__option"
+        [class.status-sheet__option--disabled]="isDisabled(opt.value)"
+      >
+        <input
+          type="radio"
+          name="status"
+          [value]="opt.value"
+          [checked]="selected === opt.value"
+          (change)="selected = opt.value"
+          [disabled]="isDisabled(opt.value)"
+        />
+        <span class="status-sheet__radio-custom"></span>
+        <span class="status-sheet__label">{{ opt.label }}</span>
+      </label>
+    }
+  </div>
+
+  <div class="status-sheet__footer">
+    <button class="status-sheet__apply" (click)="apply()">Apply</button>
+  </div>
+</div>

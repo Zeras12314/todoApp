@@ -128,19 +128,40 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
       return false;
     }
 
-    const due = new Date(todo.dueDate);
-    const today = new Date();
+    if (todo.priority !== 'CRITICAL') {
+      const due = new Date(todo.dueDate);
+      const today = new Date();
 
-    due.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
+      due.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
 
-    const days = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+      const days = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
 
-    if (todo.priority === 'CRITICAL') {
-      return days >= 0 && days <= 2;
+      return days >= 0 && days <= 1;
     }
 
-    return days >= 0 && days <= 1;
+    // critical: only show Today if <= 24 hours
+    const hoursUntilDue =
+      (new Date(todo.dueDate).getTime() - Date.now()) /
+      (1000 * 60 * 60);
+
+    return hoursUntilDue >= 0 && hoursUntilDue <= 24;
+  }
+
+  isDueSoon(todo: Todo): boolean {
+    if (
+      todo.status === 'COMPLETED' ||
+      todo.status === 'CANCELLED' ||
+      todo.priority !== 'CRITICAL'
+    ) {
+      return false;
+    }
+
+    const hoursUntilDue =
+      (new Date(todo.dueDate).getTime() - Date.now()) /
+      (1000 * 60 * 60);
+
+    return hoursUntilDue > 24 && hoursUntilDue <= 48;
   }
 
   onEdit(todo: Todo) {

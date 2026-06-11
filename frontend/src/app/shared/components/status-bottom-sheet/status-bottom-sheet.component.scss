@@ -1,0 +1,102 @@
+@use '../../../styles/tokens.scss' as *;
+
+.status-sheet {
+  padding: 0;
+
+  &__header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $space-4;
+    border-bottom: 1px solid $tertiary-grey;
+    position: relative;
+    margin-inline: $space-4;
+  }
+
+  &__title {
+    font-size: $text-16;
+    font-weight: $fw-bold;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__close {
+    position: absolute;
+    right: $space-4;
+    background: none;
+    border: none;
+    font-size: $text-16;
+    cursor: pointer;
+    color: #333;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    padding: $space-2 0;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-4 $space-5;
+    cursor: pointer;
+
+    input[type="radio"] {
+      display: none;
+    }
+
+    &--disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  &__radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+
+    input:checked ~ & {
+      border-color: $primary-blue;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: $space-3 - 2;
+        height: $space-3 - 2;
+        border-radius: 50%;
+        background: $primary-blue;
+      }
+    }
+  }
+
+  &__label {
+    font-size: $space-4;
+  }
+
+  &__footer {
+    border-top: 1px solid $tertiary-grey;
+    padding-block: $space-4;
+    margin-inline: $space-4;
+  }
+
+  &__apply {
+    width: 100%;
+    padding: $space-2;
+    background: $primary-blue;
+    color: white;
+    border: none;
+    border-radius: $space-4;
+    border-radius: 50px;
+    font-size: $text-16;
+    font-weight: $fw-bold;
+    cursor: pointer;
+  }
+}

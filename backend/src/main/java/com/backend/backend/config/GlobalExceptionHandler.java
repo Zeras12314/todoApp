@@ -33,4 +33,15 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        HttpStatus status = ex.getMessage().contains("not found") ||
+                ex.getMessage().contains("unauthorized")
+                ? HttpStatus.NOT_FOUND
+                : HttpStatus.INTERNAL_SERVER_ERROR;
+
+        return ResponseEntity.status(status)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
 }

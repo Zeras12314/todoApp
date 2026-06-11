@@ -99,6 +99,9 @@ tr.example-element-row {
   &--warning {
     color: $warning;
   }
+  &--soon{
+    color: $warning;
+  }
 }
 
 .due-label {
@@ -109,6 +112,9 @@ tr.example-element-row {
     color: $error;
   }
   &--warning {
+    color: $warning;
+  }
+    &--soon{
     color: $warning;
   }
 }
@@ -273,8 +279,8 @@ tr.example-element-row {
     color: $secondary-grey;
 
     img {
-      width: 16px;
-      height: 16px;
+      width: $space-3;
+      height: $space-3;
       flex-shrink: 0;
     }
   }
@@ -333,6 +339,9 @@ tr.example-element-row {
       color: $error;
     }
     &--warning {
+      color: $warning;
+    }
+    &--soon {
       color: $warning;
     }
   }

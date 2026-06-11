@@ -125,6 +125,7 @@
                 [ngClass]="{
                   'due-date--overdue': isOverdue(todo),
                   'due-date--warning': isWarning(todo),
+                  'due-date--soon': isWarning(todo),
                 }"
               >
                 {{ todo.dueDate | date: 'MM/dd/yyyy' }}
@@ -133,6 +134,8 @@
                 <div class="due-label due-label--overdue">Overdue</div>
               } @else if (isWarning(todo)) {
                 <div class="due-label due-label--warning">Today</div>
+              } @else if (isDueSoon(todo)) {
+                <div class="due-label due-label--soon">Due Soon</div>
               }
             </td>
           </ng-container>
@@ -249,7 +252,7 @@
     </div>
   }
 
-  <!-- MOBILE CARDS -->
+  <!-- MOBILE LAYOUT -------------------------------------------------------------------->
   <div class="d-md-none todo-card-list">
     @for (todo of todos; track todo.id) {
       <div class="todo-card" [class.todo-card--expanded]="isExpanded(todo)">
@@ -270,10 +273,15 @@
               <div class="todo-card__priority me-3">
                 <img [src]="getPriorityIcon(todo.priority)" alt="{{ todo.priority }}" />
               </div>
-
               <span class="todo-card__status">
                 <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
                 <span>{{ todo.status | titlecase }}</span>
+
+                @if (todo.status === 'COMPLETED' && todo.completedDate) {
+                  <span class="completed-date secondary-text d-block">
+                    <small>• {{ todo.completedDate | date: 'MM/dd/yyyy' }}</small>
+                  </span>
+                }
               </span>
             </div>
 
@@ -311,6 +319,7 @@
                 [ngClass]="{
                   'todo-card__date--overdue': isOverdue(todo),
                   'todo-card__date--warning': isWarning(todo),
+                  'todo-card__date--soon': isDueSoon(todo),
                 }"
               >
                 {{ todo.dueDate | date: 'MM/dd/yyyy' }}
@@ -319,6 +328,8 @@
                 <span class="due-label due-label--overdue">Overdue</span>
               } @else if (isWarning(todo)) {
                 <span class="due-label due-label--warning">Today </span>
+              } @else if (isDueSoon(todo)) {
+                <span class="due-label due-label--soon">Due Soon</span>
               }
             </div>
           </div>

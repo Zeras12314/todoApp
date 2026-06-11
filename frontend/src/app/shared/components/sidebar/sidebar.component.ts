@@ -6,11 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { StoreService } from '../../../store/store.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { AuthActions } from '../../../store/auth/auth.action';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatButtonModule, AsyncPipe],
+  imports: [MatButtonModule, AsyncPipe, RouterLink],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })
@@ -23,10 +24,20 @@ export class SidebarComponent {
 
   openLogoutDialog(): void {
     this.dialog.open(ConfirmDialogComponent, {
+      width: '320px',
+      maxWidth: '90vw',
+      panelClass: 'signout-dialog',
+
       data: {
         hasCloseButton: false,
         title: 'Sign out',
-        message: 'Are you sure you want to sign out? All unsaved changes will be lost.',
+        message: `
+                  <p class="text-start p-0 m-0">
+                    Are you sure you want to sign out?<br/>
+                    All unsaved changes will be lost.
+                  </p>
+                `
+        ,
         dialogAlign: 'end',
         confirmText: 'Sign out',
         confirmAsText: true

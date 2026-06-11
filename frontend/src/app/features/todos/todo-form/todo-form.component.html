@@ -3,11 +3,28 @@
     <div class="todo-form__wrapper">
       <!-- Priority + Status -->
       <div class="todo-form__row todo-form__row--three">
-        <!-- Priority -->
+        <!-- Priority ----------------------------------------------------->
         <mat-form-field appearance="outline" class="todo-form__field">
           <mat-label>Priority</mat-label>
           @if (isEditMode) {
             <input matInput formControlName="priority" readonly />
+          } @else if (isMobile) {
+            <ng-container>
+              <input
+                matInput
+                readonly
+                [value]="priorityOptions | statusLabel: form.get('priority')?.value"
+                (click)="openPrioritySheet()"
+              />
+              <span matSuffix (click)="openPrioritySheet()">
+                <img
+                  src="/Icons/Accordion_supress.svg"
+                  alt="dropdown icon"
+                  class="dropdown-icon-mobile pointer"
+                  style="height: 12px !important; width: 12px !important"
+                />
+              </span>
+            </ng-container>
           } @else {
             <mat-select formControlName="priority">
               @for (opt of priorityOptions; track opt.value) {
@@ -17,20 +34,41 @@
           }
         </mat-form-field>
 
-        <!-- Status -->
-        <mat-form-field appearance="outline" class="todo-form__field">
+        <!-- Status ----------------------------------------------------->
+        <mat-form-field appearance="outline" class="todo-form__field status-field-mobile">
           <mat-label>Status</mat-label>
-          <mat-select formControlName="status">
-            @for (opt of statusOptions; track opt.value) {
-              <mat-option [value]="opt.value" [disabled]="isStatusDisabled(opt.value)">{{
-                opt.label
-              }}</mat-option>
-            }
-          </mat-select>
+
+          @if (isMobile) {
+            <ng-container>
+              <input
+                matInput
+                readonly
+                [value]="statusOptions | statusLabel: form.get('status')?.value"
+                (click)="openStatusSheet()"
+              />
+              <span matSuffix (click)="openStatusSheet()">
+                <img
+                  src="/Icons/Accordion_supress.svg"
+                  alt="dropdown icon"
+                  class="dropdown-icon-mobile pointer"
+                  style="height: 12px !important; width: 12px !important"
+                />
+              </span>
+            </ng-container>
+          } @else {
+            <!-- Desktop: normal dropdown -->
+            <mat-select formControlName="status">
+              @for (opt of statusOptions; track opt.value) {
+                <mat-option [value]="opt.value" [disabled]="isStatusDisabled(opt.value)">
+                  {{ opt.label }}
+                </mat-option>
+              }
+            </mat-select>
+          }
         </mat-form-field>
 
         <!-- Completion Date — only when edit + COMPLETED, else empty placeholder -->
-        @if (isEditMode && showCompletionDateField) {
+        @if (showCompletionDateField) {
           <mat-form-field appearance="outline" class="todo-form__field">
             <mat-label>Completion Date</mat-label>
             <input
@@ -38,9 +76,10 @@
               [matDatepicker]="completedPicker"
               formControlName="completedDate"
               [min]="minDueDate"
+              readonly
             />
             <mat-datepicker-toggle matIconSuffix [for]="completedPicker"></mat-datepicker-toggle>
-            <mat-datepicker #completedPicker></mat-datepicker>
+            <mat-datepicker #completedPicker [touchUi]="isMobile"></mat-datepicker>
           </mat-form-field>
         } @else {
           <div class="todo-form__field"></div>
@@ -56,6 +95,13 @@
           (form.get('title')?.touched || form.get('title')?.dirty)
         ) {
           <mat-error> Title must not be empty </mat-error>
+        }
+
+        @if (
+          form.get('title')?.hasError('maxlength') &&
+          (form.get('title')?.touched || form.get('title')?.dirty)
+        ) {
+          <mat-error>Title cannot exceed 25 characters</mat-error>
         }
       </mat-form-field>
 
@@ -80,9 +126,10 @@
             [matDatepicker]="duePicker"
             formControlName="dueDate"
             [min]="minDueDate"
+            placeholder="mm/dd/yyyy"
           />
           <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
-          <mat-datepicker #duePicker></mat-datepicker>
+          <mat-datepicker #duePicker [touchUi]="isMobile"></mat-datepicker>
           @if (
             form.get('dueDate')?.hasError('required') &&
             (form.get('dueDate')?.touched || form.get('dueDate')?.dirty)
@@ -106,6 +153,13 @@
           rows="4"
           placeholder="Add task details..."
         ></textarea>
+
+        @if (
+          form.get('description')?.hasError('maxlength') &&
+          (form.get('description')?.touched || form.get('description')?.dirty)
+        ) {
+          <mat-error>Description cannot exceed 300 characters</mat-error>
+        }
       </mat-form-field>
 
       <!--  Attachments / File Uploader-->
@@ -119,22 +173,27 @@
       <div class="todo-form__subtasks">
         <div class="todo-form__subtasks-header mb-4">
           <h3 class="todo-form__subtasks-title">Subtask</h3>
-          <img
-            [src]="
-              isCompleted
-                ? '/Buttons/Button_New Subtask_inactive.svg'
-                : isAddSubtaskPressed()
-                  ? '/Buttons/Button_New Subtask_selected.svg'
-                  : '/Buttons/Button_New Subtask_active.svg'
-            "
-            alt="new subtask"
-            [class.pointer]="!isCompleted"
-            [class.pointer-disabled]="isCompleted"
-            (mousedown)="!isCompleted && isAddSubtaskPressed.set(true)"
-            (mouseup)="isAddSubtaskPressed.set(false)"
-            (mouseleave)="isAddSubtaskPressed.set(false)"
-            (click)="!isCompleted && addSubTask()"
-          />
+          <div class="todo-form__subtasks-actions">
+            <img
+              [src]="
+                isCompleted || isSubtaskLimitReached
+                  ? '/Buttons/Button_New Subtask_inactive.svg'
+                  : isAddSubtaskPressed()
+                    ? '/Buttons/Button_New Subtask_selected.svg'
+                    : '/Buttons/Button_New Subtask_active.svg'
+              "
+              alt="new subtask"
+              [class.pointer]="!isCompleted && !isSubtaskLimitReached"
+              [class.pointer-disabled]="isCompleted || isSubtaskLimitReached"
+              (mousedown)="!isCompleted && !isSubtaskLimitReached && isAddSubtaskPressed.set(true)"
+              (mouseup)="isAddSubtaskPressed.set(false)"
+              (mouseleave)="isAddSubtaskPressed.set(false)"
+              (click)="!isCompleted && !isSubtaskLimitReached && addSubTask()"
+            />
+            @if (isSubtaskLimitReached) {
+              <div><small class="text-danger">Maximum of 10 subtasks allowed.</small></div>
+            }
+          </div>
         </div>
 
         @for (subtask of subTasks.controls; track $index) {
@@ -210,7 +269,9 @@
     </div>
 
     <!-- ACTIONS -->
+
     <div class="todo-form__actions">
+      <!-- Cancel -->
       <img
         src="/Buttons/Button_Cancel.svg"
         alt="cancel"
@@ -218,7 +279,8 @@
         (click)="onCancel()"
       />
 
-      @if (todo?.subTasks?.length > 0 && allSubTasksDone) {
+      <!-- Save (DEFAULT CTA ALWAYS) -->
+      @if (shouldShowMarkAsComplete) {
         <img
           src="/Buttons/Button_Mark as Complete.svg"
           alt="mark as complete"
@@ -234,6 +296,11 @@
           (click)="onSave()"
         />
       }
+
+      <!-- Mark as Complete (OPTIONAL) -->
+      <!-- @if (subTasks.length > 0 && allSubTasksDone) {
+
+      } -->
     </div>
   </form>
 </div>

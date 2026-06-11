@@ -21,6 +21,12 @@ public class FileStorageService {
             Files.createDirectories(uploadPath);
         }
 
+        // sanitize filename — remove path traversal characters
+        String originalFilename = file.getOriginalFilename();
+        String safeFilename = originalFilename != null
+                ? Paths.get(originalFilename).getFileName().toString()
+                : "file";
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), filePath);

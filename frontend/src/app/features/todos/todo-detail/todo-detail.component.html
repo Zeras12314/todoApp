@@ -34,8 +34,10 @@
     <!-- TITLE + DATE -->
     <h2 class="todo-detail__title">{{ todo.title }}</h2>
     <p class="todo-detail__dates">
-      <small>{{ todo.createdDate | date: 'd MMM y' }}</small> -
-      <small>{{ todo.dueDate | date: 'd MMM y' }}</small>
+      <small>
+        {{ todo.createdDate | date: 'd MMM y' }} ·
+        {{ todo.dueDate | date: 'd MMM y' }}
+      </small>
     </p>
 
     <!-- DESCRIPTION (static placeholder) -->
@@ -46,10 +48,10 @@
     <div class="todo-detail__attachement">
       <!-- <pre>{{ todo.attachments | json }}</pre> -->
 
-      <div class="todo-detail__attachement ">
+      <div class="todo-detail__attachement">
         @for (img of todo.attachments; track img.id) {
           <img [src]="'http://localhost:8080/' + img?.filePath" alt="Attachment" />
-          <p class="file-name ">{{ img.fileName }}</p>
+          <p class="file-name">{{ img.fileName }}</p>
           <p class="file-size">{{ formatFileSize(img.fileSize) }}</p>
         }
       </div>

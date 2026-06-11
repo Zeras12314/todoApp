@@ -56,7 +56,7 @@ export class TodoDetailComponent {
 
 
   deleteTodo(id: number): void {
-    this.store.dispatch(TodoActions.deleteTodo({ id }));
+    this.store.dispatch(TodoActions.deleteTodos({ ids: [id] }));
     this.router.navigate(['/todos']);
   }
 
