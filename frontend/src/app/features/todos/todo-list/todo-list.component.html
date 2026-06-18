@@ -169,7 +169,7 @@
               <div class="status-content-wrapper d-flex gap-2">
                 <div><img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" /></div>
                 <div>
-                  <span class="status-cell d-inline">{{ todo.status | titlecase }}</span>
+                  <span class="status-cell d-inline">{{ todo.status.replace('_', ' ') | titlecase }}</span>
                   @if (todo.status === 'COMPLETED' && todo.completedDate) {
                     <small class="completed-date secondary-text d-block">
                       {{ todo.completedDate | date: 'MM/dd/yyyy' }}
@@ -275,7 +275,7 @@
               </div>
               <span class="todo-card__status">
                 <img [src]="getStatusIcon(todo.status)" alt="{{ todo.status }}" />
-                <span>{{ todo.status | titlecase }}</span>
+                <span>{{ todo.status.replace('_', ' ') | titlecase }}</span>
 
                 @if (todo.status === 'COMPLETED' && todo.completedDate) {
                   <span class="completed-date secondary-text d-block">
