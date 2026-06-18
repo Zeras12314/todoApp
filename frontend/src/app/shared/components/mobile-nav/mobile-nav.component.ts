@@ -43,7 +43,13 @@ export class MobileNavComponent {
 
 
   constructor() {
-    this.store.dispatch(TodoActions.loadTodos());
+    // only load if store is empty — avoids duplicate calls with TodoListComponent
+    // duplicate call, will remove this for now
+    // this.store.select(selectAllTodos).pipe(take(1)).subscribe(todos => {
+    //   if (todos.length === 0) {
+    //     this.store.dispatch(TodoActions.loadTodos());
+    //   }
+    // });
     // clear selection whenever navigating away from /todos
     this.router.events.pipe(
       filter(event => event instanceof NavigationStart),
@@ -81,21 +87,21 @@ export class MobileNavComponent {
   }
 
 
-goToEditPage(): void {
-  const id = this.currentTodoId();
-  if (!id) return;
+  goToEditPage(): void {
+    const id = this.currentTodoId();
+    if (!id) return;
 
-  this.router.navigate(['/todos', id, 'edit']);
-}
+    this.router.navigate(['/todos', id, 'edit']);
+  }
 
-goToCreateTodoPage(): void{
+  goToCreateTodoPage(): void {
     this.router.navigate(['/todos/new']);
-}
+  }
 
-currentTodoId = computed(() => {
-  const match = this.url().match(/\/todos\/(\d+)/);
-  return match ? Number(match[1]) : null;
-});
+  currentTodoId = computed(() => {
+    const match = this.url().match(/\/todos\/(\d+)/);
+    return match ? Number(match[1]) : null;
+  });
 
   currentTodoTitle = toSignal(
     toObservable(this.currentTodoId).pipe(

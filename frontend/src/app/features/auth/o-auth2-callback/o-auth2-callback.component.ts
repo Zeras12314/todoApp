@@ -1,7 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { filter, take } from 'rxjs';
 import { AuthActions } from '../../../store/auth/auth.action';
+import { selectAuthStatus } from '../../../store/auth/auth.selector';
 
 @Component({
   selector: 'app-o-auth2-callback',
@@ -11,30 +13,22 @@ import { AuthActions } from '../../../store/auth/auth.action';
   styleUrl: './o-auth2-callback.component.scss'
 })
 export class OAuth2CallbackComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(Store);
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('token');
-    const username = this.route.snapshot.queryParamMap.get('username');
+    // cookie was set by the backend before redirecting here; verify it
+    this.store.dispatch(AuthActions.checkAuth());
 
-    console.log('=== OAuth2 Callback ===');
-    console.log('Full URL:', window.location.href);
-    console.log('Token:', token);
-    console.log('Username:', username);
-    console.log('All params:', this.route.snapshot.queryParams);
-    console.log('======================');
-
-    if (token && username) {
-      this.store.dispatch(AuthActions.loginSuccess({
-        token,
-        username,
-        message: 'Signed in successfully'
-      }));
-      this.router.navigate(['/todos']);
-    } else {
-      this.router.navigate(['/login'], { queryParams: { error: 'oauth2_failed' } });
-    }
+    this.store.select(selectAuthStatus).pipe(
+      filter((status) => status !== 'unknown'),
+      take(1),
+    ).subscribe((status) => {
+      if (status === 'authenticated') {
+        this.router.navigate(['/todos']);
+      } else {
+        this.router.navigate(['/login'], { queryParams: { error: 'oauth2_failed' } });
+      }
+    });
   }
 }

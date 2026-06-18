@@ -124,7 +124,7 @@
               <span
                 [ngClass]="{
                   'due-date--overdue': isOverdue(todo),
-                  'due-date--warning': isWarning(todo),
+                  'due-date--warning': isWithin24Hours(todo) || isWarning(todo),
                   'due-date--soon': isDueSoon(todo),
                 }"
               >
@@ -135,7 +135,7 @@
               } @else if (isWarning(todo)) {
                 <div class="due-label due-label--warning">Today</div>
               } @else if (isDueSoon(todo)) {
-                <div class="due-label due-label--soon">Due Soon</div>
+                <!-- <div class="due-label due-label--soon">Due Soon</div> -->
               }
             </td>
           </ng-container>

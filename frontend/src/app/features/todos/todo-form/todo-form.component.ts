@@ -315,9 +315,10 @@ export class TodoFormComponent implements OnInit {
       return;
     }
 
+    //  Extract existing subtask numbers from titles (e.g., "Subtask 01" -> 1)
     const existingIndexes = this.subTasks.controls.map(control => {
       const title = control.get('title')?.value || '';
-      const match = title.match(/Task\s*(\d+)/);
+      const match = title.match(/Subtask\s*(\d+)/); // Match "Subtask XX" and capture the number
       return match ? parseInt(match[1], 10) : 0;
     });
 
