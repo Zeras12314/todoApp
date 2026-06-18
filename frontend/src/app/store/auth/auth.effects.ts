@@ -13,35 +13,65 @@ export class AuthEffects {
   toastService = inject(ToastService);
   router = inject(Router);
 
-  // =========================
-  // LOGIN
-  // =========================
-  login$ = createEffect(() =>
+
+  // SESSION CHECK
+  checkAuth$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.login),
-
-      switchMap((action) =>
-        this.authService.login(action.username, action.password).pipe(
-          map((res: any) =>
-            AuthActions.loginSuccess({
-              token: res.token,
-              message: res.message || 'Login successful',
-              username: res.username,
-            }),
-          ),
-
-          catchError((err) => {
-            console.log('LOGIN ERROR:', err);
-            return of(
-              AuthActions.loginFailure({
-                error: err.error?.error || err.error?.message || 'Login failed',
-              }),
-            );
-          }),
+      ofType(AuthActions.checkAuth),
+      switchMap(() =>
+        this.authService.me().pipe(
+          map((res) => AuthActions.checkAuthSuccess({ username: res.username })),
+          catchError(() => of(AuthActions.checkAuthFailure())),
         ),
       ),
     ),
   );
+
+  // LOGIN — cookie is set by the browser automatically; we just read the username
+  login$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.login),
+      switchMap((action) =>
+        this.authService.login(action.username, action.password).pipe(
+          map((res) =>
+            AuthActions.loginSuccess({
+              message: 'Login successful',
+              username: res.username,
+            }),
+          ),
+          catchError((err) =>
+            of(AuthActions.loginFailure({
+              error: err.error?.error || err.error?.message || 'Login failed',
+            })),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  // LOGOUT — tell the backend to clear the cookie, then reset locally.
+  // The frontend cannot delete an httpOnly cookie itself.
+  logout$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.logout),
+      switchMap(() =>
+        this.authService.logout().pipe(
+          map(() => AuthActions.logoutComplete()),
+          catchError(() => of(AuthActions.logoutComplete())), // clear local state regardless
+        ),
+      ),
+    ),
+  );
+
+  logoutComplete$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logoutComplete),
+        tap(() => this.router.navigate(['/login'])),
+      ),
+    { dispatch: false },
+  );
+
 
   // LOGIN SUCCESS TOAST + MODE CHANGE
   loginSuccessToast$ = createEffect(
@@ -129,17 +159,4 @@ export class AuthEffects {
     { dispatch: false },
   );
 
-  // LOGOUT
-  logout$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(AuthActions.logout),
-        tap(() => {
-          localStorage.removeItem('todo_token');
-          localStorage.removeItem('username');
-          window.location.href = '/login';
-        }),
-      ),
-    { dispatch: false },
-  );
 }

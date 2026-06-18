@@ -11,7 +11,7 @@
         <!-- STATUS -->
         <div class="todo-detail__status">
           <img [src]="getStatusIcon(todo?.status)" [alt]="todo?.status" />
-          <span class="ms-2">{{ todo?.status | titlecase }}</span
+          <span class="ms-2">{{ todo?.status?.replace('_', ' ') | titlecase }}</span
           ><span class="ms-2">
             @if (todo?.status === 'COMPLETED') {
               {{ todo.completedDate | date: 'd MMM y' }}

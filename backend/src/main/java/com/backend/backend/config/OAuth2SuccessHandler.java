@@ -6,8 +6,11 @@ import com.backend.backend.service.OAuth2UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -36,18 +39,24 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             provider = token.getAuthorizedClientRegistrationId(); // returns "google" or "facebook"
         }
 
-
         // Save / find user
         User user = oAuth2UserService.processOAuth2User(oAuth2User, provider);
-
         // Generate JWT
         String token = jwtService.generateToken(user.getUsername());
 
-        //  Redirect to Angular callback (FIXED)
-        String redirectUrl = "http://localhost:4200/oauth2/callback"
-                + "?token=" + token
-                + "&username=" + user.getUsername();
+        // Set httpOnly cookie instead of exposing token in the URL
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.buildTokenCookie(token).toString());
 
-        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+        // Drop the OAuth2 session — from here on, the JWT cookie is the only auth.
+        // Otherwise the session restores an OAuth2User principal on later requests
+        // and bypasses the JwtFilter.
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+
+        // Clean redirect — no token, no username in the URL
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:4200/oauth2/callback");
     }
 }

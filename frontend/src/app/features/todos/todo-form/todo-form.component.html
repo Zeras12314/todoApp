@@ -43,6 +43,7 @@
               <input
                 matInput
                 readonly
+                #statusInputMobile
                 [value]="statusOptions | statusLabel: form.get('status')?.value"
                 (click)="openStatusSheet()"
               />
@@ -57,7 +58,7 @@
             </ng-container>
           } @else {
             <!-- Desktop: normal dropdown -->
-            <mat-select formControlName="status">
+            <mat-select formControlName="status" #statusSelect>
               @for (opt of statusOptions; track opt.value) {
                 <mat-option [value]="opt.value" [disabled]="isStatusDisabled(opt.value)">
                   {{ opt.label }}
@@ -257,10 +258,10 @@
           </div>
         }
 
-        @if (allSubTasksDone && subTasks.length > 0) {
+        @if (allSubTasksDone && subTasks.length > 0 && !markedAsComplete) {
           <div class="subtasks-done-message d-sm-none m-auto text-center">
             <p>All Subtask are <strong>Done</strong>!</p>
-            <div class="mark-as-complete" (click)="onSave()">
+            <div class="mark-as-complete" (click)="onMarkAsComplete()">
               <img src="Buttons/Button_Mark as Complete.svg" alt="mark as complete" />
             </div>
           </div>
@@ -285,7 +286,7 @@
           src="/Buttons/Button_Mark as Complete.svg"
           alt="mark as complete"
           class="mark_complete pointer"
-          (click)="onSave()"
+          (click)="onMarkAsComplete()"
         />
       } @else {
         <img

@@ -62,6 +62,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit(): void {
+    console.log(Date)
     this.storeService.loadTodos();
     this.allTodos$ = this.store.select(selectAllTodos);
     this.filteredTodos$ = this.store.select(selectFilteredTodos);
@@ -123,29 +124,33 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
+  // highlight class — true if due within the next 24 hours (any priority)
+  isWithin24Hours(todo: Todo): boolean {
+    if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') {
+      return false;
+    }
+
+    const hoursUntilDue =
+      (new Date(todo.dueDate).getTime() - Date.now()) / (1000 * 60 * 60);
+
+    return hoursUntilDue >= 0 && hoursUntilDue <= 24;
+  }
+
+  // "Today" text — true if due date matches today's calendar date
   isWarning(todo: Todo): boolean {
     if (todo.status === 'COMPLETED' || todo.status === 'CANCELLED') {
       return false;
     }
 
-    if (todo.priority !== 'CRITICAL') {
-      const due = new Date(todo.dueDate);
-      const today = new Date();
+    const due = new Date(todo.dueDate);
+    const today = new Date();
 
-      due.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
 
-      const days = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+    const days = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
 
-      return days >= 0 && days <= 1;
-    }
-
-    // critical: only show Today if <= 24 hours
-    const hoursUntilDue =
-      (new Date(todo.dueDate).getTime() - Date.now()) /
-      (1000 * 60 * 60);
-
-    return hoursUntilDue >= 0 && hoursUntilDue <= 24;
+    return days === 0;
   }
 
   isDueSoon(todo: Todo): boolean {

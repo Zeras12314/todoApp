@@ -57,7 +57,10 @@ public class TodoService {
         Todo todo = new Todo();
         todo.setTitle(request.getTitle());
         todo.setPriority(Priority.valueOf(request.getPriority()));
-        todo.setStatus(Status.NOT_STARTED);
+        Status status = request.getStatus() != null
+                ? Status.valueOf(request.getStatus())
+                : Status.NOT_STARTED;
+        todo.setStatus(status);
         todo.setDueDate(request.getDueDate());
         todo.setDescription(request.getDescription());
         todo.setUser(user);

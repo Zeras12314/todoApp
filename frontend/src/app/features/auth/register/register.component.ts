@@ -41,7 +41,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private readonly actions$ = inject(Actions);
   private destroy$ = new Subject<void>();
   hide = true;
-  mode = signal<AuthMode>('signup');
+  mode = signal<AuthMode>('login');
 
   // form
   userForm = new FormGroup({

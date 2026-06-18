@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe, DatePipe, JsonPipe, NgClass } from '@angular/common';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Store } from '@ngrx/store';
@@ -64,6 +64,8 @@ export class TodoFormComponent implements OnInit {
   private readonly bottomSheet = inject(MatBottomSheet);
 
   @ViewChild('fileUploader') fileUploader!: FileUploaderComponent;
+  @ViewChild('statusSelect') statusSelect?: MatSelect;
+  @ViewChild('statusInputMobile') statusInputMobile?: ElementRef<HTMLInputElement>;
 
   isAddSubtaskPressed = signal(false);
   isEditMode = false;
@@ -72,9 +74,9 @@ export class TodoFormComponent implements OnInit {
   today = new Date();
 
   form!: FormGroup;
-  autoCompletedBySubtasks: boolean
   minDueDate: Date = new Date();
   hasUserCompletedSubtasks = false;
+  markedAsComplete = false;
 
   readonly statusOptions = [
     { value: 'NOT_STARTED', label: 'Not Started' },
@@ -98,7 +100,11 @@ export class TodoFormComponent implements OnInit {
         initialized = true;
         return;
       }
-      this.onSave();
+      if (this.shouldShowMarkAsComplete) {
+        this.onMarkAsComplete();
+      } else {
+        this.onSave();
+      }
     });
   }
 
@@ -237,6 +243,10 @@ export class TodoFormComponent implements OnInit {
       if (allDone) {
         this.hasUserCompletedSubtasks = true;
         this.cdr.markForCheck();
+      } else if (this.markedAsComplete) {
+        // a subtask was reopened after marking complete — let the flow repeat
+        this.markedAsComplete = false;
+        this.cdr.markForCheck();
       }
     });
 
@@ -265,10 +275,6 @@ export class TodoFormComponent implements OnInit {
 
     const formValue = this.form.getRawValue();
 
-    const { status } = this.resolveTodoStatus(formValue);
-
-    formValue.status = status;
-
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
 
@@ -287,22 +293,20 @@ export class TodoFormComponent implements OnInit {
     }
   }
 
-  // helper to determine if status should be auto-completed by subtasks
-  private resolveTodoStatus(formValue: any): {
-    status: string;
-    autoCompleted: boolean;
-  } {
-    const allDone =
-      formValue.subTasks?.length > 0 &&
-      formValue.subTasks.every((s: any) => s.completed);
+  onMarkAsComplete(): void {
+    const statusCtrl = this.form.get('status');
+    statusCtrl?.setValue('COMPLETED');
+    statusCtrl?.markAsDirty();
+    statusCtrl?.markAsTouched();
 
-    const shouldAutoComplete =
-      allDone && formValue.status !== 'COMPLETED';
+    this.markedAsComplete = true;
+    this.cdr.markForCheck();
 
-    return {
-      status: shouldAutoComplete ? 'COMPLETED' : formValue.status,
-      autoCompleted: shouldAutoComplete
-    };
+    if (this.isMobile) {
+      this.statusInputMobile?.nativeElement.focus();
+    } else {
+      this.statusSelect?.focus();
+    }
   }
 
   onCancel(): void {
@@ -315,9 +319,10 @@ export class TodoFormComponent implements OnInit {
       return;
     }
 
+    //  Extract existing subtask numbers from titles (e.g., "Subtask 01" -> 1)
     const existingIndexes = this.subTasks.controls.map(control => {
       const title = control.get('title')?.value || '';
-      const match = title.match(/Task\s*(\d+)/);
+      const match = title.match(/Subtask\s*(\d+)/); // Match "Subtask XX" and capture the number
       return match ? parseInt(match[1], 10) : 0;
     });
 
@@ -447,7 +452,8 @@ export class TodoFormComponent implements OnInit {
   get shouldShowMarkAsComplete(): boolean {
     return this.subTasks.length > 0 &&
       this.allSubTasksDone &&
-      this.hasUserCompletedSubtasks;
+      this.hasUserCompletedSubtasks &&
+      !this.markedAsComplete;
   }
 
   get isMobile(): boolean {

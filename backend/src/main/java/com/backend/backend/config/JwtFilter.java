@@ -4,6 +4,7 @@ import com.backend.backend.service.JwtService;
 import com.backend.backend.service.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,8 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
 
-        if (path.equals("/login") ||
-                path.equals("/register") ||
+        if (path.equals("/api/login") ||
+                path.equals("/api/register") ||
                 path.startsWith("/oauth2") ||
                 path.startsWith("/login/oauth2"))
         {
@@ -46,8 +47,20 @@ public class JwtFilter extends OncePerRequestFilter {
         String userName = null;
 
         try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
+//            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//                token = authHeader.substring(7);
+//                userName = jwtService.extractUserName(token);
+//            }
+            if (request.getCookies() != null) {
+                for (Cookie c : request.getCookies()) {
+                    if (CookieUtil.ACCESS_TOKEN.equals(c.getName())) {
+                        token = c.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (token != null) {
                 userName = jwtService.extractUserName(token);
             }
 
@@ -65,7 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // malformed token, expired token, user not found — just don't authenticate
+            // malformed token, expired token, user not found
             // let Spring Security handle the 401 for protected routes
             SecurityContextHolder.clearContext();
         }
