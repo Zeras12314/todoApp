@@ -2,6 +2,7 @@ package com.backend.backend.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +38,9 @@ public class SecurityConfig {
 
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    @Value("${frontend.url:http://localhost:4200}")
+    private String frontendUrl;
 
 
     @Bean
@@ -98,7 +102,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of(frontendUrl));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);   // required for cookies; wildcard origin now forbidden

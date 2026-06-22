@@ -10,7 +10,7 @@ import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Store } from '@ngrx/store';
-import { Observable, of, switchMap, take } from 'rxjs';
+import { firstValueFrom, Observable, of, switchMap, take } from 'rxjs';
 import { Todo, TodoAttachment } from '../../../models/todo.model';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
@@ -77,6 +77,12 @@ export class TodoFormComponent implements OnInit {
   minDueDate: Date = new Date();
   hasUserCompletedSubtasks = false;
   markedAsComplete = false;
+
+  // existing attachments the user removed in this session — only deleted on the backend once Save succeeds
+  private pendingRemovals: number[] = [];
+
+  private readonly MAX_SUBTASKS = 10;
+  private readonly INCOMPLETE_SUBTASKS_MESSAGE = 'Cannot mark as completed: not all subtasks are done.';
 
   readonly statusOptions = [
     { value: 'NOT_STARTED', label: 'Not Started' },
@@ -243,9 +249,25 @@ export class TodoFormComponent implements OnInit {
       if (allDone) {
         this.hasUserCompletedSubtasks = true;
         this.cdr.markForCheck();
-      } else if (this.markedAsComplete) {
-        // a subtask was reopened after marking complete — let the flow repeat
-        this.markedAsComplete = false;
+      } else {
+        // a subtask was reopened — a previously selected Completed status is no longer valid
+        const statusCtrl = this.form.get('status');
+        if (statusCtrl?.value === 'COMPLETED') {
+          statusCtrl.setValue('IN_PROGRESS');
+          statusCtrl.markAsDirty();
+          this.toastService.error(this.INCOMPLETE_SUBTASKS_MESSAGE);
+
+          if (this.isMobile) {
+            this.statusInputMobile?.nativeElement.focus();
+          } else {
+            this.statusSelect?.focus();
+          }
+        }
+
+        if (this.markedAsComplete) {
+          // a subtask was reopened after marking complete — let the flow repeat
+          this.markedAsComplete = false;
+        }
         this.cdr.markForCheck();
       }
     });
@@ -273,6 +295,11 @@ export class TodoFormComponent implements OnInit {
       return;
     }
 
+    if (this.form.get('status')?.value === 'COMPLETED' && !this.allSubTasksDone) {
+      this.toastService.error(this.INCOMPLETE_SUBTASKS_MESSAGE);
+      return;
+    }
+
     const formValue = this.form.getRawValue();
 
     if (this.isEditMode && this.todoId) {
@@ -282,14 +309,14 @@ export class TodoFormComponent implements OnInit {
 
       this.actions$
         .pipe(ofType(TodoActions.updateTodoSuccess), take(1))
-        .subscribe(() => this.uploadPendingFiles(this.todoId!));
+        .subscribe(() => this.syncAttachments(this.todoId!));
 
     } else {
       this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
 
       this.actions$
         .pipe(ofType(TodoActions.createTodoSuccess), take(1))
-        .subscribe(({ todo }) => this.uploadPendingFiles(todo.id));
+        .subscribe(({ todo }) => this.syncAttachments(todo.id));
     }
   }
 
@@ -314,8 +341,8 @@ export class TodoFormComponent implements OnInit {
   }
 
   addSubTask(): void {
-    if (this.subTasks.length >= 10) {
-      this.toastService.error('Maximum of 10 subtasks allowed.');
+    if (this.subTasks.length >= this.MAX_SUBTASKS) {
+      this.toastService.error(`Maximum of ${this.MAX_SUBTASKS} subtasks allowed.`);
       return;
     }
 
@@ -339,7 +366,7 @@ export class TodoFormComponent implements OnInit {
   }
 
   get isSubtaskLimitReached(): boolean {
-    return this.subTasks.length >= 10;
+    return this.subTasks.length >= this.MAX_SUBTASKS;
   }
 
 
@@ -347,19 +374,21 @@ export class TodoFormComponent implements OnInit {
     this.subTasks.removeAt(index);
   }
 
-  // call uploadAll after todo is saved
-  private async uploadPendingFiles(todoId: number) {
-    console.log('uploadPendingFiles called, todoId:', todoId);
-    console.log('files to upload:', this.fileUploader?.files);
-
+  // uploads staged files and applies queued removals — only called after the todo itself is saved
+  private async syncAttachments(todoId: number) {
     try {
       if (this.fileUploader?.files?.length) {
         await this.fileUploader.uploadAll(todoId);
-      } else {
-        console.log('no files to upload');
+      }
+
+      if (this.pendingRemovals.length) {
+        await Promise.all(
+          this.pendingRemovals.map(id => firstValueFrom(this.todoService.deleteAttachment(todoId, id)))
+        );
+        this.pendingRemovals = [];
       }
     } catch {
-      this.toastService.error('Some files failed to upload');
+      this.toastService.error('Some attachment changes failed to save');
     } finally {
       this.router.navigate(['/todos']);
     }
@@ -415,17 +444,17 @@ export class TodoFormComponent implements OnInit {
       }
     }).afterClosed().subscribe(result => {
       if (result) {
-        this.todoService.deleteAttachment(this.todoId!, att.id)
-          .subscribe(() => {
-            if (this.todo) {
-              // new object reference triggers OnPush
-              this.todo = {
-                ...this.todo,
-                attachments: this.todo.attachments.filter(a => a.id !== att.id)
-              };
-              this.cdr.markForCheck();   // tell OnPush to re-render
-            }
-          });
+        // queue the removal — actually deleted from the backend only once Save succeeds
+        this.pendingRemovals.push(att.id);
+
+        if (this.todo) {
+          // new object reference triggers OnPush
+          this.todo = {
+            ...this.todo,
+            attachments: this.todo.attachments.filter(a => a.id !== att.id)
+          };
+          this.cdr.markForCheck();   // tell OnPush to re-render
+        }
       }
     });
   }
