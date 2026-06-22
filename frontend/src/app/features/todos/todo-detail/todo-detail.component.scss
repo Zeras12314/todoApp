@@ -44,6 +44,22 @@
     div {
       cursor: pointer;
     }
+
+    div.disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  }
+
+  &__delete-trigger {
+    display: flex;
+    align-items: center;
+
+    .spinner-border {
+      width: $space-6;
+      height: $space-6;
+    }
   }
 
   // ── TITLE ──────────────────────────────────────────────

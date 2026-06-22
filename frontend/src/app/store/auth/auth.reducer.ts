@@ -43,6 +43,11 @@ export const authReducer = createReducer(
   })),
 
   // LOGOUT — explicitly unauthenticated, not 'unknown'
+  on(AuthActions.logout, (state) => ({
+    ...state,
+    loading: true,
+  })),
+
   on(AuthActions.logoutComplete, () => ({
     ...initialAuthState,
     status: 'unauthenticated' as const,

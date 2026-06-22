@@ -111,6 +111,31 @@
     height: $space-8;
   }
 
+  &__actions .cancel.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .save-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    height: $space-8;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    .spinner-border {
+      width: $space-8;
+      height: $space-8;
+    }
+  }
+
   ::ng-deep .mat-mdc-form-field-icon-suffix {
     img.dropdown-icon-mobile {
       height: 12px !important;

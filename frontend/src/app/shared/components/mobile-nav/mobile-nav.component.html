@@ -4,20 +4,25 @@
       <div
         class="select-wrapper"
         [ngClass]="{ 'select-wrapper--active': (selectedIds() ?? []).length > 0 && isTodosListPage() }"
+        [class.disabled]="isDeleting()"
         (click)="openDeleteDialogMobile()"
       >
-        <img
-          [src]="
-            (selectedIds() ?? []).length > 0 || isTodoDetailPage()
-              ? '/Icons/Delete_active.svg'
-              : '/Icons/Delete_inactive.svg'
-          "
-          alt="delete"
-          class="d-block m-auto"
-          [class.cursor-pointer]="(selectedIds() ?? []).length > 0 || isTodoDetailPage()"
-        />
+        @if (isDeleting()) {
+          <span class="spinner-border spinner-border-sm m-auto" aria-hidden="true"></span>
+        } @else {
+          <img
+            [src]="
+              (selectedIds() ?? []).length > 0 || isTodoDetailPage()
+                ? '/Icons/Delete_active.svg'
+                : '/Icons/Delete_inactive.svg'
+            "
+            alt="delete"
+            class="d-block m-auto"
+            [class.cursor-pointer]="(selectedIds() ?? []).length > 0 || isTodoDetailPage()"
+          />
+        }
 
-        @if ((selectedIds() ?? []).length > 0 && isTodosListPage()) {
+        @if ((selectedIds() ?? []).length > 0 && isTodosListPage() && !isDeleting()) {
           <span class="badge rounded-pill ms-1 bg-info">
             {{ (selectedIds() ?? []).length }}
           </span>

@@ -16,6 +16,16 @@
         <!-- TITLE -->
         <h2>{{ title }}</h2>
 
+        @if (mode() === 'login') {
+          <div class="demo-note">
+            <mat-icon>info</mat-icon>
+            <span>
+              This is a live portfolio demo hosted on a free-tier server — credentials are
+              prefilled, but the first load may take 30–60s to wake up if the server has been idle.
+            </span>
+          </div>
+        }
+
         <form class="auth-form" [formGroup]="userForm">
           <!-- USERNAME -->
           <mat-form-field appearance="outline" class="full-width mb-2">

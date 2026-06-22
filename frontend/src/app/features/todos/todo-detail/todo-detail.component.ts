@@ -1,8 +1,8 @@
 import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { map, merge, Observable, of, switchMap, take } from 'rxjs';
 import { Todo } from '../../../models/todo.model';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -15,11 +15,15 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StoreService } from '../../../store/store.service';
 import { env } from '../../../environment/env';
+import { Actions, ofType } from '@ngrx/effects';
+import { ToastService } from '../../../services/toast.service';
 
 interface Subtask {
   name: string;
   done: boolean;
 }
+
+type DeleteResult = { ok: true } | { ok: false; error: string };
 @Component({
   selector: 'app-todo-detail',
   standalone: true,
@@ -36,9 +40,13 @@ export class TodoDetailComponent {
   private readonly router = inject(Router);
   private readonly todoService = inject(TodoService);
   private readonly sotreService = inject(StoreService)
+  private readonly actions$ = inject(Actions);
+  private readonly toastService = inject(ToastService);
 
 
   readonly dialog = inject(MatDialog);
+
+  isDeleting = signal(false);
 
   // Static until subtasks are implemented in the backend
   staticSubtasks: Subtask[] = [
@@ -59,8 +67,20 @@ export class TodoDetailComponent {
 
 
   deleteTodo(id: number): void {
+    this.isDeleting.set(true);
     this.store.dispatch(TodoActions.deleteTodos({ ids: [id] }));
-    this.router.navigate(['/todos']);
+
+    merge(
+      this.actions$.pipe(ofType(TodoActions.deleteTodosSuccess), map((): DeleteResult => ({ ok: true }))),
+      this.actions$.pipe(ofType(TodoActions.deleteTodosFailure), map(({ error }): DeleteResult => ({ ok: false, error }))),
+    ).pipe(take(1)).subscribe((result: DeleteResult) => {
+      if (result.ok) {
+        this.router.navigate(['/todos']);
+      } else {
+        this.isDeleting.set(false);
+        this.toastService.error('Failed to delete task.');
+      }
+    });
   }
 
   openDelete(id: number): void {

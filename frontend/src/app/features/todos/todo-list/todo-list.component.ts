@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AsyncPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { Todo } from '../../../models/todo.model';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, merge, Observable, Subject, take, takeUntil } from 'rxjs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,10 @@ import { selectAllTodos, selectFilteredTodos, selectSortedFilteredTodos } from '
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Actions, ofType } from '@ngrx/effects';
+import { ToastService } from '../../../services/toast.service';
+
+type DeleteResult = { ok: true } | { ok: false; error: string };
 
 @Component({
   selector: 'app-todo-list',
@@ -30,8 +34,11 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   router = inject(Router);
   storeService = inject(StoreService);
   store = inject(Store);
+  private readonly actions$ = inject(Actions);
+  private readonly toastService = inject(ToastService);
   todo$: Observable<Todo[]>;
   selectedIds: number[] = [];
+  isDeleting = signal(false);
 
   allTodos$: Observable<Todo[]>;
   filteredTodos$: Observable<Todo[]>;
@@ -191,8 +198,21 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   onBulkDelete(): void {
     if (this.selectedIds.length === 0) return;
+
+    this.isDeleting.set(true);
     this.store.dispatch(TodoActions.deleteTodos({ ids: this.selectedIds }));
-    this.selectedIds = [];
+
+    merge(
+      this.actions$.pipe(ofType(TodoActions.deleteTodosSuccess), map((): DeleteResult => ({ ok: true }))),
+      this.actions$.pipe(ofType(TodoActions.deleteTodosFailure), map(({ error }): DeleteResult => ({ ok: false, error }))),
+    ).pipe(take(1)).subscribe((result: DeleteResult) => {
+      this.isDeleting.set(false);
+      // on success, selectedIds is cleared by the selectAllTodos subscription above;
+      // on failure, leave the selection intact so the user can retry
+      if (!result.ok) {
+        this.toastService.error('Failed to delete task(s).');
+      }
+    });
   }
 
   getStatusIcon(status: string): string {

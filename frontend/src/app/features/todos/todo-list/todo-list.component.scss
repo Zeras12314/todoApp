@@ -14,6 +14,12 @@
   cursor: pointer;
 }
 
+.select-wrapper.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 table {
   width: 100%;
   background-color: $white;

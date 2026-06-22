@@ -277,11 +277,12 @@
         src="/Buttons/Button_Cancel.svg"
         alt="cancel"
         class="cancel pointer"
-        (click)="onCancel()"
+        [class.disabled]="isSaving"
+        (click)="!isSaving && onCancel()"
       />
 
       <!-- Save (DEFAULT CTA ALWAYS) -->
-      @if (shouldShowMarkAsComplete) {
+      @if (shouldShowMarkAsComplete && !isSaving) {
         <img
           src="/Buttons/Button_Mark as Complete.svg"
           alt="mark as complete"
@@ -289,13 +290,20 @@
           (click)="onMarkAsComplete()"
         />
       } @else {
-        <img
-          src="/Buttons/Button_Save.svg"
-          alt="save"
-          class="save pointer"
-          [class.disabled]="form.invalid"
+        <button
+          type="button"
+          class="save-btn"
+          [class.disabled]="form.invalid || isSaving"
+          [disabled]="form.invalid || isSaving"
+          [attr.aria-label]="isSaving ? 'Saving' : 'Save'"
           (click)="onSave()"
-        />
+        >
+          @if (isSaving) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          } @else {
+            <img src="/Buttons/Button_Save.svg" alt="save" class="save pointer" />
+          }
+        </button>
       }
 
       <!-- Mark as Complete (OPTIONAL) -->

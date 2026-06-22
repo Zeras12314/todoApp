@@ -10,7 +10,7 @@ import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Store } from '@ngrx/store';
-import { firstValueFrom, Observable, of, switchMap, take } from 'rxjs';
+import { firstValueFrom, map, merge, Observable, of, switchMap, take } from 'rxjs';
 import { Todo, TodoAttachment } from '../../../models/todo.model';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { selectTodoById } from '../../../store/todo/todo.selectors';
@@ -25,6 +25,10 @@ import { StoreService } from '../../../store/store.service';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { StatusLabelPipe } from '../../../pipes/status.label.pipe';
 import { StatusBottomSheetComponent } from '../../../shared/components/status-bottom-sheet/status-bottom-sheet.component';
+
+type SaveResult =
+  | { ok: true; todoId: number }
+  | { ok: false; error: string };
 
 
 @Component({
@@ -77,6 +81,7 @@ export class TodoFormComponent implements OnInit {
   minDueDate: Date = new Date();
   hasUserCompletedSubtasks = false;
   markedAsComplete = false;
+  isSaving = false;
 
   // existing attachments the user removed in this session — only deleted on the backend once Save succeeds
   private pendingRemovals: number[] = [];
@@ -302,22 +307,45 @@ export class TodoFormComponent implements OnInit {
 
     const formValue = this.form.getRawValue();
 
+    this.isSaving = true;
+    this.cdr.markForCheck();
+
     if (this.isEditMode && this.todoId) {
       const updated: Todo = { ...this.todo!, ...formValue, id: this.todoId };
 
       this.store.dispatch(TodoActions.updateTodo({ todo: updated }));
 
-      this.actions$
-        .pipe(ofType(TodoActions.updateTodoSuccess), take(1))
-        .subscribe(() => this.syncAttachments(this.todoId!));
+      merge(
+        this.actions$.pipe(ofType(TodoActions.updateTodoSuccess), map((): SaveResult => ({ ok: true, todoId: this.todoId! }))),
+        this.actions$.pipe(ofType(TodoActions.updateTodoFailure), map(({ error }): SaveResult => ({ ok: false, error }))),
+      ).pipe(take(1)).subscribe((result: SaveResult) => {
+        if (result.ok) {
+          this.syncAttachments(result.todoId);
+        } else {
+          this.onSaveFailure('Failed to save task.');
+        }
+      });
 
     } else {
       this.store.dispatch(TodoActions.createTodo({ todo: formValue }));
 
-      this.actions$
-        .pipe(ofType(TodoActions.createTodoSuccess), take(1))
-        .subscribe(({ todo }) => this.syncAttachments(todo.id));
+      merge(
+        this.actions$.pipe(ofType(TodoActions.createTodoSuccess), map(({ todo }): SaveResult => ({ ok: true, todoId: todo.id }))),
+        this.actions$.pipe(ofType(TodoActions.createTodoFailure), map(({ error }): SaveResult => ({ ok: false, error }))),
+      ).pipe(take(1)).subscribe((result: SaveResult) => {
+        if (result.ok) {
+          this.syncAttachments(result.todoId);
+        } else {
+          this.onSaveFailure('Failed to save task.');
+        }
+      });
     }
+  }
+
+  private onSaveFailure(error: string): void {
+    this.isSaving = false;
+    this.toastService.error(error || 'Failed to save task.');
+    this.cdr.markForCheck();
   }
 
   onMarkAsComplete(): void {
@@ -390,6 +418,7 @@ export class TodoFormComponent implements OnInit {
     } catch {
       this.toastService.error('Some attachment changes failed to save');
     } finally {
+      this.isSaving = false;
       this.router.navigate(['/todos']);
     }
   }

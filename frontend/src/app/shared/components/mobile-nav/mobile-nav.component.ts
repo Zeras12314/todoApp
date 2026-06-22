@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { AuthActions } from '../../../store/auth/auth.action';
@@ -8,8 +8,12 @@ import { AsyncPipe, NgClass } from '@angular/common';
 import { TodoActions } from '../../../store/todo/todo.actions';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, of, switchMap, take } from 'rxjs';
+import { filter, map, merge, of, switchMap, take } from 'rxjs';
 import { StoreService } from '../../../store/store.service';
+import { Actions, ofType } from '@ngrx/effects';
+import { ToastService } from '../../../services/toast.service';
+
+type DeleteResult = { ok: true } | { ok: false; error: string };
 
 @Component({
   selector: 'app-mobile-nav',
@@ -25,12 +29,16 @@ export class MobileNavComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly storeService = inject(StoreService);
+  private readonly actions$ = inject(Actions);
+  private readonly toastService = inject(ToastService);
 
   store = inject(Store);
   readonly selectedIds = toSignal(
     this.store.select(selectSelectedIds),
     { initialValue: [] }
   );
+
+  readonly isDeleting = signal(false);
 
 
   url = toSignal(
@@ -120,6 +128,8 @@ export class MobileNavComponent {
 
 
   openDeleteDialogMobile(): void {
+    if (this.isDeleting()) return;
+
     const isDetail = this.isTodoDetailPage();
     const isList = this.isTodosListPage();
 
@@ -170,16 +180,39 @@ export class MobileNavComponent {
   onBulkDelete(): void {
     const ids = this.selectedIds();
     if (ids.length === 0) return;
+
+    this.isDeleting.set(true);
     this.store.dispatch(TodoActions.deleteTodos({ ids }));
 
-    // Clear selection via store
-    this.store.dispatch(TodoActions.setSelectedIds({ ids: [] }));
-
+    this.awaitDeleteResult(result => {
+      this.isDeleting.set(false);
+      if (result.ok) {
+        this.store.dispatch(TodoActions.setSelectedIds({ ids: [] }));
+      } else {
+        this.toastService.error('Failed to delete task(s).');
+      }
+    });
   }
 
   deleteTodo(id: number): void {
-    this.store.dispatch(TodoActions.deleteTodo({ id }));
-    this.router.navigate(['/todos']);
+    this.isDeleting.set(true);
+    this.store.dispatch(TodoActions.deleteTodos({ ids: [id] }));
+
+    this.awaitDeleteResult(result => {
+      if (result.ok) {
+        this.router.navigate(['/todos']);
+      } else {
+        this.isDeleting.set(false);
+        this.toastService.error('Failed to delete task.');
+      }
+    });
+  }
+
+  private awaitDeleteResult(callback: (result: DeleteResult) => void): void {
+    merge(
+      this.actions$.pipe(ofType(TodoActions.deleteTodosSuccess), map((): DeleteResult => ({ ok: true }))),
+      this.actions$.pipe(ofType(TodoActions.deleteTodosFailure), map(({ error }): DeleteResult => ({ ok: false, error }))),
+    ).pipe(take(1)).subscribe(callback);
   }
 
   logout(): void {

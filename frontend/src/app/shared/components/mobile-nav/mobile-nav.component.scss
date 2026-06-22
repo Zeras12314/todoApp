@@ -31,6 +31,12 @@
     cursor: pointer;
   }
 
+  .select-wrapper.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
   .mobile-nav__actions-edit {
     // width: 27px;
     height: $space-6;

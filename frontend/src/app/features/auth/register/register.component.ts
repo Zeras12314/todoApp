@@ -47,9 +47,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
   mode = signal<AuthMode>('login');
 
   // form
+  // prefilled with the demo account creds so portfolio visitors can sign in without typing anything
   userForm = new FormGroup({
-    username: new FormControl('', [Validators.required],),
-    password: new FormControl(''),
+    username: new FormControl('test_user', [Validators.required],),
+    password: new FormControl('test_password'),
   });
 
   usernameValue = toSignal(this.userForm.get('username')!.valueChanges, { initialValue: '' });
