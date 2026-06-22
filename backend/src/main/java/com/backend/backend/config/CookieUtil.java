@@ -11,8 +11,8 @@ public class CookieUtil {
     public static ResponseCookie buildTokenCookie(String jwt) {
         return ResponseCookie.from(ACCESS_TOKEN, jwt)
                 .httpOnly(true)
-                .secure(false)              // set true in production (https)
-                .sameSite("Lax")
+                .secure(true)               // required for SameSite=None
+                .sameSite("None")            // frontend and backend are on different origins
                 .path("/")
                 .maxAge(Duration.ofHours(24)) // matches JWT expiration
                 .build();
@@ -21,8 +21,8 @@ public class CookieUtil {
     public static ResponseCookie buildClearCookie() {
         return ResponseCookie.from(ACCESS_TOKEN, "")
                 .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
                 .build();

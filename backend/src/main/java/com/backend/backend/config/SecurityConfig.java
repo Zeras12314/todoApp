@@ -1,5 +1,6 @@
 package com.backend.backend.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,6 +68,14 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 // stateless session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                // return 401 for unauthenticated REST calls instead of redirecting to /login;
+                // oauth2Login() below would otherwise install a browser-style redirect entry point
+                .exceptionHandling(exceptions -> exceptions
+                        .defaultAuthenticationEntryPointFor(
+                                (request, response, authException) ->
+                                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED),
+                                request -> !request.getServletPath().startsWith("/oauth2")
+                                        && !request.getServletPath().startsWith("/login/oauth2")))
 
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)

@@ -18,6 +18,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { filter } from 'rxjs/internal/operators/filter';
 import { takeUntil } from 'rxjs/internal/operators/takeUntil';
 import { Subject } from 'rxjs/internal/Subject';
+import { env } from '../../../environment/env';
 
 type AuthMode = 'login' | 'signup' | 'success';
 
@@ -37,6 +38,8 @@ type AuthMode = 'login' | 'signup' | 'success';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  readonly fileBaseUrl = env.fileBaseUrl;
+
   private readonly store = inject(Store);
   private readonly actions$ = inject(Actions);
   private destroy$ = new Subject<void>();

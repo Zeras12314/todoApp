@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final OAuth2UserService oAuth2UserService;
     private final JwtService jwtService;
+
+    @Value("${frontend.url:http://localhost:4200}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -57,6 +61,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         SecurityContextHolder.clearContext();
 
         // Clean redirect — no token, no username in the URL
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:4200/oauth2/callback");
+        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth2/callback");
     }
 }

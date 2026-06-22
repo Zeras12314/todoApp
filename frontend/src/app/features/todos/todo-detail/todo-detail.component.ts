@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StoreService } from '../../../store/store.service';
+import { env } from '../../../environment/env';
 
 interface Subtask {
   name: string;
@@ -27,6 +28,8 @@ interface Subtask {
   styleUrl: './todo-detail.component.scss',
 })
 export class TodoDetailComponent {
+  readonly fileBaseUrl = env.fileBaseUrl;
+
   // INJECT
   private readonly store = inject(Store);
   private readonly route = inject(ActivatedRoute);

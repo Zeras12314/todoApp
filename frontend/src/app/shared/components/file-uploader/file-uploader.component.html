@@ -44,7 +44,7 @@
             </div>
             <img
               class="todo-form__file-preview"
-              [src]="'http://localhost:8080/' + file.filePath"
+              [src]="fileBaseUrl + '/' + file.filePath"
               alt="{{ file.fileName }}"
             />
             <div class="todo-form__file-meta">

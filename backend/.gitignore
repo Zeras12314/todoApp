@@ -11,6 +11,9 @@ application-dev.properties
 # Spring config
 application.properties
 
+# Environment variables (secrets)
+.env
+
 ### STS ###
 .apt_generated
 .classpath

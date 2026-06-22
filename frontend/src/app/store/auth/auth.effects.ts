@@ -116,7 +116,8 @@ export class AuthEffects {
 
           catchError((err) => {
             const apiError = err.error;
-            const errorMessage = apiError?.error || apiError?.message || 'Register failed';
+            const rawMessage = apiError?.error || apiError?.message || 'Register failed';
+            const errorMessage = typeof rawMessage === 'string' ? rawMessage : 'Register failed';
 
             // detect username conflict from the message
             const isUsernameTaken = errorMessage.toLowerCase().includes('username') ||

@@ -6,6 +6,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ToastService } from '../../../services/toast.service';
 import { TodoAttachment } from '../../../models/todo.model';
 import { TodoService } from '../../../services/todo.service';
+import { env } from '../../../environment/env';
 
 @Component({
   selector: 'app-file-uploader',
@@ -16,6 +17,8 @@ import { TodoService } from '../../../services/todo.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileUploaderComponent {
+  readonly fileBaseUrl = env.fileBaseUrl;
+
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly toastService = inject(ToastService);
   private readonly todoService = inject(TodoService);

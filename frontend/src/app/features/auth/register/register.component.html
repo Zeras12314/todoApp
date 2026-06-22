@@ -176,15 +176,15 @@
         <!-- SOCIAL LOGIN -->
         <div class="cta cta-wrapper">
           <a
-           href="http://localhost:8080/oauth2/authorization/google"
+           [href]="fileBaseUrl + '/oauth2/authorization/google'"
             class="cta-google btn w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
           >
             <img src="Icons/Google.svg" width="18" height="18" alt="google logo" />
             <span>Continue with Google</span>
           </a>
 
-          <a 
-          href="http://localhost:8080/oauth2/authorization/facebook"
+          <a
+          [href]="fileBaseUrl + '/oauth2/authorization/facebook'"
           class="cta-fb btn w-100 d-flex align-items-center justify-content-center gap-2">
             <img src="Icons/Facebook.svg" width="18" height="18" alt="facebook logo" />
             <span>Continue with Facebook</span>
