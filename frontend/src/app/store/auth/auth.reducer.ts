@@ -7,19 +7,21 @@ import { initialAuthState } from './auth.initial-state';
 export const authReducer = createReducer(
   initialAuthState,
 
-  on(AuthActions.checkAuth, (state) => ({ ...state, status: 'unknown' as const })),
+  on(AuthActions.checkAuth, (state) => ({ ...state, status: 'unknown' as const, loading: true })),
 
   // SESSION CHECK
   on(AuthActions.checkAuthSuccess, (state, { username }) => ({
     ...state,
     status: 'authenticated' as const,
     username,
+    loading: false,
   })),
 
   on(AuthActions.checkAuthFailure, (state) => ({
     ...state,
     status: 'unauthenticated' as const,
     username: '',
+    loading: false,
   })),
 
   // LOGIN

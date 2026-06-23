@@ -1,5 +1,11 @@
 @if (loading$ | async) {
   <div class="loading-overlay">
     <div class="spinner"></div>
+    @if (showSlowMessage$ | async) {
+      <p class="loading-message">
+        Still loading… this app runs on a free hosting tier, so the server may
+        take a minute to wake up. Thanks for your patience!
+      </p>
+    }
   </div>
 }
